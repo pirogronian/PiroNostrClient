@@ -11,7 +11,7 @@ a:not(#ArticleView a):hover, label:not(#ArticleView label):hover {
 
 .hidden { display: none }
 
-div { display: flow-root; }
+div:not(#ArticleView div) { display: flow-root; }
 
 .block {
     display: block;
