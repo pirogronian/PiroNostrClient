@@ -1,7 +1,7 @@
 
 a:not(:where(#ArticleView a)), label:not(#ArticleView label) {
-    display: block;
-    float: left;
+    display: inline-flex;      /* Prawidłowe zachowanie wierszowe */
+    align-items: center;
     padding: 0.2cm;
 }
 
@@ -55,6 +55,7 @@ code {
 }
 
 div.ArticleHead a.ArticleTitle {
+    float: left;
     border-right: lightgrey solid 0.5mm;
     padding-left: 5mm;
     padding-right: 7mm;
