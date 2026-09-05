@@ -1,1 +1,11 @@
 .hidden { display: none }
+#MainNav {
+    margin-bottom: 0.5cm;
+    border-bottom: 0.05cm black solid;
+}
+
+.SettingsGroup {
+    margin: 0.2cm;
+    padding: 0.2cm;
+    border: 0.05cm lightgrey solid;
+}
