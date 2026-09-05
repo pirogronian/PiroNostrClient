@@ -1,5 +1,20 @@
+
+a:not(#ArticleView a) {
+    display: block;
+    float: left;
+    padding: 0.2cm;
+}
+
+a:not(#ArticleView a):hover {
+    background-color: lightgray;
+}
+
 .hidden { display: none }
+
+div { display: flow-root; }
+
 #MainNav {
+    display: block flow-root;
     margin-bottom: 0.5cm;
     border-bottom: 0.05cm black solid;
 }
@@ -8,4 +23,19 @@
     margin: 0.2cm;
     padding: 0.2cm;
     border: 0.05cm lightgrey solid;
+}
+
+code {
+    white-space: pre-wrap;     /* Zachowuje formatowanie, ale pozwala na zawijanie */
+    overflow-wrap: anywhere;   /* Wymusza przełamanie nawet długiego ciągu bez spacji */
+    word-break: break-word;    /* Kompatybilność wsteczna */
+}
+
+.Scrollable {
+    display: block;
+    overflow-y: auto;
+    /*overflow-wrap: anywhere;
+    word-break: break-all;
+    white-space: normal;*/
+    height: 100vh
 }
