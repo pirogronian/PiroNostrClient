@@ -1,11 +1,11 @@
 
-a:not(#ArticleView a) {
+a:not(#ArticleView a), label:not(#ArticleView label) {
     display: block;
     float: left;
     padding: 0.2cm;
 }
 
-a:not(#ArticleView a):hover {
+a:not(#ArticleView a):hover, label:not(#ArticleView label):hover {
     background-color: lightgray;
 }
 

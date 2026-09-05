@@ -74,6 +74,20 @@ export class ArticleView {
         }
     }
     
+    setFormatSelector(format: string|null = null) {
+        const select = $("#ContentTypeSelect")
+        switch(format) {
+            case "asciidoc":
+                select.val(format)
+                break
+            case "djot":
+                select.val(format)
+                break
+            default:
+                select.val("plain")
+        }
+    }
+
     show() {
         if (!this.event) return
         this.ui.mainView().html(ArticleViewHTML)
@@ -89,7 +103,7 @@ export class ArticleView {
         const select = $("#ContentTypeSelect")
         const format = this.event.tagValue("f")
         this.render(format)
-        select.val(format)
+        this.setFormatSelector(format)
 
         function SwitchView() {
             const type = $("input[name='ViewType']:checked").val()
