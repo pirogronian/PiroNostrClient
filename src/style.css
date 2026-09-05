@@ -11,7 +11,7 @@ a:not(#ArticleView a):hover, label:not(#ArticleView label):hover {
 
 .hidden { display: none }
 
-div:not(#ArticleView div) { display: flow-root; }
+/*div:not(#ArticleView div) { display: flow-root; }*/
 
 .block {
     display: block;
@@ -46,11 +46,13 @@ code {
     height: 100vh
 }
 
+#MainView div.ArticleHeader { display: flow-root; }
+
 #ArticleViewHeader {
     display: flex
 }
 
-#ArticleViewHeader div, h1, label, input, select {
+#MainView #ArticleViewHeader div, h1, label, input, select {
     display: inline-block;
     align-self: first baseline;
     margin: 0.2cm;
