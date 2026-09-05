@@ -3,6 +3,7 @@ import Navigo from "navigo";
 import NDK, { NDKEvent, NDKRelay, NDKUser } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 
+import FinderTagInputs from "./FinderTagInputs.html?raw"
 import { ArticleView } from "./ArticleView.js";
 
 import HomeHTML from "./Home.html?raw"
@@ -99,6 +100,22 @@ export class UI {
         o.find("input[name='id']").val(id)
         this.mainView().append(o)
         const form = $("#FinderForm")
+        form.find("button#AddSearchTag").click(() => {
+            const tag = form.find("input[name='tag']").val()
+            const val = form.find("input[name='tagvalue']").val()
+            if (!tag) return;
+            const ti = $.parseHTML(FinderTagInputs)
+            const o = $("<div>").append(ti)
+            o.find("input").attr("name", tag).val(val)
+            o.find("label").attr("for", tag).text(tag)
+            o.find("button").attr("data", tag)
+            o.find("button").click(() => {
+                form.find(`input[name=${tag}]`).remove()
+                form.find(`label[for=${tag}]`).remove()
+                form.find(`button[data=${tag}]`).remove()
+            })
+            form.append(ti)
+        })
         form.submit((e) => {
             e.preventDefault()
             const formData = new FormData(form.get(0));

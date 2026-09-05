@@ -13,8 +13,7 @@ export class Articles{
         this.ndk = ndk
     }
 
-    load(author : string | null,
-        id : string | null,
+    load(params: object,
         onEvent: (event: NDKEvent, relay?: NDKRelay) => any)
     {
         this.enabled = true
@@ -22,14 +21,19 @@ export class Articles{
             kinds: [30818]
             //'#d': [pageSlug]
         };
-        if (author) {
-            console.log("Subscribing with author:", author)
-            filter.authors = [ author ]
+        if (params.author) {
+            console.log("Subscribing with author:", params.author)
+            filter.authors = [ params.author ]
         }
-        if (id) {
-            console.log("Subscribing with id:", id)
-            filter['#d'] = [ id ]
+        if (params.id) {
+            console.log("Subscribing with id:", params.id)
+            filter['#d'] = [ params.id ]
         }
+        for (const [key, value] of Object.entries(params)) {
+            if (key.length == 1)
+                filter[`#${key}`] = value
+        }
+
         console.log("Subscribing for articles...")
         
         try {

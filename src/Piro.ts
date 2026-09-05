@@ -50,7 +50,8 @@ export class Piro {
             this.loadArticle(addr)
         })
         .on('/articles', (match) => {
-            this.loadArticles(match?.params?.author, match?.params?.id)
+            //this.loadArticles(match?.params?.author, match?.params?.id)
+            this.loadArticles(match?.params)
         })
         .on('/search', (match) => {
             this.loadFinder()
@@ -102,9 +103,9 @@ export class Piro {
         this.ui.finder(this.router, author, id)
     }
 
-    loadArticles(author: string | null, id: string | null) {
-        this.loadFinder(author, id)
-        const err = this.articles.load(author, id, 
+    loadArticles(params: object) {
+        this.loadFinder(params.author, params.id)
+        const err = this.articles.load(params,
             (event: NDKEvent, relay?: NDKRelay) => {
                 this.ui.ArticleHead(event, relay)
             })
