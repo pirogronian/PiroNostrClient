@@ -95,14 +95,23 @@ export class UI {
         })
     }
 
-    ArticleHead(event: NDKEvent, relay?: NDKRelay) : void {
+    async ArticleHead(event: NDKEvent, relay?: NDKRelay) : void {
         const Head = $(ArtHeadHTML)
         const title = Head.find(".ArticleTitle")
-        const TT = event.tagValue("title")
-        if (!TT) { return }
+        let TT = event.tagValue("title")
+        if (!TT) { TT = event.tagValue("d") }
         console.log(`Received article "${TT}"`)
         title.text(TT)
         title.attr("href", `/article/${event.encode()}`)
+
+        const user = await this.ndk.fetchUser(event.pubkey)
+        if (user) {
+            await user.fetchProfile()
+            if (user.profile) {
+                Head.find("a.AuthorNick").text(user.profile.name).attr("href", `/articles?author=${user.pubkey}`)
+                Head.find("img.AuthorImg").attr("src", user.profile.picture)
+            }
+        }
 
         this.mainView().append(Head)
     }
