@@ -4,9 +4,9 @@ import NDK, { NDKNip07Signer, NDKEvent, NDKUser, NDKRelay } from "@nostr-dev-kit
 import NDKCacheAdapterDexie from '@nostr-dev-kit/ndk-cache-dexie';
 import { UI } from "./UI.js"
 import { Relays } from './Relays.js';
+import { User } from "./User.js"
 
 import { safeAsync } from "./various.js"
-import { UpdateUserInfo } from './User.js';
 import { LoadArticle } from "./Article.js"
 import { Articles } from './Articles.js';
 import type { CallExpression } from 'typescript/unstable/ast';
@@ -15,6 +15,7 @@ export class NostrWiki {
     router: Navigo
     ndk: NDK
     relays: Relays
+    user: User
     ui: UI
     articles: Articles
 
@@ -24,6 +25,7 @@ export class NostrWiki {
         const nip07signer = new NDKNip07Signer();
         this.ndk = new NDK({ cacheAdapter, signer: nip07signer });
         this.relays = new Relays(this.ndk)
+        this.user = new User(this.ndk)
         this.articles = new Articles(this.ndk)
         this.ui = new UI(this.ndk)
         this.ndk.pool.on('relay:connect', () => {
@@ -68,8 +70,12 @@ export class NostrWiki {
     }
 
     settings() {
+        const user = this.user.get()
+        console.log(user)
         this.ui.settings()
-        UpdateUserInfo(this.ndk)
+        user.then((u) => {
+            this.ui.user(u)
+        })
         this.ui.Relays()
     }
 

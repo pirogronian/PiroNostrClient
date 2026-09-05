@@ -1,6 +1,6 @@
 
 import Navigo from "navigo";
-import NDK, { NDKEvent, NDKRelay } from "@nostr-dev-kit/ndk";
+import NDK, { NDKEvent, NDKRelay, NDKUser } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 
 import SettingsHTML from "./Settings.html?raw"
@@ -34,6 +34,21 @@ export class UI {
 
     error(msg: string) {
         $("#Message").text(`Error: ${msg}`)
+    }
+
+    user(user: NDKUser | null) {
+        const UserHTML = $("#LoggedUser")
+        const NickHtml = $("#LoggedUserNick")
+        const PubkeyHtml = $("#LoggedUserPubkey")
+        if (user) {
+            UserHTML.show()
+            NickHtml.text(user.profile?.name || user.profile?.displayName || "")
+            PubkeyHtml.text(user.pubkey)
+        } else {
+            UserHTML.hide()
+            NickHtml.text("")
+            PubkeyHtml.text("")
+        }
     }
 
     Relays() : void {
