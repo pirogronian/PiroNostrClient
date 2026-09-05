@@ -50,8 +50,10 @@ export class Piro {
             this.loadArticle(addr)
         })
         .on('/articles', (match) => {
-            this.ui.clear()
             this.loadArticles(match?.params?.author, match?.params?.id)
+        })
+        .on('/search', (match) => {
+            this.loadFinder()
         })
         .on('/settings/', () => {
             console.log("Route settings.")
@@ -59,7 +61,7 @@ export class Piro {
         })
         .on('/', () => {
             console.log("Main site.")
-            this.loadFinder()
+            this.home()
         });
 
 
@@ -78,6 +80,10 @@ export class Piro {
 
     initHyperlinks() {
         this.ui.initRouting(this.router)
+    }
+
+    home() {
+        this.ui.home()
     }
 
     settings() {

@@ -5,6 +5,7 @@ import $ from "jquery"
 
 import { ArticleView } from "./ArticleView.js";
 
+import HomeHTML from "./Home.html?raw"
 import SettingsHTML from "./Settings.html?raw"
 import FinderHTML from "./Finder.html?raw"
 import ArtHeadHTML from "./ArticleHeader.html?raw"
@@ -38,6 +39,10 @@ export class UI {
 
     error(msg: string) {
         $("#Message").text(`Error: ${msg}`)
+    }
+
+    home() {
+        this.mainView().html(HomeHTML)
     }
 
     user(user: NDKUser | null, handlers: { onLogin: (method: string) => any, onLogout: () => any}) {
