@@ -7,7 +7,7 @@ import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
 import NDK, { NDKEvent } from "@nostr-dev-kit/ndk";
 
-import { safeAsync, ErrorMessage } from "./various.js";
+import { safeAsync } from "./various.js";
 
 import ArticleViewHTML from './Article.html?raw';
 
@@ -106,18 +106,18 @@ export function ShowArticle(event) {
 export async function LoadArticle(ndk : NDK, addr : string) : Promise<void> {
     const [err, wikiEvent] = await safeAsync(ndk.fetchEvent(addr));
     if (err) {
-        ErrorMessage("Wrong address format!")
+        //ErrorMessage("Wrong address format!")
         console.log(`Error while parsing address ${addr}`)
         console.log(`Error message: ${err.message}`)
     } else {
         if (wikiEvent === null) {
-            ErrorMessage("No event found!")
+            //ErrorMessage("No event found!")
             console.log(`No event with address ${addr}`)
         } else {
             if (wikiEvent.kind == 30818) {
                 ShowArticle(wikiEvent)
             } else {
-                ErrorMessage(`Wrong kind of event (${wikiEvent.kind})`)
+                //ErrorMessage(`Wrong kind of event (${wikiEvent.kind})`)
             }
         }
     }

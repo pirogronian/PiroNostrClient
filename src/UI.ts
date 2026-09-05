@@ -32,6 +32,10 @@ export class UI {
         this.mainView().html("")
     }
 
+    error(msg: string) {
+        $("#Message").text(`Error: ${msg}`)
+    }
+
     Relays() : void {
         const list = this.ndk.pool.relays;
         const ListHTML = $(`#${RelaysListId}`)

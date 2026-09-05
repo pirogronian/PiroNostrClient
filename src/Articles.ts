@@ -2,6 +2,8 @@
 import NDK, { NDKEvent, NDKRelay } from "@nostr-dev-kit/ndk";
 import type { NDKFilter, NDKSubscription } from "@nostr-dev-kit/ndk"
 
+import { safeAsync } from "./various.js";
+
 export class Articles{
     ndk: NDK
     sub: NDKSubscription | null = null
@@ -11,9 +13,9 @@ export class Articles{
         this.ndk = ndk
     }
 
-    async load(author : string | null,
+    load(author : string | null,
         id : string | null,
-        onEvent: (event: NDKEvent, relay?: NDKRelay) => any) : Promise<void>
+        onEvent: (event: NDKEvent, relay?: NDKRelay) => any)
     {
         this.enabled = true
         const filter: NDKFilter = {
@@ -29,11 +31,15 @@ export class Articles{
             filter['#d'] = [ id ]
         }
         console.log("Subscribing for articles...")
-        this.sub = this.ndk.subscribe(
-            filter,
-            { closeOnEose : true },
-            { onEvent: onEvent }
-        )
+        
+        try {
+            this.sub = this.ndk.subscribe(
+                filter,
+                { closeOnEose : true },
+                { onEvent: onEvent })
+        } catch (e) {
+            return e
+        }
     }
 
     stop() {
