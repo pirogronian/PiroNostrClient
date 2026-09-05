@@ -104,6 +104,7 @@ export class UI {
     }
 
     async ArticleHead(event: NDKEvent, relay?: NDKRelay) : void {
+        if (!globalThis.piro.articles.enabled) return
         const Head = $(ArtHeadHTML)
         const title = Head.find(".ArticleTitle")
         let TT = event.tagValue("title")
