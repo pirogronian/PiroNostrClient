@@ -98,11 +98,12 @@ export class Piro {
         this.ui.Relays()
     }
 
-    loadFinder() {
-        this.ui.finder(this.router)
+    loadFinder(author: string|null = null, id: string|null = null) {
+        this.ui.finder(this.router, author, id)
     }
 
     loadArticles(author: string | null, id: string | null) {
+        this.loadFinder(author, id)
         const err = this.articles.load(author, id, 
             (event: NDKEvent, relay?: NDKRelay) => {
                 this.ui.ArticleHead(event, relay)

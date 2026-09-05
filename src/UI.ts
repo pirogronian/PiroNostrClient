@@ -83,8 +83,11 @@ export class UI {
         this.mainView().html(SettingsHTML)
     }
 
-    finder(router: Navigo) {
-        this.mainView().html(FinderHTML)
+    finder(router: Navigo, author: string|null = null, id: string|null = null) {
+        const o = $(FinderHTML)
+        o.find("input[name='author']").val(author)
+        o.find("input[name='id']").val(id)
+        this.mainView().append(o)
         const form = $("#FinderForm")
         form.submit((e) => {
             e.preventDefault()
