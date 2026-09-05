@@ -1,5 +1,5 @@
 
-a:not(#ArticleView a), label:not(#ArticleView label) {
+a:not(:where(#ArticleView a)), label:not(#ArticleView label) {
     display: block;
     float: left;
     padding: 0.2cm;
@@ -54,15 +54,32 @@ code {
     border: lightgray solid 0.05cm
 }
 
-div.ArticleHead div.ArticleAuthor {
-    display: block flow-root;
-    clear: both;
+div.ArticleHead a.ArticleTitle {
+    border-right: lightgrey solid 0.5mm;
+    padding-left: 5mm;
+    padding-right: 7mm;
+    margin-right: 5mm
 }
 
-div.ArticleHead div.ArticleAuthor a, img {
-    display: block;
-    float: left;
-    max-height: 1cm
+div.ArticleHead div.ArticleAuthor {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap
+}
+
+div.ArticleHead div.ArticleAuthor > a,
+div.ArticleHead div.ArticleAuthor > img,
+div.ArticleHead div.ArticleAuthor > div {
+  display: inline-flex;      /* Prawidłowe zachowanie wierszowe */
+  align-items: center;
+  float: none;
+  max-height: 1cm;
+  max-width: 100%;
+  min-width: 0;
+}
+
+div.ArticleHead div.ArticleAuthor div.CreationTime {
+    margin-left: 1cm
 }
 
 #ArticleViewHeader {
