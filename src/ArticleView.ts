@@ -119,12 +119,22 @@ export class ArticleView {
         }
     }
 
-    show() {
+    async show() {
         if (!this.event) return
-        this.ui.mainView().html(ArticleViewHTML)
-        $("h1").text(this.event.tagValue("title"))
-        $("#RawArticleContent").text(this.event.content)
+        const o = $(ArticleViewHTML)
+        o.find("h1 a").text(this.event.tagValue("title")).attr("href", `/articles?id=${this.event.tagValue("d")}`)
+        o.find("#RawArticleContent").text(this.event.content)
     
+        const user = await globalThis.piro.user.get(this.event.pubkey)
+        if (user && user.profile) {
+            o.find("img#AuthorPicture").attr("src", user.profile.picture)
+            o.find("a#AuthorNick").text(user.profile.name).attr("href", `/articles?author=${user.pubkey}`)
+        }
+        const t = new Date(this.event.created_at * 1000)
+        o.find("#CreationTime").text(t.toLocaleString())
+
+        this.ui.mainView().append(o)
+
         $("#ContentTypeSelect").change((e) => {
             const fmt = $(e.currentTarget).val()
             this.render(fmt)

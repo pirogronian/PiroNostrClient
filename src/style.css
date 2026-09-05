@@ -25,7 +25,7 @@ a:not(#ArticleView a):hover, label:not(#ArticleView label):hover {
     border-bottom: 0.05cm black solid;
 }
 
-.SettingsGroup, #ArticleView {
+.Frame {
     margin: 0.2cm;
     padding: 0.2cm;
     border: 0.05cm lightgrey solid;
@@ -83,18 +83,23 @@ div.ArticleHead div.ArticleAuthor div.CreationTime {
     margin-left: 1cm
 }
 
-#ArticleViewHeader {
+#ArticleInfoHeader, #ArticleSettingsHeader {
     display: flex
 }
 
-#MainView #ArticleViewHeader div, h1, label, input, select {
+#ArticleInfoHeader div, img, h1, a {
+    display: inline-block;
+    align-self: center;
+    margin: 0.2cm;
+    max-height: 2cm;
+}
+
+#ArticleSettingsHeader div, label, input, select {
     display: inline-block;
     align-self: first baseline;
     margin: 0.2cm;
-    position: relative;
-    bottom: 0;
 }
 
-#ArticleViewHeader h1 {
+#ArticleInfoHeader h1 {
     margin-right: 2cm
 }
