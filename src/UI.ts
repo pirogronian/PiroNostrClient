@@ -50,16 +50,18 @@ export class UI {
 
     finder(router: Navigo) {
         this.mainView().html(FinderHTML)
-        $("#FinderSubmit").click(function(event) {
-            event.preventDefault()
-            const id = $("#FinderId").val()
-            const author = $("#FinderAuthor").val()
-            let url: string = ""
-            if (!id && !author) { url ="#/articles/" }
-            if (id && !author) { url = `#/articles/id/${id}` }
-            if (!id && author) { url = `#/articles/author/${author}` }
-            if (id && author) { url =`#/articles/id/${id}/author/${author}` }
-            router.navigate(url)
+        const form = $("#FinderForm")
+        form.submit((e) => {
+            e.preventDefault()
+            const formData = new FormData(form.get(0));
+            const searchParams = new URLSearchParams();
+            for (const [key, value] of formData.entries()) {
+                if (value) {
+                    searchParams.append(key, value.toString());
+                }
+            }
+            const url = searchParams.toString()
+            router.navigate(`/articles?${url}`)
         })
     }
 

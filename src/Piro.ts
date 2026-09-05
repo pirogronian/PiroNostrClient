@@ -46,21 +46,9 @@ export class NostrWiki {
             const addr = data.id
             LoadArticle(this.ndk, addr)
         })
-        .on('/articles/id/:id/author/:author', async ({data}) => {
+        .on('/articles', (match) => {
             this.ui.clear()
-            this.loadArticles(data.author, data.id)
-        })
-        .on('/articles/id/:id', async ({data}) => {
-            this.ui.clear()
-            this.loadArticles(null, data.id)
-        })
-        .on('/articles/author/:author', async ({data}) => {
-            this.ui.clear()
-            this.loadArticles(data.author, null)
-        })
-        .on('/articles/', () => {
-            this.ui.clear()
-            this.loadArticles(null, null)
+            this.loadArticles(match?.params?.author, match?.params?.id)
         })
         .on('/settings/', () => {
             this.settings()
