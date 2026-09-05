@@ -39,6 +39,7 @@ export class Piro {
         this.router.hooks({
             before: (done, math) => {
                 this.articles.stop()
+                this.ui.clear()
                 done()
             }
         })
@@ -53,6 +54,7 @@ export class Piro {
             this.loadArticles(match?.params?.author, match?.params?.id)
         })
         .on('/settings/', () => {
+            console.log("Route settings.")
             this.settings()
         })
         .on('/', () => {
