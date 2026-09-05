@@ -46,7 +46,24 @@ code {
     height: 100vh
 }
 
-#MainView div.ArticleHeader { display: flow-root; }
+#MainView div.ArticleHead {
+    display: block;
+    clear: both;
+    padding: 2mm;
+    margin: 2mm;
+    border: lightgray solid 0.05cm
+}
+
+div.ArticleHead div.ArticleAuthor {
+    display: block flow-root;
+    clear: both;
+}
+
+div.ArticleHead div.ArticleAuthor a, img {
+    display: block;
+    float: left;
+    max-height: 1cm
+}
 
 #ArticleViewHeader {
     display: flex
