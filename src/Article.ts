@@ -53,6 +53,8 @@ export function ShowArticle(event) {
     const MWHtml = document.getElementById('MainView');
     MWHtml.innerHTML = ArticleViewHTML
 
+    $("h1").text(event.tagValue("title"))
+
     document.getElementById("RawArticleContent").innerText = event.content
 
     const inputs = MWHtml?.querySelectorAll("#ContentTypeSelect");
