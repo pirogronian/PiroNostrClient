@@ -1,4 +1,11 @@
 <div id="Settings">
+  <div id="Login">
+    <label for="LoginMethod">Login with:</label>
+    <select name="LoginMethod" id="LoginMethodSelect">
+      <option value="">None</option>
+      <option value="nip07">NIP-07</option>
+    </select>
+  </div>
   <div id="LoggedUser">
     <div>Logged user:</div>
     <dl>
@@ -7,6 +14,7 @@
       <dt>Pubkey:</dt>
       <dd id="LoggedUserPubkey"></dd>
     </dl>
+    <button type="button" id="Logout">Logout</button>
   </div>
   <div>Active relays:</div>
   <ul id="RelaysList"></ul>

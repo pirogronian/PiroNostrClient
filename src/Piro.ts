@@ -1,6 +1,6 @@
 
 import Navigo from 'navigo';
-import NDK, { NDKNip07Signer, NDKEvent, NDKUser, NDKRelay } from "@nostr-dev-kit/ndk";
+import NDK, { NDKEvent, NDKUser, NDKRelay } from "@nostr-dev-kit/ndk";
 import NDKCacheAdapterDexie from '@nostr-dev-kit/ndk-cache-dexie';
 import { UI } from "./UI.js"
 import { Relays } from './Relays.js';
@@ -11,7 +11,7 @@ import { LoadArticle } from "./Article.js"
 import { Articles } from './Articles.js';
 import type { CallExpression } from 'typescript/unstable/ast';
 
-export class NostrWiki {
+export class Piro {
     router: Navigo
     ndk: NDK
     relays: Relays
@@ -22,8 +22,7 @@ export class NostrWiki {
     constructor() {
         this.router = new Navigo('/', { hash: true })
         const cacheAdapter = new NDKCacheAdapterDexie({ dbName: 'wiki-nostr-cache' });
-        const nip07signer = new NDKNip07Signer();
-        this.ndk = new NDK({ cacheAdapter, signer: nip07signer });
+        this.ndk = new NDK({ cacheAdapter });
         this.relays = new Relays(this.ndk)
         this.user = new User(this.ndk)
         this.articles = new Articles(this.ndk)
@@ -65,6 +64,16 @@ export class NostrWiki {
         this.router.resolve();
     }
 
+    login(method?: string) {
+        this.user.login(method)
+        this.settings()
+    }
+
+    logout() {
+        this.user.logout()
+        this.settings()
+    }
+
     initHyperlinks() {
         this.ui.initRouting(this.router)
     }
@@ -74,7 +83,9 @@ export class NostrWiki {
         console.log(user)
         this.ui.settings()
         user.then((u) => {
-            this.ui.user(u)
+            this.ui.user(u, { 
+                onLogin: (method:string) => { this.login(method) }, 
+                onLogout: () => { this.logout() } })
         })
         this.ui.Relays()
     }

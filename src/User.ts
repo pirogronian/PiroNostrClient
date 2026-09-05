@@ -1,5 +1,9 @@
 
-import NDK, { NDKUser } from "@nostr-dev-kit/ndk";
+import NDK, { NDKUser, NDKNip07Signer } from "@nostr-dev-kit/ndk";
+
+const SIGNER_KEY = "SIGNER"
+const NIP07 = "nip07"
+const PIVATEKEY = "privatekey"
 
 export class User {
     ndk: NDK
@@ -21,5 +25,25 @@ export class User {
             }
         }
         return user
+    }
+
+    login(method: string|null = null) {
+        if (!method) { method = localStorage.getItem(SIGNER_KEY) }
+        switch (method) {
+            case NIP07:
+                this.loginNip07()
+                break;
+        }
+    }
+
+    loginNip07() {
+        const signer = new NDKNip07Signer()
+        this.ndk.signer = signer
+        localStorage.setItem(SIGNER_KEY, NIP07)
+    }
+
+    logout() {
+        this.ndk.signer = undefined
+        localStorage.removeItem(SIGNER_KEY)
     }
 }

@@ -1,8 +1,9 @@
 
-import { NostrWiki } from "./Piro.js"
+import { Piro } from "./Piro.js"
 
-const nw = new NostrWiki()
+const p = new Piro()
 
-nw.connect()
-nw.initRouting()
-nw.initHyperlinks()
+p.login()
+p.connect()
+p.initRouting()
+p.initHyperlinks()
