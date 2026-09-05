@@ -13,13 +13,19 @@ a:not(#ArticleView a):hover {
 
 div { display: flow-root; }
 
+.block {
+    display: block;
+    float: left;
+    margin: 0.2cm
+ }
+
 #MainNav {
     display: block flow-root;
     margin-bottom: 0.5cm;
     border-bottom: 0.05cm black solid;
 }
 
-.SettingsGroup {
+.SettingsGroup, #ArticleView {
     margin: 0.2cm;
     padding: 0.2cm;
     border: 0.05cm lightgrey solid;
@@ -38,4 +44,20 @@ code {
     word-break: break-all;
     white-space: normal;*/
     height: 100vh
+}
+
+#ArticleViewHeader {
+    display: flex
+}
+
+#ArticleViewHeader div, h1, label, input, select {
+    display: inline-block;
+    align-self: first baseline;
+    margin: 0.2cm;
+    position: relative;
+    bottom: 0;
+}
+
+#ArticleViewHeader h1 {
+    margin-right: 2cm
 }
