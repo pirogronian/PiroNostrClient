@@ -94,7 +94,7 @@ export class Piro {
         this.ui.finder(this.router)
     }
 
-    loadArticles(author: NDKUser | null, id: string | null) {
+    loadArticles(author: string | null, id: string | null) {
         const err = this.articles.load(author, id, 
             (event: NDKEvent, relay?: NDKRelay) => {
                 this.ui.ArticleHead(event, relay)
