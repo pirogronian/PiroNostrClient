@@ -3,6 +3,8 @@ import Navigo from "navigo";
 import NDK, { NDKEvent, NDKRelay, NDKUser } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 
+import { ArticleView } from "./ArticleView.js";
+
 import SettingsHTML from "./Settings.html?raw"
 import FinderHTML from "./Finder.html?raw"
 import ArtHeadHTML from "./ArticleHeader.html?raw"
@@ -12,9 +14,11 @@ const RelaysListId = "RelaysList"
 
 export class UI {
     ndk: NDK
+    artv: ArticleView
 
     constructor(ndk: NDK) {
         this.ndk = ndk
+        this.artv = new ArticleView(this)
     }
 
     mainView() {
@@ -101,5 +105,10 @@ export class UI {
         title.attr("href", `/article/${event.encode()}`)
 
         this.mainView().append(Head)
+    }
+
+    article(event: NDKEvent) {
+        this.artv.setEvent(event)
+        this.artv.show()
     }
 }

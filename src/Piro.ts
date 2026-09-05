@@ -46,7 +46,7 @@ export class Piro {
         this.router
         .on('/article/:id', async ({data}) => {
             const addr = data.id
-            LoadArticle(this.ndk, addr)
+            this.loadArticle(addr)
         })
         .on('/articles', (match) => {
             this.ui.clear()
@@ -101,6 +101,20 @@ export class Piro {
             })
         if (err) {
             this.ui.error(err.message)
+        }
+    }
+
+    async loadArticle(addr: string) {
+        const ret = await LoadArticle(this.ndk, addr)
+        if (ret instanceof NDKEvent) {
+            this.ui.article(ret)
+        } else {
+            if (ret instanceof Error) {
+                this.ui.error(ret.message)
+            }
+            if (typeof(ret) == "string") {
+                this.ui.error(ret)
+            }
         }
     }
 }
