@@ -98,7 +98,7 @@ export class UI {
         if (!TT) { return }
         console.log(`Received article "${TT}"`)
         title.text(TT)
-        title.attr("href", `#/article/${event.encode()}`)
+        title.attr("href", `/article/${event.encode()}`)
 
         this.mainView().append(Head)
     }
