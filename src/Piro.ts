@@ -5,10 +5,11 @@ import NDKCacheAdapterDexie from '@nostr-dev-kit/ndk-cache-dexie';
 import { UI } from "./UI.js"
 import { Relays } from './Relays.js';
 
-import { safeAsync, ErrorMessage } from "./various.js"
+import { safeAsync } from "./various.js"
 import { UpdateUserInfo } from './User.js';
 import { LoadArticle } from "./Article.js"
 import { Articles } from './Articles.js';
+import type { CallExpression } from 'typescript/unstable/ast';
 
 export class NostrWiki {
     router: Navigo
@@ -77,9 +78,12 @@ export class NostrWiki {
     }
 
     loadArticles(author: NDKUser | null, id: string | null) {
-        this.articles.load(author, id, 
+        const err = this.articles.load(author, id, 
             (event: NDKEvent, relay?: NDKRelay) => {
                 this.ui.ArticleHead(event, relay)
-            } )
+            })
+        if (err) {
+            this.ui.error(err.message)
+        }
     }
 }
