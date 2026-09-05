@@ -1,0 +1,97 @@
+
+import Navigo from 'navigo';
+import NDK, { NDKNip07Signer, NDKEvent, NDKUser, NDKRelay } from "@nostr-dev-kit/ndk";
+import NDKCacheAdapterDexie from '@nostr-dev-kit/ndk-cache-dexie';
+import { UI } from "./UI.js"
+import { Relays } from './Relays.js';
+
+import { safeAsync, ErrorMessage } from "./various.js"
+import { UpdateUserInfo } from './User.js';
+import { LoadArticle } from "./Article.js"
+import { Articles } from './Articles.js';
+
+export class NostrWiki {
+    router: Navigo
+    ndk: NDK
+    relays: Relays
+    ui: UI
+    articles: Articles
+
+    constructor() {
+        this.router = new Navigo('/', { hash: true })
+        const cacheAdapter = new NDKCacheAdapterDexie({ dbName: 'wiki-nostr-cache' });
+        const nip07signer = new NDKNip07Signer();
+        this.ndk = new NDK({ cacheAdapter, signer: nip07signer });
+        this.relays = new Relays(this.ndk)
+        this.articles = new Articles(this.ndk)
+        this.ui = new UI(this.ndk)
+        this.ndk.pool.on('relay:connect', () => {
+            this.relays.save();
+        });
+        this.relays.load()
+    }
+
+    connect() { this.ndk.connect() }
+
+    initRouting() {
+        this.router.hooks({
+            before: (done, math) => {
+                this.articles.stop()
+                done()
+            }
+        })
+
+        this.router
+        .on('/article/:id', async ({data}) => {
+            const addr = data.id
+            LoadArticle(this.ndk, addr)
+        })
+        .on('/articles/id/:id/author/:author', async ({data}) => {
+            this.ui.clear()
+            this.loadArticles(data.author, data.id)
+        })
+        .on('/articles/id/:id', async ({data}) => {
+            this.ui.clear()
+            this.loadArticles(null, data.id)
+        })
+        .on('/articles/author/:author', async ({data}) => {
+            this.ui.clear()
+            this.loadArticles(data.author, null)
+        })
+        .on('/articles/', () => {
+            this.ui.clear()
+            this.loadArticles(null, null)
+        })
+        .on('/settings/', () => {
+            this.settings()
+        })
+        .on('/', () => {
+            console.log("Main site.")
+            this.loadFinder()
+        });
+
+
+        this.router.resolve();
+    }
+
+    initHyperlinks() {
+        this.ui.initRouting(this.router)
+    }
+
+    settings() {
+        this.ui.settings()
+        UpdateUserInfo(this.ndk)
+        this.ui.Relays()
+    }
+
+    loadFinder() {
+        this.ui.finder(this.router)
+    }
+
+    loadArticles(author: NDKUser | null, id: string | null) {
+        this.articles.load(author, id, 
+            (event: NDKEvent, relay?: NDKRelay) => {
+                this.ui.ArticleHead(event, relay)
+            } )
+    }
+}
