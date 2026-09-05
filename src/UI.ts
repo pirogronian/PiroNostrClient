@@ -41,6 +41,16 @@ export class UI {
         $("#Message").text(`Error: ${msg}`)
     }
 
+    time(seconds: number|undefined|null = null) {
+        let t: Date|null = null
+        if (seconds) {
+            seconds *= 1000;
+            t = new Date(seconds)
+        }
+        t = new Date()
+        return t.toLocaleString()
+    }
+
     home() {
         this.mainView().html(HomeHTML)
     }
@@ -113,14 +123,11 @@ export class UI {
         title.text(TT)
         title.attr("href", `/article/${event.encode()}`)
 
-        const time = new Date()
-        time.setTime(event.created_at * 1000)
         const user = await globalThis.piro.user.get(event.pubkey)
-        const timestr = time.toLocaleString()
         if (user && user.profile) {
             Head.find("a.AuthorNick").text(user.profile.name).attr("href", `/articles?author=${user.pubkey}`)
             Head.find("img.AuthorImg").attr("src", user.profile.picture)
-            Head.find("div.CreationTime").text(timestr)
+            Head.find("div.CreationTime").text(this.time(event.created_at))
         }
 
         this.mainView().append(Head)

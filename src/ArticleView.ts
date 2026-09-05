@@ -130,8 +130,7 @@ export class ArticleView {
             o.find("img#AuthorPicture").attr("src", user.profile.picture)
             o.find("a#AuthorNick").text(user.profile.name).attr("href", `/articles?author=${user.pubkey}`)
         }
-        const t = new Date(this.event.created_at * 1000)
-        o.find("#CreationTime").text(t.toLocaleString())
+        o.find("#CreationTime").text(this.ui.time(this.event.created_at))
 
         this.ui.mainView().append(o)
 
