@@ -12,9 +12,10 @@ export class User {
         this.ndk = ndk
     }
 
-    async get() : Promise<NDKUser|null> {
-        let user : NDKUser | null = null
-        if (this.ndk.signer) {
+    async get(npub: string|null = null, profile: boolean = true) : Promise<NDKUser|null|undefined> {
+        let user : NDKUser|null|undefined = null
+
+        if (!npub && this.ndk.signer) {
             user = await this.ndk.signer.user()
             if (user) {
                 console.log("Fetching profile...")
@@ -23,6 +24,10 @@ export class User {
                     groupable: false
                 })
             }
+        }
+        if (npub && profile) {
+            user = await this.ndk.fetchUser(npub)
+            if (user) await user.fetchProfile()
         }
         return user
     }

@@ -115,15 +115,12 @@ export class UI {
 
         const time = new Date()
         time.setTime(event.created_at * 1000)
-        const user = await this.ndk.fetchUser(event.pubkey)
+        const user = await globalThis.piro.user.get(event.pubkey)
         const timestr = time.toLocaleString()
-        if (user) {
-            await user.fetchProfile()
-            if (user.profile) {
-                Head.find("a.AuthorNick").text(user.profile.name).attr("href", `/articles?author=${user.pubkey}`)
-                Head.find("img.AuthorImg").attr("src", user.profile.picture)
-                Head.find("div.CreationTime").text(timestr)
-            }
+        if (user && user.profile) {
+            Head.find("a.AuthorNick").text(user.profile.name).attr("href", `/articles?author=${user.pubkey}`)
+            Head.find("img.AuthorImg").attr("src", user.profile.picture)
+            Head.find("div.CreationTime").text(timestr)
         }
 
         this.mainView().append(Head)
