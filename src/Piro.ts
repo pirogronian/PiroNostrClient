@@ -35,33 +35,49 @@ export class Piro {
 
     connect() { this.ndk.connect() }
 
+    onRoute(route: string, f: Function) {
+        this.router.on(route, f, { already: f })
+    }
+
     initRouting() {
         this.router.hooks({
             before: (done, math) => {
                 this.articles.stop()
-                this.ui.clear()
                 done()
             }
         })
 
-        this.router
-        .on('/article/:id', async ({data}) => {
+        this.onRoute('/article/:id', async ({data}) => {
+            this.ui.clear()
             const addr = data.id
             this.loadArticle(addr)
         })
-        .on('/articles', (match) => {
-            //this.loadArticles(match?.params?.author, match?.params?.id)
+        this.onRoute('/articles', (match) => {
+            console.log(match.params)
+            if (Object.entries(match.params).length > 0) {
+                this.ui.clearFinderResult()
+                this.ui.finder(this.router)
+            }
+            else {
+                console.log("Clear UI.")
+                this.ui.clear()
+                this.ui.finder(this.router, true)
+            }
             this.loadArticles(match?.params)
         })
-        .on('/search', (match) => {
+        this.onRoute('/search', (match) => {
+            console.log("Route: /search")
+            this.ui.clear()
             this.loadFinder()
         })
-        .on('/settings/', () => {
+        this.onRoute('/settings', () => {
             console.log("Route settings.")
+            this.ui.clear()
             this.settings()
         })
-        .on('/', () => {
+        this.onRoute('/', () => {
             console.log("Main site.")
+            this.ui.clear()
             this.home()
         });
 
@@ -71,12 +87,12 @@ export class Piro {
 
     login(method?: string) {
         this.user.login(method)
-        this.settings()
+        //this.settings()
     }
 
     logout() {
         this.user.logout()
-        this.settings()
+        //this.settings()
     }
 
     initHyperlinks() {
@@ -88,13 +104,20 @@ export class Piro {
     }
 
     settings() {
+        console.log("Settings")
         const user = this.user.get()
         console.log(user)
         this.ui.settings()
         user.then((u) => {
             this.ui.user(u, { 
-                onLogin: (method:string) => { this.login(method) }, 
-                onLogout: () => { this.logout() } })
+                onLogin: (method:string) => {
+                    this.login(method);
+                    this.router.navigate("/settings")
+                },
+                onLogout: () => {
+                    this.logout();
+                    this.router.navigate("/settings")
+                } })
         })
         this.ui.Relays()
     }
@@ -104,7 +127,7 @@ export class Piro {
     }
 
     loadArticles(params: object) {
-        this.loadFinder(params.author, params.id)
+        //this.loadFinder(params.author, params.id)
         const err = this.articles.load(params,
             (event: NDKEvent, relay?: NDKRelay) => {
                 this.ui.ArticleHead(event, relay)

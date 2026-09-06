@@ -30,7 +30,8 @@ export class UI {
     initRouting(router: Navigo) {
         $("a").click(function(event) {
             event.preventDefault()
-            router.navigate($(this).attr("href"))
+            router.navigate($(this).attr("href"), { callHandler: true })
+            //router.navigate($(this).attr("href"))
         })
     }
 
@@ -94,10 +95,10 @@ export class UI {
         this.mainView().html(SettingsHTML)
     }
 
-    finder(router: Navigo, author: string|null = null, id: string|null = null) {
+    finder(router: Navigo, replace: boolean = false) {
+        if ($("#FinderForm").html() && !replace)
+            return
         const o = $(FinderHTML)
-        o.find("input[name='author']").val(author)
-        o.find("input[name='id']").val(id)
         this.mainView().append(o)
         const form = $("#FinderForm")
         form.find("button#AddSearchTag").click(() => {
@@ -147,7 +148,11 @@ export class UI {
             Head.find("div.CreationTime").text(this.time(event.created_at))
         }
 
-        this.mainView().append(Head)
+        this.mainView().find("#FinderResult").append(Head)
+    }
+
+    clearFinderResult() {
+        $("#FinderResult").html("")
     }
 
     article(event: NDKEvent) {
