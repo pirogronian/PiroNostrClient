@@ -43,8 +43,8 @@ export class ArticleView {
     asciidocCreateWikilinks(element) {
         element.find("a").each(function() {
             const node = $(this)
-            console.log("Checking node:", $(this).prop("nodeName"))
-            console.log("Checking node:", node)
+            //console.log("Checking node:", $(this).prop("nodeName"))
+            //console.log("Checking node:", node)
             if (!node.text() && !node.attr("href")) {
                 node.text(node.attr("id"))
                 node.attr("href", `/articles?id=${formatNip54TagD(node.attr("id"))}`)
@@ -68,8 +68,8 @@ export class ArticleView {
     djotCreateWikilinksAfter(element) {
         element.find("a").each(function() {
             const node = $(this)
-            console.log("Checking node:", $(this).prop("nodeName"))
-            console.log("Checking node:", node)
+            //console.log("Checking node:", $(this).prop("nodeName"))
+            //console.log("Checking node:", node)
             if (!node.attr("href")) {
                 node.attr("href", `/articles?id=${formatNip54TagD(node.text())}`)
             }
@@ -84,27 +84,38 @@ export class ArticleView {
 
     plaintext(content : string) : string {  return content}
 
-    async render(format: string|null = null) {
-        if (!this.event) return;
+    async createNode(format: string|null = null, content: string|null = null) {
+        if (!content) {
+            if (this.event)
+                content = this.event.content
+            else
+                return
+        }
         let cnt: string|ADDocument = ""
-        const av = $("#ArticleView")
+        let ret
         switch(format) {
             case "asciidoc":
-                cnt = await this.asciidoc(this.event.content)
-                av.html(cnt)
-                this.asciidocCreateWikilinks(av)
+                cnt = await this.asciidoc(content)
+                ret = $(cnt)
+                this.asciidocCreateWikilinks(ret)
                 break
             case "djot":
-                cnt = this.djot(this.event.content)
-                av.html(cnt)
-                this.djotCreateWikilinksAfter(av)
+                cnt = this.djot(content)
+                ret = $(cnt)
+                this.djotCreateWikilinksAfter(ret)
                 break
             default:
-                cnt = this.plaintext(this.event.content)
-                av.html(cnt)
+                cnt = this.plaintext(content)
+                ret = $("<div>").text(cnt)
         }
+        return ret
     }
     
+    async showContent(format: string|undefined ) {
+        $("#ArticleView").html("")
+        $("#ArticleView").append(await this.createNode(format))
+    }
+
     setFormatSelector(format: string|null = null) {
         const select = $("#ContentTypeSelect")
         switch(format) {
@@ -120,7 +131,11 @@ export class ArticleView {
     }
 
     async show() {
-        if (!this.event) return
+        if (!this.event) {
+            console.log("No event!")
+            return
+        }
+
         const o = $(ArticleViewHTML)
         o.find("h1 a").text(this.event.tagValue("title")).attr("href", `/articles?id=${this.event.tagValue("d")}`)
         o.find("#RawArticleContent").text(this.event.content)
@@ -136,13 +151,13 @@ export class ArticleView {
 
         $("#ContentTypeSelect").change((e) => {
             const fmt = $(e.currentTarget).val()
-            this.render(fmt)
+            this.showContent(fmt)
             console.log("Change content type:", fmt)
         })
     
         const select = $("#ContentTypeSelect")
         const format = this.event.tagValue("f")
-        this.render(format)
+        this.showContent(format)
         this.setFormatSelector(format)
 
         function SwitchView() {
