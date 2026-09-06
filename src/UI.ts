@@ -150,6 +150,8 @@ export class UI {
             Head.find("div.CreationTime").text(this.time(event.created_at))
         }
 
+        Head.find("div.Summary").text(event.tagValue("summary"))
+
         this.mainView().find("#FinderResult").append(Head)
     }
 

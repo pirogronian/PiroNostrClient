@@ -46,16 +46,32 @@ code {
     height: 100vh
 }
 
-#MainView div.ArticleHead {
-    display: block;
-    clear: both;
+div.ArticleHead {
+    display: flex;
     padding: 2mm;
     margin: 2mm;
     border: lightgray solid 0.05cm
 }
 
+div.ArticleHead * {
+    display: inline-block;
+    align-self: center;
+    padding: 2mm;
+    margin: 2mm;
+    max-height: 1cm
+}
+
+div.ArticleHead img {
+    padding: 0;
+    margin: 0
+}
+
+div.ArticleHead div.ArticleAuthor {
+    padding: 0;
+    margin: 0
+}
+
 div.ArticleHead a.ArticleTitle {
-    float: left;
     border-right: lightgrey solid 0.5mm;
     padding-left: 5mm;
     padding-right: 7mm;
@@ -64,26 +80,13 @@ div.ArticleHead a.ArticleTitle {
 
 div.ArticleHead div.ArticleAuthor {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap
 }
 
-div.ArticleHead div.ArticleAuthor > a,
-div.ArticleHead div.ArticleAuthor > img,
-div.ArticleHead div.ArticleAuthor > div {
-  display: inline-flex;      /* Prawidłowe zachowanie wierszowe */
-  align-items: center;
-  float: none;
-  max-height: 1cm;
-  max-width: 100%;
-  min-width: 0;
+div.ArticleHead div.CreationTime {
+    text-decoration: underline;
 }
 
-div.ArticleHead div.ArticleAuthor div.CreationTime {
-    margin-left: 1cm
-}
-
-#ArticleInfoHeader div, img, h1, a {
+#ArticleInfoHeader * {
     display: inline-block;
     align-self: center;
     margin: 0.2cm;
@@ -104,7 +107,7 @@ div.ArticleHead div.ArticleAuthor div.CreationTime {
     display: block;
 }
 
-#ArticleInfoHeader #ArticleTitleGroup div, h1 {
+#ArticleInfoHeader #ArticleTitleGroup * {
     margin: 0;
     padding: 0
 }
@@ -122,7 +125,7 @@ div.ArticleHead div.ArticleAuthor div.CreationTime {
     display: flex
 }
 
-#ArticleInfoHeader #AuthorNickAndCreationDate div.row, a.row {
+#ArticleInfoHeader #AuthorNickAndCreationDate .row, .row {
     display: block;
     margin: 0
 }
