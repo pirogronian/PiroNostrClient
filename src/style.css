@@ -5,7 +5,7 @@ a:not(:where(#ArticleView a)), label:not(#ArticleView label) {
     padding: 0.2cm;
 }
 
-a:not(#ArticleView a):hover, label:not(#ArticleView label):hover {
+a:not(#ArticleView a):hover, label.active:not(#ArticleView label):hover {
     background-color: lightgray;
 }
 
