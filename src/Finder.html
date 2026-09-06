@@ -4,11 +4,13 @@
     <input type="text" name="id" id="FinderId"/>
     <label for="id">Author:</label>
     <input type="text" name="author" id="FinderAuthor"/>
-    <label for="tag">Tag:</label>
-    <input type="text" name="tag"/>
-    <label for="tagvalue">Value:</label>
-    <input type="text" name="tagvalue"/>
-    <button type="button" id="AddSearchTag">Add</button>
+    <div id="FinderFormTags">
+        <label for="tag">Tag:</label>
+        <input type="text" name="tag"/>
+        <label for="tagvalue">Value:</label>
+        <input type="text" name="tagvalue"/>
+        <button type="button" id="AddSearchTag">Add</button>
+    </div>
     <input type="submit" value="Search" id="FinderSubmit"/>
 </form>
 <div id="FinderResult"></div>

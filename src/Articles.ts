@@ -21,20 +21,27 @@ export class Articles{
             kinds: [30818]
             //'#d': [pageSlug]
         };
-        if (params.author) {
-            console.log("Subscribing with author:", params.author)
-            filter.authors = [ params.author ]
-        }
-        if (params.id) {
-            console.log("Subscribing with id:", params.id)
-            filter['#d'] = [ params.id ]
-        }
-        for (const [key, value] of Object.entries(params)) {
-            if (key.length == 1)
-                filter[`#${key}`] = value
+        if (params) {
+            if (params.author) {
+                console.log("Subscribing with author:", params.author)
+                filter.authors = [ params.author ]
+            }
+            if (params.id) {
+                console.log("Subscribing with id:", params.id)
+                filter['#d'] = [ params.id ]
+            }
+            for (const [key, value] of Object.entries(params)) {
+                if (key.length == 1) {
+                    const tkey = `#${key}`
+                    if (Array.isArray(value))
+                        filter[`#${key}`] = value
+                    else
+                        filter[`#${key}`] = [ value ]
+                }
+            }
         }
 
-        console.log("Subscribing for articles...")
+        console.log("Subscribing for articles with filter", filter)
         
         try {
             this.sub = this.ndk.subscribe(

@@ -39,6 +39,10 @@ export class UI {
         this.mainView().html("")
     }
 
+    clearMessage() {
+        $("#Message").text("")
+    }
+
     error(msg: string) {
         $("#Message").text(`Error: ${msg}`)
     }
@@ -101,21 +105,19 @@ export class UI {
         const o = $(FinderHTML)
         this.mainView().append(o)
         const form = $("#FinderForm")
+        const fft = form.find("#FinderFormTags")
         form.find("button#AddSearchTag").click(() => {
             const tag = form.find("input[name='tag']").val()
             const val = form.find("input[name='tagvalue']").val()
             if (!tag) return;
-            const ti = $.parseHTML(FinderTagInputs)
-            const o = $("<div>").append(ti)
+            const o = $(FinderTagInputs)
             o.find("input").attr("name", tag).val(val)
             o.find("label").attr("for", tag).text(tag)
             o.find("button").attr("data", tag)
-            o.find("button").click(() => {
-                form.find(`input[name=${tag}]`).remove()
-                form.find(`label[for=${tag}]`).remove()
-                form.find(`button[data=${tag}]`).remove()
+            o.find("button").click(function() {
+                $(this).parent().remove()
             })
-            form.append(ti)
+            fft.append(o)
         })
         form.submit((e) => {
             e.preventDefault()

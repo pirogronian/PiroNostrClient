@@ -54,7 +54,7 @@ export class Piro {
         })
         this.onRoute('/articles', (match) => {
             console.log(match.params)
-            if (Object.entries(match.params).length > 0) {
+            if (match.params instanceof Object && Object.entries(match.params).length > 0) {
                 this.ui.clearFinderResult()
                 this.ui.finder(this.router)
             }
