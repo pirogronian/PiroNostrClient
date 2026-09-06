@@ -17,7 +17,7 @@ export class User {
 
         if (!npub && this.ndk.signer) {
             user = await this.ndk.signer.user()
-            if (user) {
+            if (user && profile) {
                 console.log("Fetching profile...")
                 await user.fetchProfile({
                     closeOnEose: true,
@@ -25,9 +25,9 @@ export class User {
                 })
             }
         }
-        if (npub && profile) {
+        if (npub) {
             user = await this.ndk.fetchUser(npub)
-            if (user) await user.fetchProfile()
+            if (user && profile) await user.fetchProfile()
         }
         return user
     }
