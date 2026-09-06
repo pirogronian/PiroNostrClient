@@ -147,6 +147,7 @@ export class ArticleView {
         }
         o.find("#CreationTime").text(this.ui.time(this.event.created_at))
         o.find("a#ArticleId").text(this.event.tagValue("d")).attr("href", `/articles?id=${this.event.tagValue("d")}`)
+        o.find("#ArticleSummary").text(this.event.tagValue("summary"))
 
         this.ui.mainView().append(o)
 

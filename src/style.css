@@ -121,11 +121,12 @@ div.ArticleHead div.CreationTime {
     font-size: 5mm;
 }
 
-#ArticleInfoHeader #AuthorNickAndCreationDate {
-    display: flex
+#ArticleInfoHeader #AuthorNickAndCreationTime {
+    display: flex;
+    flex-direction: column;
 }
 
-#ArticleInfoHeader #AuthorNickAndCreationDate .row, .row {
+#ArticleInfoHeader #AuthorNickAndCreationTime .row {
     display: block;
     margin: 0
 }
