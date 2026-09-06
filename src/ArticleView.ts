@@ -13,12 +13,29 @@ import { UI } from "./UI.js";
 
 import ArticleViewHTML from './Article.html?raw';
 
+const LAST_ARTICLE_FORMAT_KEY = "LAST_ARTICLE_FORMATKEY"
+const USE_LAST_ARTICLE_FORMAT_KEY = "USE_LAST_ARTICLE_FORMAT_KEY"
+
 export class ArticleView {
     event: NDKEvent|null = null
     ui : UI
+    lastFormat: string = ""
+    useLastFormat: string = "1"
 
     constructor(ui : UI) {
         this.ui = ui
+    }
+
+    saveSettings() {
+        localStorage.setItem(LAST_ARTICLE_FORMAT_KEY, this.lastFormat)
+        localStorage.setItem(USE_LAST_ARTICLE_FORMAT_KEY, this.useLastFormat)
+    }
+
+    restoreSettings() {
+        let tmp = localStorage.getItem(LAST_ARTICLE_FORMAT_KEY)
+        this.lastFormat = tmp ? tmp : ""
+        tmp = localStorage.getItem(USE_LAST_ARTICLE_FORMAT_KEY)
+        this.useLastFormat = tmp ? tmp : ""
     }
 
     setEvent(event: NDKEvent) {
@@ -136,6 +153,8 @@ export class ArticleView {
             return
         }
 
+        this.restoreSettings()
+
         const o = $(ArticleViewHTML)
         o.find("h1 a").text(this.event.tagValue("title")).attr("href", `/articles?id=${this.event.tagValue("d")}`)
         o.find("#RawArticleContent").text(this.event.content)
@@ -170,16 +189,28 @@ export class ArticleView {
 
         this.ui.mainView().append(o)
 
+        const ulf = $("input[name='uselastformat']")
+        if (this.useLastFormat)  ulf.prop("checked", "checked")
+        ulf.change(() => {
+            console.log("Checked")
+            this.useLastFormat = ulf.prop("checked") ? "1" : ""
+            this.saveSettings()
+        })
+
         $("#ContentTypeSelect").change((e) => {
-            const fmt = $(e.currentTarget).val()
+            let fmt = $(e.currentTarget).val()
             this.showContent(fmt)
+            this.lastFormat = fmt
+            this.saveSettings()
             console.log("Change content type:", fmt)
         })
     
         const select = $("#ContentTypeSelect")
-        const format = this.event.tagValue("f")
-        this.showContent(format)
-        this.setFormatSelector(format)
+        let fmt = this.event.tagValue("f")
+        if (!fmt && this.useLastFormat)
+            fmt = this.lastFormat
+        this.setFormatSelector(fmt)
+        this.showContent(fmt)
 
         function SwitchView() {
             const type = $("input[name='ViewType']:checked").val()

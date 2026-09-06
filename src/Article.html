@@ -23,15 +23,17 @@
   <div id="ArticleClient"></div>
 </div>
 <div id="ArticleSettingsHeader" class="Frame">
-  <label for="ContentTypeSelect">Content type:</label>
+  <label for="ContentTypeSelect">Format:</label>
   <select name="ContentTypeSelect" id="ContentTypeSelect">
     <option value="plain">Plain text</option>
     <option value="djot">Djot</option>
     <option value="asciidoc">Asciidoc</option>
   </select>
-  <label for="article">Article</label>
+  <label for="uselastformat">Remember</label>
+  <input type="checkbox" name="uselastformat"/>
+  <label for="article">Article:</label>
   <input type="radio" name="ViewType" value="article" checked/>
-  <label for="event">Event</label>
+  <label for="event">Event:</label>
   <input type="radio" name="ViewType" value="event"/>
 </div>
 <div id='ArticleView' class="Frame">
