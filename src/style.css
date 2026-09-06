@@ -58,12 +58,12 @@ div.ArticleHead * {
     align-self: center;
     padding: 2mm;
     margin: 2mm;
-    max-height: 1cm
 }
 
 div.ArticleHead img {
     padding: 0;
-    margin: 0
+    margin: 0;
+    max-height: 1cm
 }
 
 div.ArticleHead div.ArticleAuthor {
