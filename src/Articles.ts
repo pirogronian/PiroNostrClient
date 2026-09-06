@@ -39,6 +39,11 @@ export class Articles{
                         filter[`#${key}`] = [ value ]
                 }
             }
+            if (params.limit) {
+                const limit = Number(params.limit)
+                console.log("Filter: limit:", limit)
+                filter.limit = limit
+            }
         }
 
         console.log("Subscribing for articles with filter", filter)
