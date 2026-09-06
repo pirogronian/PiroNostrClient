@@ -39,9 +39,23 @@ export class Articles{
                         filter[`#${key}`] = [ value ]
                 }
             }
+            if (params.since) {
+                const since = params.since
+                console.log("Filter.since:", since)
+                const dobj = new Date(since)
+                const dn = dobj.getTime() / 1000
+                filter.since = dn
+            }
+            if (params.unitl) {
+                const until = params.unitl
+                console.log("Filter.until:", until)
+                const dobj = new Date(until)
+                const dn = dobj.getTime() / 1000
+                filter.until = dn
+            }
             if (params.limit) {
                 const limit = Number(params.limit)
-                console.log("Filter: limit:", limit)
+                console.log("Filter.limit:", limit)
                 filter.limit = limit
             }
         }
