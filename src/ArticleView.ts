@@ -112,8 +112,8 @@ export class ArticleView {
     }
     
     async showContent(format: string|undefined ) {
-        $("#ArticleView").html("")
-        $("#ArticleView").append(await this.createNode(format))
+        $("#ArticleContentView").html("")
+        $("#ArticleContentView").append(await this.createNode(format))
     }
 
     setFormatSelector(format: string|null = null) {
@@ -146,6 +146,7 @@ export class ArticleView {
             o.find("a#AuthorNick").text(user.profile.name).attr("href", `/articles?author=${user.pubkey}`)
         }
         o.find("#CreationTime").text(this.ui.time(this.event.created_at))
+        o.find("a#ArticleId").text(this.event.tagValue("d")).attr("href", `/articles?id=${this.event.tagValue("d")}`)
 
         this.ui.mainView().append(o)
 

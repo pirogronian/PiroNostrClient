@@ -1,10 +1,22 @@
 <div id="ArticleInfoHeader" class="Frame">
-  <div>Title:</div><h1 id="Title"><a></a></h1>
+  <div id="ArticleTitleGroup">
+    <div class="row">
+      <div>Title:</div><h1 id="Title"><a></a></h1>
+    </div>
+    <div class="row">
+      <div>Id:</div>
+      <a id="ArticleId"></a>
+    </div>
+  </div>
   <div>by</div>
   <img id="AuthorPicture" />
-  <a id="AuthorNick"></a>
-  <div>on</div>
-  <div id="CreationTime"></div>
+  <div id="AuthorNickAndCreatetime">
+    <a id="AuthorNick" class="row"></a>
+    <div class="row">
+      <div>on</div>
+      <div id="CreationTime"></div>
+    </div>
+  </div>
 </div>
 <div id="ArticleSettingsHeader" class="Frame">
   <label for="ContentTypeSelect">Content type:</label>
@@ -18,6 +30,12 @@
   <label for="event">Event</label>
   <input type="radio" name="ViewType" value="event"/>
 </div>
-<article id='ArticleView' class="Scrollable Frame"></article>
+<div id='ArticleView' class="Frame">
+  <article id="ArticleContentView" class="Scrollable"></article>
+  <div id="ArticleTagsView" class="Frame">
+    Tags
+  </div>
+  <div id="ArticleRelaysView"></div>
+</div>
 <div id='RawEventView' style="display: none"  class="Scrollable"></div>
 <div id="RawArticleContent" style="display: none"></div>
