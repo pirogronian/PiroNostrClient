@@ -8,7 +8,7 @@ import { createJSONEditor, createKeySelection } from "vanilla-jsoneditor";
 import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core';
 import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
-import { formatNip54TagD } from "./various.js";
+import { formatNip54TagD, EventTagValues } from "./various.js";
 import { UI } from "./UI.js";
 
 import ArticleViewHTML from './Article.html?raw';
@@ -148,6 +148,25 @@ export class ArticleView {
         o.find("#CreationTime").text(this.ui.time(this.event.created_at))
         o.find("a#ArticleId").text(this.event.tagValue("d")).attr("href", `/articles?id=${this.event.tagValue("d")}`)
         o.find("#ArticleSummary").text(this.event.tagValue("summary"))
+
+        let origin = this.event.tagValue("e")
+        if (!origin) origin = this.event.tagValue("a")
+        const oa = o.find("#OriginLink")
+        if (origin) {
+            oa.attr("href", `/article/${origin}`)
+        } else oa.hide()
+
+        const topics = EventTagValues(this.event, "t")
+        const HeadTopics = o.find("#ArticleTopics")
+        topics.forEach(function(topic) {
+            const a = $(`<a href="/articles?t=${topic}">${topic}</a>`)
+            HeadTopics.append(a)
+        })
+
+        const co = o.find("#ArticleClient")
+        const client = this.event.tagValue("client")
+        if (client) co.text(`Created with: ${client}`)
+        else co.hide()
 
         this.ui.mainView().append(o)
 

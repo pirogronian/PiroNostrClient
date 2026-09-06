@@ -3,12 +3,13 @@ import Navigo from "navigo";
 import NDK, { NDKEvent, NDKRelay, NDKUser } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 
-import FinderTagInputs from "./FinderTagInputs.html?raw"
 import { ArticleView } from "./ArticleView.js";
+import { EventTagValues } from "./various.js"
 
 import HomeHTML from "./Home.html?raw"
 import SettingsHTML from "./Settings.html?raw"
 import FinderHTML from "./Finder.html?raw"
+import FinderTagInputs from "./FinderTagInputs.html?raw"
 import ArtHeadHTML from "./ArticleHeader.html?raw"
 
 const MainViewId = "MainView"
@@ -151,6 +152,12 @@ export class UI {
         }
 
         Head.find("div.Summary").text(event.tagValue("summary"))
+        const topics = EventTagValues(event, "t")
+        const HeadTopics = Head.find(".Topics")
+        topics.forEach(function(topic) {
+            const a = $(`<a href="/articles?t=${topic}">${topic}</a>`)
+            HeadTopics.append(a)
+        })
 
         this.mainView().find("#FinderResult").append(Head)
     }

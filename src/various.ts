@@ -1,3 +1,4 @@
+import { NDKEvent } from "@nostr-dev-kit/ndk";
 
 export async function safeAsync<T>(promise: Promise<T>): Promise<[Error | null, T | null]> {
     try {
@@ -27,4 +28,8 @@ export function formatNip54TagD(title: string): string {
     .replace(/-+/g, '-')
     // 8. Trim łączników i slaszy z początku oraz końca całego ciągu
     .replace(/^[-/]+|[-/]+$/g, '');
+}
+
+export function EventTagValues(event: NDKEvent, tagName: string) : string[] {
+    return event.tags.filter((tag) => tag[0] == tagName).map((tag) => tag[1])
 }
