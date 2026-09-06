@@ -100,12 +100,20 @@ export class UI {
         this.mainView().html(SettingsHTML)
     }
 
-    finder(router: Navigo, replace: boolean = false) {
+    async finder(router: Navigo, replace: boolean = false) {
         if ($("#FinderForm").html() && !replace)
             return
         const o = $(FinderHTML)
         this.mainView().append(o)
         const form = $("#FinderForm")
+        const me = form.find("button#FinderAuthorMe")
+        const user = await globalThis.piro.user.get(null, false)
+        if (user.pubkey) {
+            const ai = form.find("input[name='author']")
+            me.click(function() {
+                ai.val(user.pubkey)
+            })
+        } else me.hide()
         const fft = form.find("#FinderFormTags")
         form.find("button#AddSearchTag").click(() => {
             const tag = form.find("input[name='tag']").val()
