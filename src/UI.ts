@@ -37,6 +37,7 @@ export class UI {
     initLinks() {
         console.log("Init links.")
         $("a.inner").click((event) => {
+            console.log("Inner link clicked.")
             event.preventDefault()
             globalThis.piro.navigate($(event.currentTarget).attr("inner"))
         })

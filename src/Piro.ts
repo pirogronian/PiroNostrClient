@@ -20,7 +20,7 @@ export class Piro {
     articles: Articles
 
     constructor() {
-        this.router = new Navigo("/", { hash: true })
+        this.router = new Navigo("/", { hash: true, strategy: Navigo.ONE })
         const cacheAdapter = new NDKCacheAdapterDexie({ dbName: 'wiki-nostr-cache' });
         this.ndk = new NDK({ cacheAdapter });
         this.relays = new Relays(this.ndk)
@@ -54,12 +54,14 @@ export class Piro {
         })
 
         this.onRoute('/article/:id', async ({data}) => {
+            console.log("Route: /article/:id")
             this.ui.clear()
             const addr = data.id
             this.loadArticle(addr)
         })
         this.onRoute('/articles', (match) => {
-            console.log(match.params)
+            console.log("Route: /articles")
+            //console.log(match.params)
             if (this.ui.isFinder()) {
                 console.log("Is finder, clearing results.")
                 this.ui.clearFinderResult()
@@ -77,17 +79,17 @@ export class Piro {
             this.loadFinder()
         })
         this.onRoute('/settings', () => {
-            console.log("Route settings.")
+            console.log("Route: settings.")
             this.ui.clear()
             this.settings()
         })
         this.onRoute('/', () => {
-            console.log("Main site.")
+            console.log("Coute: home")
             this.ui.clear()
             this.home()
         });
         this.onRoute("", (match) => {
-            console.log("Default root")
+            console.log("Route: default")
             if (match && match.params) {
                 console.log("Index with params.")
             } else {
@@ -116,9 +118,15 @@ export class Piro {
 
     navigate(path: string) {
         const cleanPath = path.startsWith("/") ? path : "/" + path;
-        window.location.hash = cleanPath;
-        console.log("piro.navigate: ", window.location.href)
-        this.router.resolve()
+        if (window.location.hash == cleanPath) {
+            console.log("piro.navigate auto: ", window.location.href)
+            this.router.resolve()
+        }
+        else
+        {
+            console.log("piro.navigate manually: ", window.location.href)
+            window.location.hash = cleanPath;
+        }
     }
 
     login(method?: string) {
