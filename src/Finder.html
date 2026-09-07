@@ -1,21 +1,14 @@
 <div>Search articles</div>
 <form id="FinderForm" action="#">
-    <label for="id">Id:</label>
-    <input type="text" name="id" id="FinderId"/>
-    <label for="id">Author:</label>
-    <input type="text" name="author" id="FinderAuthor"/>
+    <label for="id">Id:<input type="text" name="id" id="FinderId"/></label>
+    <label for="id">Author:<input type="text" name="author" id="FinderAuthor"/></label>
     <button type="button" id="FinderAuthorMe">Me</button>
-    <label for="since">Since:</label>
-    <input type="datetime-local" name="since" id="FinderSince"/>
-    <label for="until">Until:</label>
-    <input type="datetime-local" name="until" id="FinderUntil"/>
-    <label for="limit">Limit:</label>
-    <input type="text" name="limit" id="FinderLimit"/>
+    <label for="since">Since:<input type="datetime-local" name="since" id="FinderSince"/></label>
+    <label for="until">Until:<input type="datetime-local" name="until" id="FinderUntil"/></label>
+    <label for="limit">Limit:<input type="text" name="limit" id="FinderLimit"/></label>
     <div id="FinderFormTags">
-        <label for="tag">Tag:</label>
-        <input type="text" name="tag"/>
-        <label for="tagvalue">Value:</label>
-        <input type="text" name="tagvalue"/>
+        <label for="tag">Tag:<input type="text" name="tag"/></label>
+        <label for="tagvalue">Value:<input type="text" name="tagvalue"/></label>
         <button type="button" id="AddSearchTag">Add</button>
     </div>
     <input type="submit" value="Search" id="FinderSubmit"/>
