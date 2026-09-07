@@ -42,7 +42,7 @@ export class Piro {
     initRouting() {
         this.router.hooks({
             before: (done, math) => {
-                console.log(window.location.pathname)
+                console.log("Navigate to:", window.location.href)
                 this.articles.stop()
                 this.ui.init()
                 done()
