@@ -131,7 +131,7 @@ export class UI {
             if (!tag) return;
             const o = $(FinderTagInputs)
             o.find("input").attr("name", tag).val(val)
-            o.find("label").attr("for", tag).text(tag)
+            o.find("label").attr("for", tag).text(`Tag "${tag}:"`)
             o.find("button").attr("data", tag)
             o.find("button").click(function() {
                 $(this).parent().remove()

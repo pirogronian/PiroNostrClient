@@ -46,7 +46,18 @@ code {
     height: 100vh
 }
 
+.FlexContainer {
+    display: flex;
+    flex-wrap: wrap;
+}
 
+.FlexContainer * {
+    display: inline-flex;
+    flex: 0 1 auto;
+    align-self: first baseline;
+    align-items: center;
+    margin: 2mm;
+}
 
 div.ArticleHead {
     display: flex;
@@ -144,11 +155,6 @@ div.ArticleHead div.CreationTime {
 }
 
 input {
-    display: inline-block;
-    margin: 0.2cm;
-}
-
-#FinderForm * {
     display: inline-block;
     margin: 0.2cm;
 }
