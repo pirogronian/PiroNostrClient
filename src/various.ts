@@ -33,3 +33,7 @@ export function formatNip54TagD(title: string): string {
 export function EventTagValues(event: NDKEvent, tagName: string) : string[] {
     return event.tags.filter((tag) => tag[0] == tagName).map((tag) => tag[1])
 }
+
+export function LocalUrl(url: string): string {
+    return window.location.pathname.concat(url)
+}

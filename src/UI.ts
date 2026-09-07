@@ -4,7 +4,7 @@ import NDK, { NDKEvent, NDKRelay, NDKUser } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 
 import { ArticleView } from "./ArticleView.js";
-import { EventTagValues } from "./various.js"
+import { EventTagValues, LocalUrl } from "./various.js"
 
 import HomeHTML from "./Home.html?raw"
 import SettingsHTML from "./Settings.html?raw"
@@ -28,8 +28,14 @@ export class UI {
         return $(`#${MainViewId}`)
     }
 
-    initRouting(router: Navigo) {
-        $("a").click(function(event) {
+    init() {
+        $("a#HomeLink").attr("href", LocalUrl("#/"))
+        $("a#SearchLink").attr("href", LocalUrl("#/search"))
+        $("a#SettingsLink").attr("href", LocalUrl("#/settings"))
+    }
+
+    initLinks(router: Navigo) {
+        $("a.a").click(function(event) {
             event.preventDefault()
             router.navigate($(this).attr("href"), { callHandler: true })
             //router.navigate($(this).attr("href"))
@@ -106,6 +112,7 @@ export class UI {
         const o = $(FinderHTML)
         this.mainView().append(o)
         const form = $("#FinderForm")
+        form.prop("action", LocalUrl("#/articles"))
         const me = form.find("button#FinderAuthorMe")
         const user = await globalThis.piro.user.get(null, false)
         if (user.pubkey) {
@@ -150,11 +157,11 @@ export class UI {
         if (!TT) { TT = event.tagValue("d") }
         console.log(`Received article "${TT}"`)
         title.text(TT)
-        title.attr("href", `/article/${event.encode()}`)
+        title.attr("href", LocalUrl(`#/article/${event.encode()}`))
 
         const user = await globalThis.piro.user.get(event.pubkey)
         if (user && user.profile) {
-            Head.find("a.AuthorNick").text(user.profile.name).attr("href", `/articles?author=${user.pubkey}`)
+            Head.find("a.AuthorNick").text(user.profile.name).attr("href", LocalUrl(`#/articles?author=${user.pubkey}`))
             Head.find("img.AuthorImg").attr("src", user.profile.picture)
             Head.find("div.CreationTime").text(this.time(event.created_at))
         }
@@ -163,7 +170,7 @@ export class UI {
         const topics = EventTagValues(event, "t")
         const HeadTopics = Head.find(".Topics")
         topics.forEach(function(topic) {
-            const a = $(`<a href="/articles?t=${topic}">${topic}</a>`)
+            const a = $(`<a href="${LocalUrl(`#/articles?t=${topic}`)}">${topic}</a>`)
             HeadTopics.append(a)
         })
 
