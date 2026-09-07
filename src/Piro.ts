@@ -46,6 +46,9 @@ export class Piro {
                 this.articles.stop()
                 this.ui.init()
                 done()
+            },
+            after: (math) => {
+                this.initHyperlinks()
             }
         })
 
@@ -56,14 +59,11 @@ export class Piro {
         })
         this.onRoute('/articles', (match) => {
             console.log(match.params)
-            if (match.params instanceof Object && Object.entries(match.params).length > 0) {
+            if (this.ui.isFinder())
                 this.ui.clearFinderResult()
-                this.ui.finder(this.router)
-            }
             else {
-                console.log("Clear UI.")
                 this.ui.clear()
-                this.ui.finder(this.router, true)
+                this.ui.finder(this.router)
             }
             this.loadArticles(match?.params)
         })
@@ -98,7 +98,7 @@ export class Piro {
     }
 
     initHyperlinks() {
-        this.ui.initRouting(this.router)
+        this.ui.initLinks(this.router)
     }
 
     home() {

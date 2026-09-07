@@ -106,9 +106,11 @@ export class UI {
         this.mainView().html(SettingsHTML)
     }
 
-    async finder(router: Navigo, replace: boolean = false) {
-        if ($("#FinderForm").html() && !replace)
-            return
+    isFinder(): boolean {
+        return $("input#FinderForm").html()
+    }
+
+    async finder(router: Navigo) {
         const o = $(FinderHTML)
         this.mainView().append(o)
         const form = $("#FinderForm")

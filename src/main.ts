@@ -8,4 +8,3 @@ globalThis.piro = p
 p.login()
 p.connect()
 p.initRouting()
-p.initHyperlinks()
