@@ -88,7 +88,7 @@ div.ArticleHead div.CreationTime {
 
 #ArticleInfoHeader * {
     display: inline-block;
-    flex: 1 1;
+    flex: 0 1;
     align-self: center;
     margin: 0.2cm;
     /*max-height: 2cm;*/
@@ -143,7 +143,7 @@ div.ArticleHead div.CreationTime {
 
 #ArticleSettingsHeader div, label, input, select {
     display: inline-block;
-    flex: 1 1;
+    flex: 0 1;
     align-self: first baseline;
     margin: 0.2cm;
 }
