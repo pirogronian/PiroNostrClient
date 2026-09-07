@@ -130,10 +130,13 @@ export class ArticleView {
         return ret
     }
     
-    async showContent(format: string|undefined ) {
+    showContent(format: string|undefined ) {
         console.log("Showing content with format:", format)
-        $("#ArticleContentView").html("")
-        $("#ArticleContentView").append(await this.createNode(format))
+        const p = this.createNode(format)
+        p.then((n) => {
+            $("#ArticleContentView").html("")
+            $("#ArticleContentView").append(n)
+        })
     }
 
     setFormatSelector(format: string|null = null) {
