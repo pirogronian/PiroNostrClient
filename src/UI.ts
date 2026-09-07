@@ -108,7 +108,7 @@ export class UI {
     }
 
     isFinder(): boolean {
-        return $("input#FinderForm").html()
+        return $("form#FinderForm").html()
     }
 
     async finder() {
