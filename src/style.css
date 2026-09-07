@@ -46,6 +46,8 @@ code {
     height: 100vh
 }
 
+
+
 div.ArticleHead {
     display: flex;
     padding: 2mm;
@@ -141,7 +143,17 @@ div.ArticleHead div.CreationTime {
     flex-wrap: wrap
 }
 
-#ArticleSettingsHeader div, label, input, select {
+input {
+    display: inline-block;
+    margin: 0.2cm;
+}
+
+#FinderForm * {
+    display: inline-block;
+    margin: 0.2cm;
+}
+
+#ArticleSettingsHeader div, label, select {
     display: inline-block;
     flex: 0 1;
     align-self: first baseline;

@@ -188,7 +188,10 @@ export class UI {
             globalThis.piro.navigate($(event.currentTarget).attr("inner"))
         })
 
-        this.mainView().find("#FinderResult").append(Head)
+        const fr = this.mainView().find("#FinderResult")
+        fr.append(Head)
+        $("#FinderResultsNumber").text(`Results: ${fr.children().length}`)
+
     }
 
     clearFinderResult() {
