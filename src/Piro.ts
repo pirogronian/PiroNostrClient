@@ -20,7 +20,7 @@ export class Piro {
     articles: Articles
 
     constructor() {
-        this.router = new Navigo('/', { hash: true })
+        this.router = new Navigo(window.location.pathname, { hash: true })
         const cacheAdapter = new NDKCacheAdapterDexie({ dbName: 'wiki-nostr-cache' });
         this.ndk = new NDK({ cacheAdapter });
         this.relays = new Relays(this.ndk)
@@ -40,11 +40,11 @@ export class Piro {
     }
 
     initRouting() {
+        console.log("Init routing on:", window.location.href)
         this.router.hooks({
             before: (done, math) => {
-                console.log("Navigate to:", window.location.href)
+                console.log("Route.before:", window.location.href)
                 this.articles.stop()
-                this.ui.init()
                 done()
             },
             after: (math) => {
@@ -59,9 +59,12 @@ export class Piro {
         })
         this.onRoute('/articles', (match) => {
             console.log(match.params)
-            if (this.ui.isFinder())
+            if (this.ui.isFinder()) {
+                console.log("Is finder, clearing results.")
                 this.ui.clearFinderResult()
+            }
             else {
+                console.log("Clear main view, create finder.")
                 this.ui.clear()
                 this.ui.finder(this.router)
             }
@@ -82,9 +85,32 @@ export class Piro {
             this.ui.clear()
             this.home()
         });
-
+        this.onRoute("", (match) => {
+            console.log("Default root")
+            if (match && match.params) {
+                console.log("Index with params.")
+            } else {
+                this.ui.clear()
+                this.home()
+            }
+        })
 
         this.router.resolve();
+    }
+
+    setupLocation() {
+        const root = window.location.pathname
+        let href = window.location.href
+        href = href.replace("#/#/", "#/")
+        const hindex = href.indexOf("#")
+        const qindex = href.indexOf("?")
+        if (qindex >= 0 && hindex >= 0 && hindex > qindex) {
+            const qstr = href.substring(qindex, hindex)
+            const hstr = href.substring(hindex)
+            href = root.concat(hstr).concat(qstr)
+            console.log("Fixing url to:", href)
+        }
+        window.history.replaceState(null, href, href)
     }
 
     login(method?: string) {
@@ -95,6 +121,10 @@ export class Piro {
     logout() {
         this.user.logout()
         //this.settings()
+    }
+
+    initUI() {
+        this.ui.init()
     }
 
     initHyperlinks() {

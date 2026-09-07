@@ -114,10 +114,10 @@ export class UI {
         const o = $(FinderHTML)
         this.mainView().append(o)
         const form = $("#FinderForm")
-        form.prop("action", LocalUrl("#/articles"))
+        //form.prop("action", LocalUrl("#/articles"))
         const me = form.find("button#FinderAuthorMe")
         const user = await globalThis.piro.user.get(null, false)
-        if (user.pubkey) {
+        if (user && user.pubkey) {
             const ai = form.find("input[name='author']")
             me.click(function() {
                 ai.val(user.pubkey)
@@ -147,7 +147,7 @@ export class UI {
                 }
             }
             const url = searchParams.toString()
-            router.navigate(`/articles?${url}`)
+            router.navigate(`#/articles?${url}`)
         })
     }
 

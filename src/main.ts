@@ -9,4 +9,6 @@ globalThis.piro = p
 
 p.login()
 p.connect()
+p.setupLocation()
 p.initRouting()
+p.initUI()
