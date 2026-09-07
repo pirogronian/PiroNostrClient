@@ -1,4 +1,9 @@
 
+input {
+    display: inline-block;
+    margin: 0.2cm;
+}
+
 a:not(:where(#ArticleView a)), label:not(:where(#ArticleView label)) {
     display: inline-flex;      /* Prawidłowe zachowanie wierszowe */
     align-items: center;
@@ -105,16 +110,15 @@ div.ArticleHead div.CreationTime {
     text-decoration: underline;
 }
 
-#ArticleInfoHeader * {
-    display: inline-block;
-    flex: 0 1;
-    align-self: center;
-    margin: 0.2cm;
-    /*max-height: 2cm;*/
+#ArticleInfoHeader {
+    @extend .Frame;
+    @extend .OnerowFlexContainer;
+    padding: 0
 }
 
 #ArticleInfoHeader img {
     max-height: 2cm;
+    margin: 0
 }
 
 #ArticleInfoHeader #ArticleTitleGroup {
@@ -129,14 +133,16 @@ div.ArticleHead div.CreationTime {
 
 #ArticleInfoHeader #ArticleTitleGroup div.row {
     display: block;
-}
-
-#ArticleInfoHeader #ArticleTitleGroup * {
     margin: 0;
     padding: 0
 }
 
-#ArticleInfoHeader #ArticleTitleGroup a {
+#ArticleInfoHeader #ArticleTitleGroup div.row * {
+    padding: 0;
+    margin: 0
+}
+
+#ArticleInfoHeader #ArticleTitleGroup div.row a {
     margin: 0;
     padding: 0mm 0.2mm 0mm 2mm
 }
@@ -148,11 +154,17 @@ div.ArticleHead div.CreationTime {
 #ArticleInfoHeader #AuthorNickAndCreationTime {
     display: flex;
     flex-direction: column;
+    padding: 0;
 }
 
-#ArticleInfoHeader #AuthorNickAndCreationTime .row {
-    display: block;
-    margin: 0
+#ArticleInfoHeader #AuthorNickAndCreationTime * {
+    margin: 0;
+    padding: 0
+}
+
+
+#ArticleInfoHeader #AuthorNickAndCreationTime a {
+    padding: 1mm 2mm 1mm 4mm
 }
 
 #ArticleInfoHeader, #ArticleSettingsHeader {
@@ -160,14 +172,7 @@ div.ArticleHead div.CreationTime {
     flex-wrap: wrap
 }
 
-input {
-    display: inline-block;
-    margin: 0.2cm;
-}
-
-#ArticleSettingsHeader div, label, select {
-    display: inline-block;
-    flex: 0 1;
-    align-self: first baseline;
-    margin: 0.2cm;
+#ArticleSettingsHeader {
+    @extend .Frame;
+    @Extend .MultirowFlexContainer
 }
