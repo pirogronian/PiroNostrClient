@@ -1,6 +1,6 @@
 
 import Navigo from "navigo";
-import NDK, { NDKEvent, NDKRelay, NDKUser } from "@nostr-dev-kit/ndk";
+import NDK, { NDKEvent, NDKRelay, NDKRelayStatus, NDKUser } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 
 import { App } from "./App.js"
@@ -11,6 +11,7 @@ import "./style.scss"
 
 import HomeHTML from "./Home.html?raw"
 import SettingsHTML from "./Settings.html?raw"
+import ActiveRelayHTML from "./ActiveRelay.html?raw"
 import FinderHTML from "./Finder.html?raw"
 import FinderTagInputs from "./FinderTagInputs.html?raw"
 import ArtHeadHTML from "./ArticleHeader.html?raw"
@@ -94,15 +95,29 @@ export class UI {
         }
     }
 
+    /*connectionNames: string[] = []
+
+    initConNames() {
+        this.connectionNames[NDKRelayStatus.CONNECTED] = "connected"
+        this.connectionNames[NDKRelayStatus.DISCONNECTED] = "disconnected"
+    }*/
+
     Relays() : void {
-        const list = this.ndk.pool.relays;
-        const ListHTML = $(`#${RelaysListId}`)
+        const list = this.ndk.pool.relays.values();
+        const UIList = $("#ActiveRelays")
+        const arn = $(ActiveRelayHTML)
 
         console.log("Relays:", list.size)
 
         list.forEach((relay : NDKRelay) => {
             console.log("Relay:", relay.url)
-            ListHTML.append(`<li>${relay.url}</li>`)
+            arn.find("a").text(relay.url).attr("href", relay.url)
+            let c: string = NDKRelayStatus[relay.status]
+            c = c.toLocaleLowerCase()
+            arn.addClass(c)
+            arn.find(".status").text(c)
+
+            UIList.append(arn)
         })
     }
 
@@ -161,7 +176,7 @@ export class UI {
     }
 
     async ArticleHead(event: NDKEvent, relay?: NDKRelay) : void {
-        if (!globalThis.app.articles.enabled) return
+        if (!App.get().articles.enabled) return
         const Head = $(ArtHeadHTML)
         const title = Head.find(".ArticleTitle")
         let TT = event.tagValue("title")
@@ -170,7 +185,7 @@ export class UI {
         title.text(TT)
         MakeLinkInner(title, `/article/${event.encode()}`)
 
-        const user = await globalThis.app.user.get(event.pubkey)
+        const user = await App.get().user.get(event.pubkey)
         if (user && user.profile) {
             MakeLinkInner(Head.find("a.AuthorNick"), `/articles?author=${user.pubkey}`, user.profile.name)
             Head.find("img.AuthorImg").attr("src", user.profile.picture)

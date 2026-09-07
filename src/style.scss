@@ -75,6 +75,18 @@ code {
     margin: 2mm;
 }
 
+.ActiveRelay {
+    @extend .OnerowFlexContainer
+}
+
+#ActiveRelays .connected {
+    background-color: green
+}
+
+#ActiveRelays .disconnected {
+    background-color: grey
+}
+
 #FinderForm {
     @extend .MultirowFlexContainer
 }
