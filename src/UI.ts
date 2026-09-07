@@ -41,7 +41,7 @@ export class UI {
         $("a.inner").click((event) => {
             console.log("Inner link clicked.")
             event.preventDefault()
-            globalThis.piro.navigate($(event.currentTarget).attr("inner"))
+            globalThis.app.navigate($(event.currentTarget).attr("inner"))
         })
     }
 
@@ -119,7 +119,7 @@ export class UI {
         const form = $("#FinderForm")
         form.prop("action", InnerUrl("/articles"))
         const me = form.find("button#FinderAuthorMe")
-        const user = await globalThis.piro.user.get(null, false)
+        const user = await globalThis.app.user.get(null, false)
         if (user && user.pubkey) {
             const ai = form.find("input[name='author']")
             me.click(function() {
@@ -150,7 +150,7 @@ export class UI {
                 }
             }
             const url = searchParams.toString()
-            globalThis.piro.navigate(`/articles?${url}`)
+            globalThis.app.navigate(`/articles?${url}`)
         })
         /*form.find("input").on("keydown", function(e){
             console.log("Pressed key in input:", e.key)
@@ -160,7 +160,7 @@ export class UI {
     }
 
     async ArticleHead(event: NDKEvent, relay?: NDKRelay) : void {
-        if (!globalThis.piro.articles.enabled) return
+        if (!globalThis.app.articles.enabled) return
         const Head = $(ArtHeadHTML)
         const title = Head.find(".ArticleTitle")
         let TT = event.tagValue("title")
@@ -169,7 +169,7 @@ export class UI {
         title.text(TT)
         MakeLinkInner(title, `/article/${event.encode()}`)
 
-        const user = await globalThis.piro.user.get(event.pubkey)
+        const user = await globalThis.app.user.get(event.pubkey)
         if (user && user.profile) {
             MakeLinkInner(Head.find("a.AuthorNick"), `/articles?author=${user.pubkey}`, user.profile.name)
             Head.find("img.AuthorImg").attr("src", user.profile.picture)
@@ -187,7 +187,7 @@ export class UI {
         Head.find("a.inner").click((event) => {
             console.log("Additional link clicked.")
             event.preventDefault()
-            globalThis.piro.navigate($(event.currentTarget).attr("inner"))
+            globalThis.app.navigate($(event.currentTarget).attr("inner"))
         })
 
         const fr = this.mainView().find("#FinderResult")

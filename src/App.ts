@@ -11,7 +11,7 @@ import { LoadArticle } from "./Article.js"
 import { Articles } from './Articles.js';
 import type { CallExpression } from 'typescript/unstable/ast';
 
-export class Piro {
+export class App {
     router: Navigo
     ndk: NDK
     relays: Relays

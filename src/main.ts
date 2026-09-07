@@ -1,14 +1,14 @@
 
-import { Piro } from "./Piro.js"
+import { App } from "./App.js"
 
 console.log("Reloading with url:", window.location.href)
 
-const p = new Piro()
+const app = new App()
 
-globalThis.piro = p
+globalThis.app = app
 
-p.login()
-p.connect()
-p.setupLocation()
-p.initRouting()
-p.initUI()
+app.login()
+app.connect()
+app.setupLocation()
+app.initRouting()
+app.initUI()

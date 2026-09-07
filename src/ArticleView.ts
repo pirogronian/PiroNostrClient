@@ -166,7 +166,7 @@ export class ArticleView {
         //o.find("h1 a").text(this.event.tagValue("title")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
         o.find("#RawArticleContent").text(this.event.content)
     
-        const user = await globalThis.piro.user.get(this.event.pubkey)
+        const user = await globalThis.app.user.get(this.event.pubkey)
         if (user && user.profile) {
             o.find("img#AuthorPicture").attr("src", user.profile.picture)
             MakeLinkInner(o.find("a#AuthorNick"), `/articles?author=${user.pubkey}`, user.profile.name)
