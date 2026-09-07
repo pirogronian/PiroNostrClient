@@ -150,6 +150,11 @@ export class UI {
             const url = searchParams.toString()
             globalThis.piro.navigate(`/articles?${url}`)
         })
+        /*form.find("input").on("keydown", function(e){
+            console.log("Pressed key in input:", e.key)
+            if (e.key === "Enter")
+                console.log("Enter pressed in input field.")
+        })*/
     }
 
     async ArticleHead(event: NDKEvent, relay?: NDKRelay) : void {
