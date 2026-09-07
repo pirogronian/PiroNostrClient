@@ -69,7 +69,7 @@ export class Piro {
             else {
                 console.log("Clear main view, create finder.")
                 this.ui.clear()
-                this.ui.finder(this.router)
+                this.ui.finder()
             }
             this.loadArticles(match?.params)
         })
@@ -170,8 +170,8 @@ export class Piro {
         this.ui.Relays()
     }
 
-    loadFinder(author: string|null = null, id: string|null = null) {
-        this.ui.finder(this.router, author, id)
+    loadFinder() {
+        this.ui.finder()
     }
 
     loadArticles(params: object) {

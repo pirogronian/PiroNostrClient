@@ -111,7 +111,7 @@ export class UI {
         return $("input#FinderForm").html()
     }
 
-    async finder(router: Navigo) {
+    async finder() {
         const o = $(FinderHTML)
         this.mainView().append(o)
         const form = $("#FinderForm")
@@ -148,7 +148,7 @@ export class UI {
                 }
             }
             const url = searchParams.toString()
-            router.navigate(`/articles?${url}`)
+            globalThis.piro.navigate(`/articles?${url}`)
         })
     }
 
