@@ -178,6 +178,7 @@ export class UI {
         })
 
         Head.find("a.inner").click((event) => {
+            console.log("Additional link clicked.")
             event.preventDefault()
             globalThis.piro.navigate($(event.currentTarget).attr("inner"))
         })
