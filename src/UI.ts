@@ -6,6 +6,8 @@ import $ from "jquery"
 import { ArticleView } from "./ArticleView.js";
 import { EventTagValues, InnerUrl, InnerLink, MakeLinkInner } from "./various.js"
 
+import "./style.scss"
+
 import HomeHTML from "./Home.html?raw"
 import SettingsHTML from "./Settings.html?raw"
 import FinderHTML from "./Finder.html?raw"

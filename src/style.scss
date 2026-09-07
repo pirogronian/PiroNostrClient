@@ -46,12 +46,12 @@ code {
     height: 100vh
 }
 
-.FlexContainer {
+.MultirowFlexContainer {
     display: flex;
     flex-wrap: wrap;
 }
 
-.FlexContainer * {
+.MultirowFlexContainer * {
     display: inline-flex;
     flex: 0 1 auto;
     align-self: first baseline;
@@ -59,18 +59,24 @@ code {
     margin: 2mm;
 }
 
-div.ArticleHead {
-    display: flex;
-    padding: 2mm;
-    margin: 2mm;
-    border: lightgray solid 0.05cm
+.OnerowFlexContainer {
+    display: flex
 }
 
-div.ArticleHead * {
+.OnerowFlexContainer * {
     display: inline-block;
     align-self: center;
     padding: 2mm;
     margin: 2mm;
+}
+
+#FinderForm {
+    @extend .MultirowFlexContainer
+}
+
+div.ArticleHead {
+    @extend .OnerowFlexContainer;
+    @extend .Frame
 }
 
 div.ArticleHead img {
