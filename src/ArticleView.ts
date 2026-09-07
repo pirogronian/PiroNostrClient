@@ -8,7 +8,7 @@ import { createJSONEditor, createKeySelection } from "vanilla-jsoneditor";
 import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core';
 import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
-import { formatNip54TagD, EventTagValues, LocalUrl } from "./various.js";
+import { formatNip54TagD, EventTagValues, InnerUrl, InnerLink, MakeLinkInner } from "./various.js";
 import { UI } from "./UI.js";
 
 import ArticleViewHTML from './Article.html?raw';
@@ -63,8 +63,9 @@ export class ArticleView {
             //console.log("Checking node:", $(this).prop("nodeName"))
             //console.log("Checking node:", node)
             if (!node.text() && !node.attr("href")) {
-                node.text(node.attr("id"))
-                node.attr("href", LocalUrl(`#/articles?id=${formatNip54TagD(node.attr("id"))}`))
+                MakeLinkInner(node, `/articles?id=${formatNip54TagD(node.attr("id"))}`, node.attr("id"))
+                /*node.text(node.attr("id"))
+                node.attr("href", InnerUrl(`/articles?id=${formatNip54TagD(node.attr("id"))}`))*/
             }
         })
     }
@@ -88,7 +89,8 @@ export class ArticleView {
             //console.log("Checking node:", $(this).prop("nodeName"))
             //console.log("Checking node:", node)
             if (!node.attr("href")) {
-                node.attr("href", LocalUrl(`#/articles?id=${formatNip54TagD(node.text())}`))
+                MakeLinkInner(node, `/articles?id=${formatNip54TagD(node.text())}`)
+                //node.attr("href", LocalUrl(`#/articles?id=${formatNip54TagD(node.text())}`))
             }
         })
     }
@@ -129,6 +131,7 @@ export class ArticleView {
     }
     
     async showContent(format: string|undefined ) {
+        console.log("Showing content with format:", format)
         $("#ArticleContentView").html("")
         $("#ArticleContentView").append(await this.createNode(format))
     }
@@ -156,16 +159,19 @@ export class ArticleView {
         this.restoreSettings()
 
         const o = $(ArticleViewHTML)
-        o.find("h1 a").text(this.event.tagValue("title")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
+        MakeLinkInner(o.find("h1 a"), `/articles?id=${this.event.tagValue("d")}`, this.event.tagValue("title"))
+        //o.find("h1 a").text(this.event.tagValue("title")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
         o.find("#RawArticleContent").text(this.event.content)
     
         const user = await globalThis.piro.user.get(this.event.pubkey)
         if (user && user.profile) {
             o.find("img#AuthorPicture").attr("src", user.profile.picture)
-            o.find("a#AuthorNick").text(user.profile.name).attr("href", LocalUrl(`#/articles?author=${user.pubkey}`))
+            MakeLinkInner(o.find("a#AuthorNick"), `/articles?author=${user.pubkey}`, user.profile.name)
+            //o.find("a#AuthorNick").text(user.profile.name).attr("href", LocalUrl(`#/articles?author=${user.pubkey}`))
         }
         o.find("#CreationTime").text(this.ui.time(this.event.created_at))
-        o.find("a#ArticleId").text(this.event.tagValue("d")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
+        MakeLinkInner(o.find("a#ArticleId"), `/articles?id=${this.event.tagValue("d")}`, this.event.tagValue("d"))
+        //o.find("a#ArticleId").text(this.event.tagValue("d")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
         o.find("#ArticleSummary").text(this.event.tagValue("summary"))
 
         let origin = this.event.tagValue("e")
@@ -178,7 +184,7 @@ export class ArticleView {
         const topics = EventTagValues(this.event, "t")
         const HeadTopics = o.find("#ArticleTopics")
         topics.forEach(function(topic) {
-            const a = $(`<a href="${LocalUrl(`#/articles?t=${topic}">${topic}</a>`)}`)
+            const a = $(InnerLink(`/articles?t=${topic}"`, topic))
             HeadTopics.append(a)
         })
 

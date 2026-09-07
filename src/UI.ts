@@ -4,7 +4,7 @@ import NDK, { NDKEvent, NDKRelay, NDKUser } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 
 import { ArticleView } from "./ArticleView.js";
-import { EventTagValues, LocalUrl } from "./various.js"
+import { EventTagValues, InnerUrl, InnerLink, MakeLinkInner } from "./various.js"
 
 import HomeHTML from "./Home.html?raw"
 import SettingsHTML from "./Settings.html?raw"
@@ -29,16 +29,16 @@ export class UI {
     }
 
     init() {
-        $("a#HomeLink").attr("href", LocalUrl("#/"))
-        $("a#SearchLink").attr("href", LocalUrl("#/search"))
-        $("a#SettingsLink").attr("href", LocalUrl("#/settings"))
+        MakeLinkInner($("a#HomeLink"), "/")
+        MakeLinkInner($("a#SearchLink"), "/search")
+        MakeLinkInner($("a#SettingsLink"), "/settings")
     }
 
-    initLinks(router: Navigo) {
-        $("a.a").click(function(event) {
+    initLinks() {
+        console.log("Init links.")
+        $("a.inner").click((event) => {
             event.preventDefault()
-            router.navigate($(this).attr("href"), { callHandler: true })
-            //router.navigate($(this).attr("href"))
+            globalThis.piro.navigate($(event.currentTarget).attr("inner"))
         })
     }
 
@@ -114,7 +114,7 @@ export class UI {
         const o = $(FinderHTML)
         this.mainView().append(o)
         const form = $("#FinderForm")
-        //form.prop("action", LocalUrl("#/articles"))
+        form.prop("action", InnerUrl("/articles"))
         const me = form.find("button#FinderAuthorMe")
         const user = await globalThis.piro.user.get(null, false)
         if (user && user.pubkey) {
@@ -159,11 +159,11 @@ export class UI {
         if (!TT) { TT = event.tagValue("d") }
         console.log(`Received article "${TT}"`)
         title.text(TT)
-        title.attr("href", LocalUrl(`#/article/${event.encode()}`))
+        MakeLinkInner(title, `/article/${event.encode()}`)
 
         const user = await globalThis.piro.user.get(event.pubkey)
         if (user && user.profile) {
-            Head.find("a.AuthorNick").text(user.profile.name).attr("href", LocalUrl(`#/articles?author=${user.pubkey}`))
+            MakeLinkInner(Head.find("a.AuthorNick"), `/articles?author=${user.pubkey}`, user.profile.name)
             Head.find("img.AuthorImg").attr("src", user.profile.picture)
             Head.find("div.CreationTime").text(this.time(event.created_at))
         }
@@ -172,8 +172,13 @@ export class UI {
         const topics = EventTagValues(event, "t")
         const HeadTopics = Head.find(".Topics")
         topics.forEach(function(topic) {
-            const a = $(`<a href="${LocalUrl(`#/articles?t=${topic}`)}">${topic}</a>`)
+            const a = $(InnerLink(`/articles?t=${topic}`), topic)
             HeadTopics.append(a)
+        })
+
+        Head.find("a.inner").click((event) => {
+            event.preventDefault()
+            globalThis.piro.navigate($(event.currentTarget).attr("inner"))
         })
 
         this.mainView().find("#FinderResult").append(Head)

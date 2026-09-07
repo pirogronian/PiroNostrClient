@@ -34,6 +34,19 @@ export function EventTagValues(event: NDKEvent, tagName: string) : string[] {
     return event.tags.filter((tag) => tag[0] == tagName).map((tag) => tag[1])
 }
 
-export function LocalUrl(url: string): string {
-    return window.location.pathname.concat(url)
+export function InnerUrl(url: string): string {
+    return window.location.pathname.concat("#".concat(url))
+}
+
+export function InnerLink(url: string, text: string = "") {
+    return `<a inner="${url}" class="inner" href=${InnerUrl}>${text}</a>`
+}
+
+export function MakeLinkInner(node, url: string, text: string|null = null) {
+    node.attr("inner", url)
+    node.attr("href", InnerUrl(url))
+    node.attr("class", "inner")
+    if (text !== null)
+        node.text(text)
+    //console.log("Prepared inner link:", node.html())
 }

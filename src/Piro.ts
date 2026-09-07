@@ -20,7 +20,7 @@ export class Piro {
     articles: Articles
 
     constructor() {
-        this.router = new Navigo(window.location.pathname, { hash: true })
+        this.router = new Navigo("/", { hash: true })
         const cacheAdapter = new NDKCacheAdapterDexie({ dbName: 'wiki-nostr-cache' });
         this.ndk = new NDK({ cacheAdapter });
         this.relays = new Relays(this.ndk)
@@ -41,6 +41,7 @@ export class Piro {
 
     initRouting() {
         console.log("Init routing on:", window.location.href)
+
         this.router.hooks({
             before: (done, math) => {
                 console.log("Route.before:", window.location.href)
@@ -113,6 +114,13 @@ export class Piro {
         window.history.replaceState(null, href, href)
     }
 
+    navigate(path: string) {
+        const cleanPath = path.startsWith("/") ? path : "/" + path;
+        window.location.hash = cleanPath;
+        console.log("piro.navigate: ", window.location.href)
+        this.router.resolve()
+    }
+
     login(method?: string) {
         this.user.login(method)
         //this.settings()
@@ -128,7 +136,7 @@ export class Piro {
     }
 
     initHyperlinks() {
-        this.ui.initLinks(this.router)
+        this.ui.initLinks()
     }
 
     home() {
@@ -144,11 +152,11 @@ export class Piro {
             this.ui.user(u, { 
                 onLogin: (method:string) => {
                     this.login(method);
-                    this.router.navigate("/settings")
+                    this.navigate("/settings")
                 },
                 onLogout: () => {
                     this.logout();
-                    this.router.navigate("/settings")
+                    this.navigate("/settings")
                 } })
         })
         this.ui.Relays()
