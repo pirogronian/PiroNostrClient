@@ -147,7 +147,7 @@ export class UI {
                 }
             }
             const url = searchParams.toString()
-            router.navigate(`#/articles?${url}`)
+            router.navigate(`/articles?${url}`)
         })
     }
 
