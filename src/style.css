@@ -1,11 +1,11 @@
 
-a:not(:where(#ArticleView a)), label:not(#ArticleView label) {
+a:not(:where(#ArticleView a)), label:not(:where(#ArticleView label)) {
     display: inline-flex;      /* Prawidłowe zachowanie wierszowe */
     align-items: center;
     padding: 0.2cm;
 }
 
-a:not(#ArticleView a):hover, label.active:not(#ArticleView label):hover {
+a:not(:where(#ArticleView a)):hover, label.active:not(:where(#ArticleView label)):hover {
     background-color: lightgray;
 }
 
@@ -17,7 +17,7 @@ a:not(#ArticleView a):hover, label.active:not(#ArticleView label):hover {
     display: block;
     float: left;
     margin: 0.2cm
- }
+}
 
 #MainNav {
     display: block flow-root;
@@ -88,15 +88,20 @@ div.ArticleHead div.CreationTime {
 
 #ArticleInfoHeader * {
     display: inline-block;
+    flex: 1 1;
     align-self: center;
     margin: 0.2cm;
+    /*max-height: 2cm;*/
+}
+
+#ArticleInfoHeader img {
     max-height: 2cm;
 }
 
 #ArticleInfoHeader #ArticleTitleGroup {
     display: flex;
     flex-direction: column;
-    max-height: 2cm
+    /*max-height: 2cm*/
 }
 
 #ArticleInfoHeader #ArticleTitleGroup {
@@ -132,11 +137,13 @@ div.ArticleHead div.CreationTime {
 }
 
 #ArticleInfoHeader, #ArticleSettingsHeader {
-    display: flex
+    display: flex;
+    flex-wrap: wrap
 }
 
 #ArticleSettingsHeader div, label, input, select {
     display: inline-block;
+    flex: 1 1;
     align-self: first baseline;
     margin: 0.2cm;
 }
