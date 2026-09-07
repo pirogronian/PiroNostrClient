@@ -11,7 +11,7 @@ const DEFAULT_RELAYS = [
 
 export function getStoredRelays(): string[] {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return DEFAULT_RELAYS;
+    if (!saved) return []
   
     try {
         const parsed = JSON.parse(saved);
@@ -22,10 +22,19 @@ export function getStoredRelays(): string[] {
 }
 
 export class Relays {
-    ndk : NDK
+    ndk: NDK
+    autoAdd: boolean = true
 
     constructor(ndk: NDK) {
         this.ndk = ndk
+    }
+
+    get() {
+        return this.ndk.pool.relays.values();
+    }
+
+    getUrls() {
+        return this.ndk.pool.relays.keys();
     }
 
     save(): void {
@@ -34,8 +43,36 @@ export class Relays {
     }
 
     load(): void {
-        const relays = getStoredRelays()
-        relays.forEach((relay) => { this.ndk.pool.addRelay(new NDKRelay(relay, null, this.ndk), true) })
+        const urls = getStoredRelays()
+        urls.forEach((url) => { 
+            this.add(url)
+        })
+    }
+
+    add(url: string|NDKRelay) {
+        let relay: NDKRelay
+        if (typeof url == "string") {
+            relay = new NDKRelay(url, undefined, this.ndk)
+        }
+        else
+            relay = url
+        if (relay)
+            this.ndk.pool.addRelay(relay, true)
+        else
+            console.log("No relay created.")
+    }
+
+    addDefaults() {
+        DEFAULT_RELAYS.forEach((url) => {
+            this.add(url)
+        })
+    }
+
+    remove(url: string) {
+        const relay = this.ndk.pool.relays.get(url)
+        if (!relay)  return
+        relay.disconnect()
+        this.ndk.pool.removeRelay(url)
     }
 }
 

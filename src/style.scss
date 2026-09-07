@@ -75,8 +75,12 @@ code {
     margin: 2mm;
 }
 
+#ActiveRelaysHeader {
+    @extend .MultirowFlexContainer
+}
+
 .ActiveRelay {
-    @extend .OnerowFlexContainer
+    @extend .OnerowFlexContainer;
 }
 
 #ActiveRelays .connected {
