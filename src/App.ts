@@ -19,7 +19,10 @@ export class App {
     ui: UI
     articles: Articles
 
+    static _app: App
+
     constructor() {
+        App._app = this
         this.router = new Navigo("/", { hash: true, strategy: Navigo.ONE })
         const cacheAdapter = new NDKCacheAdapterDexie({ dbName: 'wiki-nostr-cache' });
         this.ndk = new NDK({ cacheAdapter });
@@ -32,6 +35,8 @@ export class App {
         });
         this.relays.load()
     }
+
+    static get() : App { return App._app }
 
     connect() { this.ndk.connect() }
 

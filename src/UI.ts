@@ -3,6 +3,7 @@ import Navigo from "navigo";
 import NDK, { NDKEvent, NDKRelay, NDKUser } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 
+import { App } from "./App.js"
 import { ArticleView } from "./ArticleView.js";
 import { EventTagValues, InnerUrl, InnerLink, MakeLinkInner } from "./various.js"
 
@@ -41,7 +42,7 @@ export class UI {
         $("a.inner").click((event) => {
             console.log("Inner link clicked.")
             event.preventDefault()
-            globalThis.app.navigate($(event.currentTarget).attr("inner"))
+            App.get().navigate($(event.currentTarget).attr("inner"))
         })
     }
 
@@ -119,7 +120,7 @@ export class UI {
         const form = $("#FinderForm")
         form.prop("action", InnerUrl("/articles"))
         const me = form.find("button#FinderAuthorMe")
-        const user = await globalThis.app.user.get(null, false)
+        const user = await App.get().user.get(null, false)
         if (user && user.pubkey) {
             const ai = form.find("input[name='author']")
             me.click(function() {
@@ -150,7 +151,7 @@ export class UI {
                 }
             }
             const url = searchParams.toString()
-            globalThis.app.navigate(`/articles?${url}`)
+            App.get().navigate(`/articles?${url}`)
         })
         /*form.find("input").on("keydown", function(e){
             console.log("Pressed key in input:", e.key)
@@ -187,7 +188,7 @@ export class UI {
         Head.find("a.inner").click((event) => {
             console.log("Additional link clicked.")
             event.preventDefault()
-            globalThis.app.navigate($(event.currentTarget).attr("inner"))
+            App.get().navigate($(event.currentTarget).attr("inner"))
         })
 
         const fr = this.mainView().find("#FinderResult")

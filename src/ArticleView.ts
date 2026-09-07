@@ -8,6 +8,7 @@ import { createJSONEditor, createKeySelection } from "vanilla-jsoneditor";
 import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core';
 import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
+import { App } from "./App.js"
 import { formatNip54TagD, EventTagValues, InnerUrl, InnerLink, MakeLinkInner } from "./various.js";
 import { UI } from "./UI.js";
 
@@ -166,7 +167,7 @@ export class ArticleView {
         //o.find("h1 a").text(this.event.tagValue("title")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
         o.find("#RawArticleContent").text(this.event.content)
     
-        const user = await globalThis.app.user.get(this.event.pubkey)
+        const user = await App.get().user.get(this.event.pubkey)
         if (user && user.profile) {
             o.find("img#AuthorPicture").attr("src", user.profile.picture)
             MakeLinkInner(o.find("a#AuthorNick"), `/articles?author=${user.pubkey}`, user.profile.name)
