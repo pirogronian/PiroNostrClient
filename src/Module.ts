@@ -2,7 +2,8 @@
 import $ from "jquery"
 import Navigo from "navigo"
 import NDK from "@nostr-dev-kit/ndk"
-import { Router } from "./Router.js"
+import { Router } from "@/Router.js"
+import { InnerUrl } from "./various.js"
 
 export class Module {
     settingsName!: string

@@ -3,14 +3,14 @@ import Navigo from "navigo";
 import NDK, { NDKEvent, NDKRelay, NDKRelayStatus, NDKUser } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 
-import { App } from "./App.js"
-import { EventTagValues, InnerUrl, InnerLink, MakeLinkInner } from "./various.js"
+import { App } from "@/App.js"
+import { EventTagValues, InnerUrl, InnerLink, MakeLinkInner } from "@/various.js"
 
-import "./style.scss"
+import "@/style.scss"
 
-import HomeHTML from "./Home.html?raw"
-import SettingsHTML from "./Settings.html?raw"
-import ActiveRelayHTML from "./ActiveRelay.html?raw"
+import HomeHTML from "@/Home.html?raw"
+import SettingsHTML from "@/Settings.html?raw"
+import ActiveRelayHTML from "@/ActiveRelay.html?raw"
 
 import { ReadonlyValue } from "vanilla-jsoneditor";
 
@@ -45,24 +45,6 @@ export class UI {
 
     clear() {
         this.mainView().html("")
-    }
-
-    clearMessage() {
-        $("#Message").text("")
-    }
-
-    error(msg: string) {
-        $("#Message").text(`Error: ${msg}`)
-    }
-
-    time(seconds: number|undefined|null = null) {
-        let t: Date|null = null
-        if (seconds) {
-            seconds *= 1000;
-            t = new Date(seconds)
-        }
-        t = new Date()
-        return t.toLocaleString()
     }
 
     home() {

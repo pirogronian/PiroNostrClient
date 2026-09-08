@@ -8,12 +8,12 @@ import { createJSONEditor, createKeySelection } from "vanilla-jsoneditor";
 import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core';
 import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
-import { Module } from "./Module.js"
-import { App } from "./App.js"
-import { safeAsync, formatNip54TagD, EventTagValues, InnerUrl, InnerLink, MakeLinkInner, FormattedTime } from "./various.js";
-import { UI } from "./UI.js";
+import { Module } from "@/Module.js"
+import { App } from "@/App.js"
+import { safeAsync, formatNip54TagD, EventTagValues, InnerUrl, InnerLink, MakeLinkInner, FormattedTime } from "@/various.js";
+import { UI } from "@/UI.js";
 
-import ArticleViewHTML from './Article.html?raw';
+import ArticleViewHTML from '@/Article.html?raw';
 
 const LAST_ARTICLE_FORMAT_KEY = "LAST_ARTICLE_FORMATKEY"
 const USE_LAST_ARTICLE_FORMAT_KEY = "USE_LAST_ARTICLE_FORMAT_KEY"

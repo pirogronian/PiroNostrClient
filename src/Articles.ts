@@ -3,13 +3,13 @@ import $ from "jquery"
 import NDK, { NDKEvent, NDKRelay } from "@nostr-dev-kit/ndk";
 import type { NDKFilter, NDKSubscription } from "@nostr-dev-kit/ndk"
 
-import { safeAsync, EventTagValues, InnerUrl, MakeLinkInner, InnerLink, FormattedTime } from "./various.js";
-import { Module } from "./Module.js";
-import { App } from "./App.js"
+import { safeAsync, EventTagValues, InnerUrl, MakeLinkInner, InnerLink, FormattedTime } from "@/various.js";
+import { Module } from "@/Module.js";
+import { App } from "@/App.js"
 
-import FinderHTML from "./Finder.html?raw"
-import FinderTagInputs from "./FinderTagInputs.html?raw"
-import ArtHeadHTML from "./ArticleHeader.html?raw"
+import FinderHTML from "@/Finder.html?raw"
+import FinderTagInputs from "@/FinderTagInputs.html?raw"
+import ArtHeadHTML from "@/ArticleHeader.html?raw"
 
 export class Articles extends Module {
     sub: NDKSubscription | null = null

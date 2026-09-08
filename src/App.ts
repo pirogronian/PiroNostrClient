@@ -1,15 +1,15 @@
 
 import NDK, { NDKEvent, NDKUser, NDKRelay } from "@nostr-dev-kit/ndk";
 import NDKCacheAdapterDexie from '@nostr-dev-kit/ndk-cache-dexie';
-import { UI } from "./UI.js"
-import { Relays } from './Relays.js';
-import { User } from "./User.js"
+import { UI } from "@/UI.js"
+import { Relays } from '@/Relays.js';
+import { User } from "@/User.js"
 
-import { safeAsync } from "./various.js"
-import { Router } from "./Router.js"
-import { Module } from "./Module.js"
-import { Articles } from './Articles.js';
-import { Article } from "./Article.js";
+import { safeAsync } from "@/various.js"
+import { Router } from "@/Router.js"
+import { Module } from "@/Module.js"
+import { Articles } from '@/Articles.js';
+import { Article } from "@/Article.js";
 import type { CallExpression } from 'typescript/unstable/ast';
 
 export class App extends Module {
