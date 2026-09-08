@@ -1,16 +1,55 @@
 
+import $ from "jquery"
 import NDK, { NDKEvent, NDKRelay } from "@nostr-dev-kit/ndk";
 import type { NDKFilter, NDKSubscription } from "@nostr-dev-kit/ndk"
 
-import { safeAsync } from "./various.js";
+import { safeAsync, EventTagValues, MakeLinkInner, InnerLink, FormattedTime } from "./various.js";
 import { Module } from "./Module.js";
+import { App } from "./App.js"
+
+import ArtHeadHTML from "./ArticleHeader.html?raw"
 
 export class Articles extends Module {
     sub: NDKSubscription | null = null
     enabled: boolean = false
 
-    constructor() {
-        super()
+    async articleHead(event: NDKEvent, relay?: NDKRelay) : Promise<void> {
+        //console.log("Article event:", event)
+        if (!App.get().articles.enabled) return
+        //console.log("Articles enabled")
+        const Head = $(ArtHeadHTML)
+        const title = Head.find(".ArticleTitle")
+        let TT = event.tagValue("title")
+        if (!TT) { TT = event.tagValue("d") }
+        console.log(`Received article "${TT}"`)
+        title.text(TT)
+        MakeLinkInner(title, `/article/${event.encode()}`)
+
+        const user = await App.get().user.get(event.pubkey)
+        if (user && user.profile) {
+            MakeLinkInner(Head.find("a.AuthorNick"), `/articles?author=${user.pubkey}`, user.profile.name)
+            Head.find("img.AuthorImg").attr("src", user.profile.picture)
+            Head.find("div.CreationTime").text(FormattedTime(event.created_at))
+        }
+
+        Head.find("div.Summary").text(event.tagValue("summary"))
+        const topics = EventTagValues(event, "t")
+        const HeadTopics = Head.find(".Topics")
+        topics.forEach(function(topic) {
+            const a = $(InnerLink(`/articles?t=${topic}`), topic)
+            HeadTopics.append(a)
+        })
+
+        Head.find("a.inner").click((event) => {
+            console.log("Additional link clicked.")
+            event.preventDefault()
+            App.get().router.navigate($(event.currentTarget).attr("inner"))
+        })
+
+        const fr = this.mainView().find("#FinderResult")
+        fr.append(Head)
+        $("#FinderResultsNumber").text(`Results: ${fr.children().length}`)
+
     }
 
     load(params: object,
@@ -78,4 +117,16 @@ export class Articles extends Module {
         }
         this.enabled = false
     }
+
+    handle(params: object) {
+        //this.loadFinder(params.author, params.id)
+        const err = this.load(params,
+            (event: NDKEvent, relay?: NDKRelay) => {
+                this.articleHead(event, relay)
+            })
+        if (err) {
+            this.error(err.message)
+        }
+    }
+
 }

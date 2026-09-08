@@ -81,7 +81,7 @@ export class App extends Module {
                 this.ui.clear()
                 this.ui.finder()
             }
-            this.loadArticles(match?.params)
+            this.articles.handle(match?.params)
         })
         this.router.onRoute('/search', (match) => {
             console.log("Route: /search")
@@ -171,14 +171,4 @@ export class App extends Module {
         this.ui.finder()
     }
 
-    loadArticles(params: object) {
-        //this.loadFinder(params.author, params.id)
-        const err = this.articles.load(params,
-            (event: NDKEvent, relay?: NDKRelay) => {
-                this.ui.ArticleHead(event, relay)
-            })
-        if (err) {
-            this.ui.error(err.message)
-        }
-    }
 }

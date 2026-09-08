@@ -13,7 +13,6 @@ import SettingsHTML from "./Settings.html?raw"
 import ActiveRelayHTML from "./ActiveRelay.html?raw"
 import FinderHTML from "./Finder.html?raw"
 import FinderTagInputs from "./FinderTagInputs.html?raw"
-import ArtHeadHTML from "./ArticleHeader.html?raw"
 import { ReadonlyValue } from "vanilla-jsoneditor";
 
 const MainViewId = "MainView"
@@ -183,45 +182,6 @@ export class UI {
             if (e.key === "Enter")
                 console.log("Enter pressed in input field.")
         })*/
-    }
-
-    async ArticleHead(event: NDKEvent, relay?: NDKRelay) : void {
-        //console.log("Article event:", event)
-        if (!App.get().articles.enabled) return
-        //console.log("Articles enabled")
-        const Head = $(ArtHeadHTML)
-        const title = Head.find(".ArticleTitle")
-        let TT = event.tagValue("title")
-        if (!TT) { TT = event.tagValue("d") }
-        console.log(`Received article "${TT}"`)
-        title.text(TT)
-        MakeLinkInner(title, `/article/${event.encode()}`)
-
-        const user = await App.get().user.get(event.pubkey)
-        if (user && user.profile) {
-            MakeLinkInner(Head.find("a.AuthorNick"), `/articles?author=${user.pubkey}`, user.profile.name)
-            Head.find("img.AuthorImg").attr("src", user.profile.picture)
-            Head.find("div.CreationTime").text(this.time(event.created_at))
-        }
-
-        Head.find("div.Summary").text(event.tagValue("summary"))
-        const topics = EventTagValues(event, "t")
-        const HeadTopics = Head.find(".Topics")
-        topics.forEach(function(topic) {
-            const a = $(InnerLink(`/articles?t=${topic}`), topic)
-            HeadTopics.append(a)
-        })
-
-        Head.find("a.inner").click((event) => {
-            console.log("Additional link clicked.")
-            event.preventDefault()
-            App.get().router.navigate($(event.currentTarget).attr("inner"))
-        })
-
-        const fr = this.mainView().find("#FinderResult")
-        fr.append(Head)
-        $("#FinderResultsNumber").text(`Results: ${fr.children().length}`)
-
     }
 
     clearFinderResult() {
