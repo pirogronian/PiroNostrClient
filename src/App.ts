@@ -19,7 +19,7 @@ export class App extends Module {
     user: User
     ui: UI
     articles: Articles
-    article: ArticleView
+    article: Article
 
     static _app: App
 
@@ -32,7 +32,8 @@ export class App extends Module {
         const cacheAdapter = new NDKCacheAdapterDexie({ dbName: 'wiki-nostr-cache' });
         this.ndk = new NDK({ cacheAdapter });
         this.relays = new Relays(this.ndk)
-        this.user = new User(this.ndk)
+        this.user = new User()
+        this.user.register("user", "user", this)
         this.articles = new Articles()
         this.articles.register("articles", "articles", this)
         this.article = new Article()
@@ -139,10 +140,6 @@ export class App extends Module {
                 }})
         })
         this.ui.Relays()
-    }
-
-    loadFinder() {
-        this.ui.finder()
     }
 
 }

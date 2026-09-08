@@ -1,16 +1,12 @@
 
 import NDK, { NDKUser, NDKNip07Signer } from "@nostr-dev-kit/ndk";
+import { Module } from "@/Module.js"
 
 const SIGNER_KEY = "SIGNER"
 const NIP07 = "nip07"
 const PIVATEKEY = "privatekey"
 
-export class User {
-    ndk: NDK
-
-    constructor(ndk: NDK) {
-        this.ndk = ndk
-    }
+export class User extends Module{
 
     async get(npub: string|null = null, profile: boolean = true) : Promise<NDKUser|null|undefined> {
         let user : NDKUser|null|undefined = null
