@@ -69,20 +69,7 @@ export class App extends Module {
             const addr = data.id
             this.article.handle(addr)
         })*/
-        this.router.onRoute('/articles', (match) => {
-            console.log("Route: /articles")
-            //console.log(match.params)
-            if (this.ui.isFinder()) {
-                console.log("Is finder, clearing results.")
-                this.ui.clearFinderResult()
-            }
-            else {
-                console.log("Clear main view, create finder.")
-                this.ui.clear()
-                this.ui.finder()
-            }
-            this.articles.handle(match?.params)
-        })
+        
         this.router.onRoute('/search', (match) => {
             console.log("Route: /search")
             this.ui.clear()

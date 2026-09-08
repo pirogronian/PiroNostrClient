@@ -11,8 +11,7 @@ import "./style.scss"
 import HomeHTML from "./Home.html?raw"
 import SettingsHTML from "./Settings.html?raw"
 import ActiveRelayHTML from "./ActiveRelay.html?raw"
-import FinderHTML from "./Finder.html?raw"
-import FinderTagInputs from "./FinderTagInputs.html?raw"
+
 import { ReadonlyValue } from "vanilla-jsoneditor";
 
 const MainViewId = "MainView"
@@ -134,62 +133,4 @@ export class UI {
         this.mainView().html(SettingsHTML)
     }
 
-    isFinder(): boolean {
-        return $("form#FinderForm").html()
-    }
-
-    async finder() {
-        const o = $(FinderHTML)
-        this.mainView().append(o)
-        const form = $("#FinderForm")
-        form.prop("action", InnerUrl("/articles"))
-        const me = form.find("button#FinderAuthorMe")
-        const user = await App.get().user.get(null, false)
-        if (user && user.pubkey) {
-            const ai = form.find("input[name='author']")
-            me.click(function() {
-                ai.val(user.pubkey)
-            })
-        } else me.hide()
-        const fft = form.find("#FinderFormTags")
-        form.find("button#AddSearchTag").click(() => {
-            const tag = form.find("input[name='tag']").val()
-            const val = form.find("input[name='tagvalue']").val()
-            if (!tag) return;
-            const o = $(FinderTagInputs)
-            o.find("input").attr("name", tag).val(val)
-            o.find("label").attr("for", tag).text(`Tag "${tag}:"`)
-            o.find("button").attr("data", tag)
-            o.find("button").click(function() {
-                $(this).parent().remove()
-            })
-            fft.append(o)
-        })
-        form.submit((e) => {
-            e.preventDefault()
-            const formData = new FormData(form.get(0));
-            const searchParams = new URLSearchParams();
-            for (const [key, value] of formData.entries()) {
-                if (value) {
-                    searchParams.append(key, value.toString());
-                }
-            }
-            const url = searchParams.toString()
-            App.get().router.navigate(`/articles?${url}`)
-        })
-        /*form.find("input").on("keydown", function(e){
-            console.log("Pressed key in input:", e.key)
-            if (e.key === "Enter")
-                console.log("Enter pressed in input field.")
-        })*/
-    }
-
-    clearFinderResult() {
-        $("#FinderResult").html("")
-    }
-
-    article(event: NDKEvent) {
-        this.artv.setEvent(event)
-        this.artv.show()
-    }
 }
