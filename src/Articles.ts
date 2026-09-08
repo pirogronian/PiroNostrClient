@@ -195,5 +195,6 @@ export class Articles extends Module {
             if (match?.params)
                 this.handle(match?.params)
         })
+        this.makeLinkActive($("#SearchLink"), "")
     }
 }
