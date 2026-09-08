@@ -8,8 +8,6 @@ import { EventTagValues, InnerUrl, InnerLink, MakeLinkInner } from "@/various.js
 
 import "@/style.scss"
 
-import HomeHTML from "@/Home.html?raw"
-
 const MainViewId = "MainView"
 
 export class UI {
@@ -38,9 +36,5 @@ export class UI {
 
     clear() {
         this.mainView().html("")
-    }
-
-    home() {
-        this.mainView().html(HomeHTML)
     }
 }

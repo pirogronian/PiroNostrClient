@@ -8,6 +8,7 @@ import { User } from "@/User.js"
 import { safeAsync } from "@/various.js"
 import { Router } from "@/Router.js"
 import { Module } from "@/Module.js"
+import { About } from "@/About.js"
 import { Articles } from '@/Articles.js';
 import { Article } from "@/Article.js";
 import type { CallExpression } from 'typescript/unstable/ast';
@@ -15,6 +16,7 @@ import type { CallExpression } from 'typescript/unstable/ast';
 export class App extends Module {
     router: Router
     ndk: NDK
+    about: About
     relays: Relays
     user: User
     ui: UI
@@ -31,6 +33,8 @@ export class App extends Module {
         console.log("Router:", this.router)
         const cacheAdapter = new NDKCacheAdapterDexie({ dbName: 'wiki-nostr-cache' });
         this.ndk = new NDK({ cacheAdapter });
+        this.about = new About()
+        this.about.register("about", "about", this)
         this.relays = new Relays()
         this.relays.register("relays", "relays", this)
         this.user = new User()
@@ -64,17 +68,14 @@ export class App extends Module {
         })
         
         this.router.onRoute('/', () => {
-            console.log("Coute: home")
-            this.ui.clear()
-            this.home()
+            this.about.navigate("")
         });
         this.router.onRoute("", (match) => {
             console.log("Route: default")
             if (match && match.params) {
                 console.log("Index with params.")
             } else {
-                this.ui.clear()
-                this.home()
+                this.about.navigate("")
             }
         })
 
