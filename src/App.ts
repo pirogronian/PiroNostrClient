@@ -55,6 +55,7 @@ export class App extends Module {
             before: (done, math) => {
                 console.log("Route.before:", window.location.href)
                 this.articles.stop()
+                this.hideMessages()
                 done()
             },
             after: (math) => {
@@ -62,11 +63,11 @@ export class App extends Module {
             }
         })
 
-        this.router.onRoute('/article/:id', async ({data}) => {
+        /*this.router.onRoute('/article/:id', async ({data}) => {
             console.log("Route: /article/:id")
             const addr = data.id
             this.article.handle(addr)
-        })
+        })*/
         this.router.onRoute('/articles', (match) => {
             console.log("Route: /articles")
             //console.log(match.params)

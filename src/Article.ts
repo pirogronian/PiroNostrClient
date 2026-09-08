@@ -281,6 +281,9 @@ export class Article extends Module {
     }
 
     setup() {
-        
+        this.onRoute("/:id", (match) => {
+            const addr = match.data.id
+            this.handle(addr)
+        })
     }
 }
