@@ -7,11 +7,12 @@ import { User } from "./User.js"
 
 import { safeAsync } from "./various.js"
 import { Router } from "./Router.js"
+import { Module } from "./Module.js"
 import { LoadArticle } from "./Article.js"
 import { Articles } from './Articles.js';
 import type { CallExpression } from 'typescript/unstable/ast';
 
-export class App {
+export class App extends Module {
     router: Router
     ndk: NDK
     relays: Relays
@@ -22,6 +23,8 @@ export class App {
     static _app: App
 
     constructor() {
+        super()
+        this.register("PiroNostrClient", "")
         App._app = this
         this.router = new Router()
         console.log("Router:", this.router)
