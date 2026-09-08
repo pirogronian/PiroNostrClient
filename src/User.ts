@@ -5,7 +5,7 @@ import { Module } from "@/Module.js"
 
 import UserHTML from "@/User.html?raw"
 
-const SIGNER_KEY = "SIGNER"
+const SIGNER_KEY = "signer"
 const NIP07 = "nip07"
 const PIVATEKEY = "privatekey"
 
@@ -43,12 +43,12 @@ export class User extends Module{
     loginNip07() {
         const signer = new NDKNip07Signer()
         this.ndk.signer = signer
-        localStorage.setItem(SIGNER_KEY, NIP07)
+        this.settings(SIGNER_KEY, NIP07)
     }
 
     logout() {
         this.ndk.signer = undefined
-        localStorage.removeItem(SIGNER_KEY)
+        this.settings(SIGNER_KEY, null)
     }
 
     show(user: NDKUser | null, handlers: { onLogin: (method: string) => any, onLogout: () => any}) {
@@ -80,11 +80,11 @@ export class User extends Module{
             this.show(u, {
                 onLogin: (method:string) => {
                     this.login(method);
-                    this.navigate("")
+                    this.navigate()
                 },
                 onLogout: () => {
                     this.logout();
-                    this.navigate("")
+                    this.navigate()
                 }})
         })
     }

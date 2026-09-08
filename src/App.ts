@@ -68,14 +68,14 @@ export class App extends Module {
         })
         
         this.router.onRoute('/', () => {
-            this.about.navigate("")
+            this.about.navigate()
         });
         this.router.onRoute("", (match) => {
             console.log("Route: default")
             if (match && match.params) {
                 console.log("Index with params.")
             } else {
-                this.about.navigate("")
+                this.about.navigate()
             }
         })
 

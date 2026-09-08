@@ -56,7 +56,7 @@ export class Module {
         this.router?.onRoute(this.routingPath.concat(pattern), f)
     }
 
-    navigate(addr: string) {
+    navigate(addr: string = "") {
         console.log("Module.navigate:", addr)
         this.router?.navigate(this.url(addr))
     }
