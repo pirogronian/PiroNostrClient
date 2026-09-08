@@ -3,7 +3,7 @@ import $ from "jquery"
 import NDK, { NDKEvent, NDKRelay } from "@nostr-dev-kit/ndk";
 import type { NDKFilter, NDKSubscription } from "@nostr-dev-kit/ndk"
 
-import { safeAsync, EventTagValues, InnerUrl, InnerLink, MakeLinkInner, FormattedTime } from "@/various.js";
+import { safeAsync, EventTagValues, FormattedTime } from "@/various.js";
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
@@ -37,16 +37,10 @@ export class Articles extends Module {
         Head.find("div.Summary").text(event.tagValue("summary"))
         const topics = EventTagValues(event, "t")
         const HeadTopics = Head.find(".Topics")
-        topics.forEach(function(topic) {
-            const a = $(InnerLink(`/articles?t=${topic}`), topic)
+        topics.forEach((topic) => {
+            const a = this.activeLink(`?t=${topic}`, topic)
             HeadTopics.append(a)
         })
-
-        /*Head.find("a.inner").click((event) => {
-            console.log("Additional link clicked.")
-            event.preventDefault()
-            App.get().router.navigate($(event.currentTarget).attr("inner"))
-        })*/
 
         const fr = this.mainView().find("#FinderResult")
         fr.append(Head)
@@ -58,7 +52,7 @@ export class Articles extends Module {
         const o = $(FinderHTML)
         this.mainView().append(o)
         const form = $("#FinderForm")
-        form.prop("action", InnerUrl("/articles"))
+        form.prop("action", this.innerUrl(""))
         const me = form.find("button#FinderAuthorMe")
         const user = await App.get().user.get(null, false)
         if (user && user.pubkey) {

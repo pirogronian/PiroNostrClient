@@ -125,6 +125,7 @@ export class Module {
             e.preventDefault()
             this.navigate($(e.currentTarget).attr("inner"))
         })
+        return link
     }
 
     makeLinkActive(node, addr: string, text: string|undefined|null = null) {
