@@ -122,16 +122,15 @@ export class App {
     }
 
     navigate(path: string) {
-        const cleanPath = path.startsWith("/") ? path : "/" + path;
+        const cleanPath = "#".concat(path.startsWith("/") ? path : "/" + path);
         if (window.location.hash == cleanPath) {
-            console.log("piro.navigate manually: ", window.location.href)
+            console.log("piro.navigate manually: ", cleanPath)
             this.router.resolve()
         }
         else
         {
-            console.log("piro.navigate auto: ", window.location.href)
-            window.location.hash = cleanPath; // It was enough, but now I need to resolve manually anyway
-            this.router.resolve()
+            console.log("piro.navigate auto: ", cleanPath)
+            window.location.hash = cleanPath;
         }
     }
 
