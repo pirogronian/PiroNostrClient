@@ -39,7 +39,7 @@ export function InnerUrl(url: string): string {
 }
 
 export function InnerLink(url: string, text: string = "") {
-    return `<a inner="${url}" class="inner" href=${InnerUrl}>${text}</a>`
+    return `<a inner="${url}" class="inner" href=${InnerUrl(url)}>${text}</a>`
 }
 
 export function MakeLinkInner(node, url: string, text: string|null = null) {
@@ -48,6 +48,7 @@ export function MakeLinkInner(node, url: string, text: string|null = null) {
     node.attr("class", "inner")
     if (text !== null)
         node.text(text)
+    return node
     //console.log("Prepared inner link:", node.html())
 }
 
