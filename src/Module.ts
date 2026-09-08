@@ -1,53 +1,41 @@
 
 import Navigo from "navigo"
+import NDK from "@nostr-dev-kit/ndk"
 import { Router } from "./Router.js"
 
 export class Module {
-    _settingsName!: string
-    _routingName!: string
-    _parent: Module|undefined
-    _settingsSeparator: string = "."
-    _routingSeparator: string = "/"
-    _settingsPath!:string
-    _routingPath!:string
+    settingsName!: string
+    routingName!: string
+    parent: Module|undefined
+    settingsSeparator: string = "."
+    routingSeparator: string = "/"
+    settingsPath!:string
+    routingPath!:string
     router: Router|null = null
-    
-
-    settingsPath(path: string|undefined = undefined): string|void {
-        if (path) {
-            this._settingsPath = path
-        } else {
-            return this._settingsPath
-        }
-    }
-
-    routingPath(path: string|undefined = undefined): string|void {
-        if (path) {
-            this._routingPath = path
-        } else {
-            return this._routingPath
-        }
-    }
+    ndk!: NDK
 
     register(name: string, routingNane: string|null = null, parent: Module|undefined = undefined) {
-        this._settingsName = name
+        this.settingsName = name
         if (routingNane)
-            this._routingName = routingNane
+            this.routingName = routingNane
         else
-            this._routingName = name
-        this._parent = parent
-        if (this._parent) {
-            this._settingsPath = this._parent._settingsPath.concat(this._settingsSeparator).concat(this._settingsName)
-            this._routingPath = this._parent._routingPath.concat(this._routingSeparator).concat(this._routingName)
+            this.routingName = name
+        this.parent = parent
+        if (this.parent) {
+            this.settingsPath = this.parent.settingsPath.concat(this.settingsSeparator).concat(this.settingsName)
+            this.routingPath = this.parent.routingPath.concat(this.routingSeparator).concat(this.routingName)
 
-            if (this._parent.router)
-                this.router = this._parent.router
+            if (this.parent.router)
+                this.router = this.parent.router
+
+            if (this.parent.ndk)
+                this.ndk = this.parent.ndk
         }
     }
 
     settings(name: string, value: string|undefined|null = undefined): string|null|void {
         const ret: string|undefined = undefined
-        const key = this._settingsPath.concat(this._settingsSeparator).concat(name)
+        const key = this.settingsPath.concat(this.settingsSeparator).concat(name)
 
         if (value) {
             return localStorage.setItem(key, value)
@@ -59,6 +47,6 @@ export class Module {
     }
 
     onRoute(pattern: string, f: Function) {
-        this.router?.onRoute(this._routingPath.concat(pattern), f)
+        this.router?.onRoute(this.routingPath.concat(pattern), f)
     }
 }
