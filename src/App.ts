@@ -63,11 +63,6 @@ export class App extends Module {
             },
         })
         
-        this.router.onRoute('/settings', () => {
-            console.log("Route: settings.")
-            this.clearUI()
-            this.settings()
-        })
         this.router.onRoute('/', () => {
             console.log("Coute: home")
             this.ui.clear()
@@ -122,11 +117,4 @@ export class App extends Module {
     home() {
         this.ui.home()
     }
-
-    settings() {
-        console.log("Settings")
-        this.ui.settings()
-        this.ui.Relays()
-    }
-
 }

@@ -94,5 +94,6 @@ export class User extends Module{
             this.clearUI()
             this.handle()
         })
+        this.makeLinkActive($("#UserLink"), "")
     }
 }

@@ -122,6 +122,7 @@ export class Relays extends Module {
         this.onRoute("", (match) => {
             this.handle()
         })
+        this.makeLinkActive($("#RelaysLink"), "")
     }
 }
 
