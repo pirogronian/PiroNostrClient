@@ -9,7 +9,7 @@ import { safeAsync } from "./various.js"
 import { Router } from "./Router.js"
 import { Module } from "./Module.js"
 import { Articles } from './Articles.js';
-import { ArticleView } from "./ArticleView.js";
+import { Article } from "./Article.js";
 import type { CallExpression } from 'typescript/unstable/ast';
 
 export class App extends Module {
@@ -34,7 +34,7 @@ export class App extends Module {
         this.relays = new Relays(this.ndk)
         this.user = new User(this.ndk)
         this.articles = new Articles(this.ndk)
-        this.article = new ArticleView()
+        this.article = new Article()
         this.article.register("article", "article", this)
         this.ui = new UI(this.ndk)
         this.ndk.pool.on('relay:connect', () => {

@@ -4,7 +4,6 @@ import NDK, { NDKEvent, NDKRelay, NDKRelayStatus, NDKUser } from "@nostr-dev-kit
 import $ from "jquery"
 
 import { App } from "./App.js"
-import { ArticleView } from "./ArticleView.js";
 import { EventTagValues, InnerUrl, InnerLink, MakeLinkInner } from "./various.js"
 
 import "./style.scss"
@@ -22,11 +21,9 @@ const RelaysListId = "RelaysList"
 
 export class UI {
     ndk: NDK
-    artv: ArticleView
 
     constructor(ndk: NDK) {
         this.ndk = ndk
-        this.artv = new ArticleView(this)
     }
 
     mainView() {
