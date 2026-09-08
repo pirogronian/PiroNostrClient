@@ -1,5 +1,4 @@
 
-import Navigo from 'navigo';
 import NDK, { NDKEvent, NDKUser, NDKRelay } from "@nostr-dev-kit/ndk";
 import NDKCacheAdapterDexie from '@nostr-dev-kit/ndk-cache-dexie';
 import { UI } from "./UI.js"
@@ -7,12 +6,13 @@ import { Relays } from './Relays.js';
 import { User } from "./User.js"
 
 import { safeAsync } from "./various.js"
+import { Router } from "./Router.js"
 import { LoadArticle } from "./Article.js"
 import { Articles } from './Articles.js';
 import type { CallExpression } from 'typescript/unstable/ast';
 
 export class App {
-    router: Navigo
+    router: Router
     ndk: NDK
     relays: Relays
     user: User
@@ -23,7 +23,8 @@ export class App {
 
     constructor() {
         App._app = this
-        this.router = new Navigo("/", { hash: true, strategy: Navigo.ONE })
+        this.router = new Router()
+        console.log("Router:", this.router)
         const cacheAdapter = new NDKCacheAdapterDexie({ dbName: 'wiki-nostr-cache' });
         this.ndk = new NDK({ cacheAdapter });
         this.relays = new Relays(this.ndk)
@@ -40,9 +41,6 @@ export class App {
 
     connect() { this.ndk.connect() }
 
-    onRoute(route: string, f: Function) {
-        this.router.on(route, f, { already: f })
-    }
 
     initRouting() {
         console.log("Init routing on:", window.location.href)
@@ -58,13 +56,13 @@ export class App {
             }
         })
 
-        this.onRoute('/article/:id', async ({data}) => {
+        this.router.onRoute('/article/:id', async ({data}) => {
             console.log("Route: /article/:id")
             this.ui.clear()
             const addr = data.id
             this.loadArticle(addr)
         })
-        this.onRoute('/articles', (match) => {
+        this.router.onRoute('/articles', (match) => {
             console.log("Route: /articles")
             //console.log(match.params)
             if (this.ui.isFinder()) {
@@ -78,22 +76,22 @@ export class App {
             }
             this.loadArticles(match?.params)
         })
-        this.onRoute('/search', (match) => {
+        this.router.onRoute('/search', (match) => {
             console.log("Route: /search")
             this.ui.clear()
             this.loadFinder()
         })
-        this.onRoute('/settings', () => {
+        this.router.onRoute('/settings', () => {
             console.log("Route: settings.")
             this.ui.clear()
             this.settings()
         })
-        this.onRoute('/', () => {
+        this.router.onRoute('/', () => {
             console.log("Coute: home")
             this.ui.clear()
             this.home()
         });
-        this.onRoute("", (match) => {
+        this.router.onRoute("", (match) => {
             console.log("Route: default")
             if (match && match.params) {
                 console.log("Index with params.")
@@ -119,19 +117,6 @@ export class App {
             console.log("Fixing url to:", href)
         }
         window.history.replaceState(null, href, href)
-    }
-
-    navigate(path: string) {
-        const cleanPath = "#".concat(path.startsWith("/") ? path : "/" + path);
-        if (window.location.hash == cleanPath) {
-            console.log("piro.navigate manually: ", cleanPath)
-            this.router.resolve()
-        }
-        else
-        {
-            console.log("piro.navigate auto: ", cleanPath)
-            window.location.hash = cleanPath;
-        }
     }
 
     login(method?: string) {
@@ -165,11 +150,11 @@ export class App {
             this.ui.user(u, {
                 onLogin: (method:string) => {
                     this.login(method);
-                    this.navigate("/settings")
+                    this.router.navigate("/settings")
                 },
                 onLogout: () => {
                     this.logout();
-                    this.navigate("/settings")
+                    this.router.navigate("/settings")
                 }})
         })
         this.ui.Relays()

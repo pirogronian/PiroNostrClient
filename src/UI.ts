@@ -44,7 +44,7 @@ export class UI {
         $("a.inner").click((event) => {
             console.log("Inner link clicked.")
             event.preventDefault()
-            App.get().navigate($(event.currentTarget).attr("inner"))
+            App.get().router.navigate($(event.currentTarget).attr("inner"))
         })
     }
 
@@ -179,7 +179,7 @@ export class UI {
                 }
             }
             const url = searchParams.toString()
-            App.get().navigate(`/articles?${url}`)
+            App.get().router.navigate(`/articles?${url}`)
         })
         /*form.find("input").on("keydown", function(e){
             console.log("Pressed key in input:", e.key)
@@ -216,7 +216,7 @@ export class UI {
         Head.find("a.inner").click((event) => {
             console.log("Additional link clicked.")
             event.preventDefault()
-            App.get().navigate($(event.currentTarget).attr("inner"))
+            App.get().router.navigate($(event.currentTarget).attr("inner"))
         })
 
         const fr = this.mainView().find("#FinderResult")
