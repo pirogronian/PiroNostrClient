@@ -15,8 +15,8 @@ import { UI } from "@/UI.js";
 
 import ArticleViewHTML from '@/Article.html?raw';
 
-const LAST_ARTICLE_FORMAT_KEY = "LAST_ARTICLE_FORMATKEY"
-const USE_LAST_ARTICLE_FORMAT_KEY = "USE_LAST_ARTICLE_FORMAT_KEY"
+const LAST_ARTICLE_FORMAT_KEY = "last_format"
+const USE_LAST_ARTICLE_FORMAT_KEY = "use_last_format"
 
 export class Article extends Module {
     event: NDKEvent|null = null
@@ -28,14 +28,14 @@ export class Article extends Module {
     }
 
     saveSettings() {
-        localStorage.setItem(LAST_ARTICLE_FORMAT_KEY, this.lastFormat)
-        localStorage.setItem(USE_LAST_ARTICLE_FORMAT_KEY, this.useLastFormat)
+        this.settings(LAST_ARTICLE_FORMAT_KEY, this.lastFormat)
+        this.settings(USE_LAST_ARTICLE_FORMAT_KEY, this.useLastFormat)
     }
 
     restoreSettings() {
-        let tmp = localStorage.getItem(LAST_ARTICLE_FORMAT_KEY)
+        let tmp = this.settings(LAST_ARTICLE_FORMAT_KEY)
         this.lastFormat = tmp ? tmp : ""
-        tmp = localStorage.getItem(USE_LAST_ARTICLE_FORMAT_KEY)
+        tmp = this.settings(USE_LAST_ARTICLE_FORMAT_KEY)
         this.useLastFormat = tmp ? tmp : ""
     }
 
