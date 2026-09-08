@@ -31,7 +31,8 @@ export class App extends Module {
         console.log("Router:", this.router)
         const cacheAdapter = new NDKCacheAdapterDexie({ dbName: 'wiki-nostr-cache' });
         this.ndk = new NDK({ cacheAdapter });
-        this.relays = new Relays(this.ndk)
+        this.relays = new Relays()
+        this.relays.register("relays", "relays", this)
         this.user = new User()
         this.user.register("user", "user", this)
         this.articles = new Articles()
@@ -64,9 +65,8 @@ export class App extends Module {
         
         this.router.onRoute('/settings', () => {
             console.log("Route: settings.")
-            this.ui.clear()
+            this.clearUI()
             this.settings()
-            this.ui.initLinks()
         })
         this.router.onRoute('/', () => {
             console.log("Coute: home")
@@ -125,20 +125,7 @@ export class App extends Module {
 
     settings() {
         console.log("Settings")
-        const user = this.user.get()
-        console.log(user)
         this.ui.settings()
-        user.then((u) => {
-            this.ui.user(u, {
-                onLogin: (method:string) => {
-                    this.login(method);
-                    this.router.navigate("/settings")
-                },
-                onLogout: () => {
-                    this.logout();
-                    this.router.navigate("/settings")
-                }})
-        })
         this.ui.Relays()
     }
 

@@ -1,5 +1,6 @@
 
 import NDK, { NDKRelay } from "@nostr-dev-kit/ndk";
+import { Module } from "./Module.js";
 
 const STORAGE_KEY = 'nostr-wiki-relays';
 
@@ -9,25 +10,8 @@ const DEFAULT_RELAYS = [
     'wss://purplepag.es'
 ];
 
-export function getStoredRelays(): string[] {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return []
-  
-    try {
-        const parsed = JSON.parse(saved);
-        return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_RELAYS;
-    } catch {
-        return DEFAULT_RELAYS;
-    }
-}
-
-export class Relays {
-    ndk: NDK
+export class Relays extends Module {
     autoAdd: boolean = true
-
-    constructor(ndk: NDK) {
-        this.ndk = ndk
-    }
 
     get() {
         return this.ndk.pool.relays.values();
@@ -42,8 +26,20 @@ export class Relays {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(relayUrls));
     }
 
+    getStored(): string[] {
+        const saved = this.settings(STORAGE_KEY);
+        if (!saved) return []
+
+        try {
+            const parsed = JSON.parse(saved);
+            return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_RELAYS;
+        } catch {
+            return [];
+        }
+    }
+
     load(): void {
-        const urls = getStoredRelays()
+        const urls = this.getStored()
         urls.forEach((url) => { 
             this.add(url)
         })
