@@ -1,6 +1,10 @@
 
-import NDK, { NDKRelay } from "@nostr-dev-kit/ndk";
+import $ from "jquery"
+import NDK, { NDKRelay, NDKRelayStatus } from "@nostr-dev-kit/ndk";
 import { Module } from "./Module.js";
+
+import RelaysHTML from "@/Relays.html?raw"
+import ActiveRelayHTML from "@/ActiveRelay.html?raw"
 
 const STORAGE_KEY = 'used';
 
@@ -69,6 +73,55 @@ export class Relays extends Module {
         if (!relay)  return
         relay.disconnect()
         this.ndk.pool.removeRelay(url)
+    }
+
+    show() {
+        this.mainView().html(RelaysHTML)
+        const list = this.get()
+        const Head = $("#ActiveRelaysHeader")
+        const UIList = $("#ActiveRelays")
+
+        const NewUrl = $("input[name='NewRelayUrl']")
+        Head.find("#AddRelayButton").click((e) => {
+            this.add(NewUrl.val())
+            this.save()
+            this.handle()
+        })
+        Head.find("#RefreshActiveRelays").click(() => {
+            this.handle()
+        })
+
+        UIList.html("")
+
+        list.forEach((relay : NDKRelay) => {
+            const arn = $(ActiveRelayHTML)
+            console.log("Relay:", relay.url)
+            arn.find("a").text(relay.url).attr("href", relay.url)
+            let c: string = NDKRelayStatus[relay.status]
+            c = c.toLocaleLowerCase()
+            const s = arn.find(".RelayStatus")
+            s.text(c)
+            s.addClass(c)
+            arn.find("button.RemoveRelayButton").click((e) => {
+                console.log("Removing:", relay.url)
+                this.remove(relay.url)
+                this.save()
+                this.handle()
+            })
+
+            UIList.append(arn)
+        })
+    }
+
+    handle() {
+        this.clearUI()
+        this.show()
+    }
+
+    setup() {
+        this.onRoute("", (match) => {
+            this.handle()
+        })
     }
 }
 
