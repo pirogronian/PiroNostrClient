@@ -75,6 +75,10 @@ code {
     margin: 2mm;
 }
 
+#Notice, #Warning, #Error {
+    display: none
+}
+
 #ActiveRelaysHeader {
     @extend .MultirowFlexContainer
 }
