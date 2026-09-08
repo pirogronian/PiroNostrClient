@@ -1,4 +1,5 @@
 
+import $ from "jquery"
 import Navigo from "navigo"
 import NDK from "@nostr-dev-kit/ndk"
 import { Router } from "./Router.js"
@@ -9,8 +10,8 @@ export class Module {
     parent: Module|undefined
     settingsSeparator: string = "."
     routingSeparator: string = "/"
-    settingsPath!:string
-    routingPath!:string
+    settingsPath:string = ""
+    routingPath:string = ""
     router: Router|null = null
     ndk!: NDK
 
@@ -48,5 +49,13 @@ export class Module {
 
     onRoute(pattern: string, f: Function) {
         this.router?.onRoute(this.routingPath.concat(pattern), f)
+    }
+
+    mainView(content = null) {
+        const mv = $("#MainView")
+        if (content)
+            mv.append(content)
+        else
+            return mv
     }
 }

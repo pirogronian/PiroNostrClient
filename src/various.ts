@@ -50,3 +50,13 @@ export function MakeLinkInner(node, url: string, text: string|null = null) {
         node.text(text)
     //console.log("Prepared inner link:", node.html())
 }
+
+export function FormattedTime(seconds: number|undefined|null = null) {
+        let t: Date|null = null
+        if (seconds) {
+            seconds *= 1000;
+            t = new Date(seconds)
+        }
+        t = new Date()
+        return t.toLocaleString()
+    }

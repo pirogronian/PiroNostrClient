@@ -8,8 +8,8 @@ import { User } from "./User.js"
 import { safeAsync } from "./various.js"
 import { Router } from "./Router.js"
 import { Module } from "./Module.js"
-import { LoadArticle } from "./Article.js"
 import { Articles } from './Articles.js';
+import { ArticleView } from "./ArticleView.js";
 import type { CallExpression } from 'typescript/unstable/ast';
 
 export class App extends Module {
@@ -19,6 +19,7 @@ export class App extends Module {
     user: User
     ui: UI
     articles: Articles
+    article: ArticleView
 
     static _app: App
 
@@ -33,6 +34,8 @@ export class App extends Module {
         this.relays = new Relays(this.ndk)
         this.user = new User(this.ndk)
         this.articles = new Articles(this.ndk)
+        this.article = new ArticleView()
+        this.article.register("article", "article", this)
         this.ui = new UI(this.ndk)
         this.ndk.pool.on('relay:connect', () => {
             this.relays.save();
@@ -179,9 +182,10 @@ export class App extends Module {
     }
 
     async loadArticle(addr: string) {
-        const ret = await LoadArticle(this.ndk, addr)
+        const ret = await this.article.load(addr)
         if (ret instanceof NDKEvent) {
-            this.ui.article(ret)
+            this.article.setEvent(ret)
+            this.article.show()
         } else {
             if (ret instanceof Error) {
                 this.ui.error(ret.message)

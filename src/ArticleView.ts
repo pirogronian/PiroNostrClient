@@ -8,8 +8,9 @@ import { createJSONEditor, createKeySelection } from "vanilla-jsoneditor";
 import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core';
 import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
+import { Module } from "./Module.js"
 import { App } from "./App.js"
-import { formatNip54TagD, EventTagValues, InnerUrl, InnerLink, MakeLinkInner } from "./various.js";
+import { safeAsync, formatNip54TagD, EventTagValues, InnerUrl, InnerLink, MakeLinkInner, FormattedTime } from "./various.js";
 import { UI } from "./UI.js";
 
 import ArticleViewHTML from './Article.html?raw';
@@ -17,14 +18,13 @@ import ArticleViewHTML from './Article.html?raw';
 const LAST_ARTICLE_FORMAT_KEY = "LAST_ARTICLE_FORMATKEY"
 const USE_LAST_ARTICLE_FORMAT_KEY = "USE_LAST_ARTICLE_FORMAT_KEY"
 
-export class ArticleView {
+export class ArticleView extends Module {
     event: NDKEvent|null = null
-    ui : UI
     lastFormat: string = ""
     useLastFormat: string = "1"
 
-    constructor(ui : UI) {
-        this.ui = ui
+    constructor() {
+        super()
     }
 
     saveSettings() {
@@ -173,7 +173,7 @@ export class ArticleView {
             MakeLinkInner(o.find("a#AuthorNick"), `/articles?author=${user.pubkey}`, user.profile.name)
             //o.find("a#AuthorNick").text(user.profile.name).attr("href", LocalUrl(`#/articles?author=${user.pubkey}`))
         }
-        o.find("#CreationTime").text(this.ui.time(this.event.created_at))
+        o.find("#CreationTime").text(FormattedTime(this.event.created_at))
         MakeLinkInner(o.find("a#ArticleId"), `/articles?id=${this.event.tagValue("d")}`, this.event.tagValue("d"))
         //o.find("a#ArticleId").text(this.event.tagValue("d")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
         o.find("#ArticleSummary").text(this.event.tagValue("summary"))
@@ -197,7 +197,7 @@ export class ArticleView {
         if (client) co.text(`Created with: ${client}`)
         else co.hide()
 
-        this.ui.mainView().append(o)
+        this.mainView(o)
 
         const ulf = $("input[name='uselastformat']")
         if (this.useLastFormat)  ulf.prop("checked", "checked")
@@ -247,4 +247,20 @@ export class ArticleView {
 
         this.showRawEvent($('#RawEventView').get(0))
     }
+
+    async load(addr : string) : Promise<NDKEvent|Error|string> {
+    const [err, wikiEvent] = await safeAsync(this.ndk.fetchEvent(addr));
+    if (err) { return err
+    } else {
+        if (wikiEvent === null) {
+            return "No event found!"
+        } else {
+            if (wikiEvent.kind == 30818) {
+                return wikiEvent
+            } else {
+                return `Wrong kind of event (${wikiEvent.kind})`
+            }
+        }
+    }
+}
 }
