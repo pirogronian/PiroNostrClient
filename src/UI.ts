@@ -50,28 +50,6 @@ export class UI {
         this.mainView().html(HomeHTML)
     }
 
-    user(user: NDKUser | null, handlers: { onLogin: (method: string) => any, onLogout: () => any}) {
-        const LoginForm = $("#Login")
-        const UserHTML = $("#LoggedUser")
-        const NickHtml = $("#LoggedUserNick")
-        const PubkeyHtml = $("#LoggedUserPubkey")
-        if (user) {
-            LoginForm.hide()
-            UserHTML.show()
-            NickHtml.text(user.profile?.name || user.profile?.displayName || "")
-            PubkeyHtml.text(user.pubkey)
-            $("#Logout").click(() => { handlers.onLogout() })
-        } else {
-            UserHTML.hide()
-            NickHtml.text("")
-            PubkeyHtml.text("")
-            LoginForm.show()
-            $("#LoginMethodSelect").change((e) => {
-                handlers.onLogin($(e.currentTarget).val())
-            })
-        }
-    }
-
     Relays() : void {
         const relays = App.get().relays
         const list = relays.get()

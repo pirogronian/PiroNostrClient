@@ -1,6 +1,9 @@
 
 import NDK, { NDKUser, NDKNip07Signer } from "@nostr-dev-kit/ndk";
+import $ from "jquery"
 import { Module } from "@/Module.js"
+
+import UserHTML from "@/User.html?raw"
 
 const SIGNER_KEY = "SIGNER"
 const NIP07 = "nip07"
@@ -46,5 +49,50 @@ export class User extends Module{
     logout() {
         this.ndk.signer = undefined
         localStorage.removeItem(SIGNER_KEY)
+    }
+
+    show(user: NDKUser | null, handlers: { onLogin: (method: string) => any, onLogout: () => any}) {
+        const LoginForm = $("#Login")
+        const UserHTML = $("#LoggedUser")
+        const NickHtml = $("#LoggedUserNick")
+        const PubkeyHtml = $("#LoggedUserPubkey")
+        if (user) {
+            LoginForm.hide()
+            UserHTML.show()
+            NickHtml.text(user.profile?.name || user.profile?.displayName || "")
+            PubkeyHtml.text(user.pubkey)
+            $("#Logout").click(() => { handlers.onLogout() })
+        } else {
+            UserHTML.hide()
+            NickHtml.text("")
+            PubkeyHtml.text("")
+            LoginForm.show()
+            $("#LoginMethodSelect").change((e) => {
+                handlers.onLogin($(e.currentTarget).val())
+            })
+        }
+    }
+
+    handle() {
+        const user = this.get()
+        this.mainView().html(UserHTML)
+        user.then((u) => {
+            this.show(u, {
+                onLogin: (method:string) => {
+                    this.login(method);
+                    this.navigate("")
+                },
+                onLogout: () => {
+                    this.logout();
+                    this.navigate("")
+                }})
+        })
+    }
+
+    setup() {
+        this.onRoute('', (match) => {
+            this.clearUI()
+            this.handle()
+        })
     }
 }
