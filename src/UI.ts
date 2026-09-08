@@ -30,7 +30,7 @@ export class UI {
 
     init() {
         MakeLinkInner($("a#HomeLink"), "/")
-        MakeLinkInner($("a#SearchLink"), "/search")
+        MakeLinkInner($("a#SearchLink"), "/articles")
         MakeLinkInner($("a#SettingsLink"), "/settings")
     }
 

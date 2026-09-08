@@ -63,18 +63,7 @@ export class App extends Module {
                 this.initHyperlinks()
             }
         })
-
-        /*this.router.onRoute('/article/:id', async ({data}) => {
-            console.log("Route: /article/:id")
-            const addr = data.id
-            this.article.handle(addr)
-        })*/
         
-        this.router.onRoute('/search', (match) => {
-            console.log("Route: /search")
-            this.ui.clear()
-            this.loadFinder()
-        })
         this.router.onRoute('/settings', () => {
             console.log("Route: settings.")
             this.ui.clear()
