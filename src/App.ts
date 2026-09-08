@@ -33,7 +33,8 @@ export class App extends Module {
         this.ndk = new NDK({ cacheAdapter });
         this.relays = new Relays(this.ndk)
         this.user = new User(this.ndk)
-        this.articles = new Articles(this.ndk)
+        this.articles = new Articles()
+        this.articles.register("articles", "articles", this)
         this.article = new Article()
         this.article.register("article", "article", this)
         this.ui = new UI(this.ndk)

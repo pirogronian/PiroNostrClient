@@ -3,14 +3,14 @@ import NDK, { NDKEvent, NDKRelay } from "@nostr-dev-kit/ndk";
 import type { NDKFilter, NDKSubscription } from "@nostr-dev-kit/ndk"
 
 import { safeAsync } from "./various.js";
+import { Module } from "./Module.js";
 
-export class Articles{
-    ndk: NDK
+export class Articles extends Module {
     sub: NDKSubscription | null = null
     enabled: boolean = false
 
-    constructor(ndk: NDK) {
-        this.ndk = ndk
+    constructor() {
+        super()
     }
 
     load(params: object,

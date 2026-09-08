@@ -186,7 +186,9 @@ export class UI {
     }
 
     async ArticleHead(event: NDKEvent, relay?: NDKRelay) : void {
+        //console.log("Article event:", event)
         if (!App.get().articles.enabled) return
+        //console.log("Articles enabled")
         const Head = $(ArtHeadHTML)
         const title = Head.find(".ArticleTitle")
         let TT = event.tagValue("title")
