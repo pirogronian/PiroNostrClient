@@ -198,7 +198,8 @@ export class Articles extends Module {
                 this.clearUI()
                 this.finder()
             }
-            this.handle(match?.params)
+            if (match?.params)
+                this.handle(match?.params)
         })
     }
 }
