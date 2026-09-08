@@ -32,6 +32,8 @@ export class Module {
             if (this.parent.ndk)
                 this.ndk = this.parent.ndk
         }
+
+        this.setup()
     }
 
     settings(name: string, value: string|undefined|null = undefined): string|null|void {
@@ -51,11 +53,42 @@ export class Module {
         this.router?.onRoute(this.routingPath.concat(pattern), f)
     }
 
+    setup() {}
+
     mainView(content = null) {
         const mv = $("#MainView")
         if (content)
             mv.append(content)
         else
             return mv
+    }
+
+    hideMessages() {
+        $("#Notice").hide()
+        $("#Warning").hide()
+        $("#Error").hide()
+    }
+
+    notice(msg: string) {
+        const node = $("#Notice")
+        node.find(".Message").text(msg)
+        node.show()
+    }
+
+    warning(msg: string) {
+        const node = $("#Warning")
+        node.find(".Message").text(msg)
+        node.show()
+    }
+
+    error(msg: string) {
+        const node = $("#Error")
+        node.find(".Message").text(msg)
+        node.show()
+    }
+
+    clearUI() {
+        this.hideMessages()
+        this.mainView().empty()
     }
 }

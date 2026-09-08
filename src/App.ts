@@ -64,9 +64,8 @@ export class App extends Module {
 
         this.router.onRoute('/article/:id', async ({data}) => {
             console.log("Route: /article/:id")
-            this.ui.clear()
             const addr = data.id
-            this.loadArticle(addr)
+            this.article.handle(addr)
         })
         this.router.onRoute('/articles', (match) => {
             console.log("Route: /articles")
@@ -178,21 +177,6 @@ export class App extends Module {
             })
         if (err) {
             this.ui.error(err.message)
-        }
-    }
-
-    async loadArticle(addr: string) {
-        const ret = await this.article.load(addr)
-        if (ret instanceof NDKEvent) {
-            this.article.setEvent(ret)
-            this.article.show()
-        } else {
-            if (ret instanceof Error) {
-                this.ui.error(ret.message)
-            }
-            if (typeof(ret) == "string") {
-                this.ui.error(ret)
-            }
         }
     }
 }

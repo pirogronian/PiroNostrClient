@@ -249,18 +249,38 @@ export class Article extends Module {
     }
 
     async load(addr : string) : Promise<NDKEvent|Error|string> {
-    const [err, wikiEvent] = await safeAsync(this.ndk.fetchEvent(addr));
-    if (err) { return err
-    } else {
-        if (wikiEvent === null) {
-            return "No event found!"
+        const [err, wikiEvent] = await safeAsync(this.ndk.fetchEvent(addr));
+        if (err) { return err
         } else {
-            if (wikiEvent.kind == 30818) {
-                return wikiEvent
+            if (wikiEvent === null) {
+                return "No event found!"
             } else {
-                return `Wrong kind of event (${wikiEvent.kind})`
+                if (wikiEvent.kind == 30818) {
+                    return wikiEvent
+                } else {
+                    return `Wrong kind of event (${wikiEvent.kind})`
+                }
             }
         }
     }
-}
+
+    async handle(addr: string) {
+        this.clearUI()
+        const ret = await this.load(addr)
+        if (ret instanceof NDKEvent) {
+            this.setEvent(ret)
+            this.show()
+        } else {
+            if (ret instanceof Error) {
+                this.error(ret.message)
+            }
+            if (typeof(ret) == "string") {
+                this.error(ret)
+            }
+        }
+    }
+
+    setup() {
+        
+    }
 }
