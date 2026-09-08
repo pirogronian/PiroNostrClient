@@ -32,6 +32,8 @@ export class Module {
 
             if (this.parent.ndk)
                 this.ndk = this.parent.ndk
+        } else {
+            this.settingsPath = this.settingsName
         }
 
         this.setup()

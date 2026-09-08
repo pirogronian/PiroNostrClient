@@ -2,7 +2,7 @@
 import NDK, { NDKRelay } from "@nostr-dev-kit/ndk";
 import { Module } from "./Module.js";
 
-const STORAGE_KEY = 'nostr-wiki-relays';
+const STORAGE_KEY = 'used';
 
 const DEFAULT_RELAYS = [
     'wss://relay.damus.io',
@@ -23,7 +23,7 @@ export class Relays extends Module {
 
     save(): void {
         const relayUrls = Array.from(this.ndk.pool.relays.keys());
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(relayUrls));
+        this.settings(STORAGE_KEY, JSON.stringify(relayUrls));
     }
 
     getStored(): string[] {
