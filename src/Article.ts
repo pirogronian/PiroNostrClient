@@ -10,7 +10,7 @@ import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
-import { safeAsync, formatNip54TagD, EventTagValues, InnerUrl, InnerLink, MakeLinkInner, FormattedTime } from "@/various.js";
+import { safeAsync, formatNip54TagD, EventTagValues, FormattedTime } from "@/various.js";
 import { UI } from "@/UI.js";
 
 import ArticleViewHTML from '@/Article.html?raw';
@@ -64,7 +64,7 @@ export class Article extends Module {
             //console.log("Checking node:", $(this).prop("nodeName"))
             //console.log("Checking node:", node)
             if (!node.text() && !node.attr("href")) {
-                MakeLinkInner(node, `/articles?id=${formatNip54TagD(node.attr("id"))}`, node.attr("id"))
+                App.get().articles.makeLinkActive(node, `?id=${formatNip54TagD(node.attr("id"))}`, node.attr("id"))
                 /*node.text(node.attr("id"))
                 node.attr("href", InnerUrl(`/articles?id=${formatNip54TagD(node.attr("id"))}`))*/
             }
@@ -90,7 +90,7 @@ export class Article extends Module {
             //console.log("Checking node:", $(this).prop("nodeName"))
             //console.log("Checking node:", node)
             if (!node.attr("href")) {
-                MakeLinkInner(node, `/articles?id=${formatNip54TagD(node.text())}`)
+                App.get().articles.makeLinkActive(node, `?id=${formatNip54TagD(node.text())}`)
                 //node.attr("href", LocalUrl(`#/articles?id=${formatNip54TagD(node.text())}`))
             }
         })
@@ -163,18 +163,18 @@ export class Article extends Module {
         this.restoreSettings()
 
         const o = $(ArticleViewHTML)
-        MakeLinkInner(o.find("h1 a"), `/articles?id=${this.event.tagValue("d")}`, this.event.tagValue("title"))
+        App.get().articles.makeLinkActive(o.find("h1 a"), `?id=${this.event.tagValue("d")}`, this.event.tagValue("title"))
         //o.find("h1 a").text(this.event.tagValue("title")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
         o.find("#RawArticleContent").text(this.event.content)
     
         const user = await App.get().user.get(this.event.pubkey)
         if (user && user.profile) {
             o.find("img#AuthorPicture").attr("src", user.profile.picture)
-            MakeLinkInner(o.find("a#AuthorNick"), `/articles?author=${user.pubkey}`, user.profile.name)
+            App.get().articles.makeLinkActive(o.find("a#AuthorNick"), `?author=${user.pubkey}`, user.profile.name)
             //o.find("a#AuthorNick").text(user.profile.name).attr("href", LocalUrl(`#/articles?author=${user.pubkey}`))
         }
         o.find("#CreationTime").text(FormattedTime(this.event.created_at))
-        MakeLinkInner(o.find("a#ArticleId"), `/articles?id=${this.event.tagValue("d")}`, this.event.tagValue("d"))
+        App.get().articles.makeLinkActive(o.find("a#ArticleId"), `?id=${this.event.tagValue("d")}`, this.event.tagValue("d"))
         //o.find("a#ArticleId").text(this.event.tagValue("d")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
         o.find("#ArticleSummary").text(this.event.tagValue("summary"))
 
@@ -182,13 +182,13 @@ export class Article extends Module {
         if (!origin) origin = this.event.tagValue("a")
         const oa = o.find("#OriginLink")
         if (origin) {
-            oa.attr("href", `/article/${origin}`)
+            this.makeLinkActive(oa, `/${origin}`)
         } else oa.hide()
 
         const topics = EventTagValues(this.event, "t")
         const HeadTopics = o.find("#ArticleTopics")
         topics.forEach(function(topic) {
-            const a = $(InnerLink(`/articles?t=${topic}"`, topic))
+            const a = $(App.get().articles.activeLink(`?t=${topic}"`, topic))
             HeadTopics.append(a)
         })
 

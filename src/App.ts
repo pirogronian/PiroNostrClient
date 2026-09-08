@@ -59,15 +59,13 @@ export class App extends Module {
                 this.hideMessages()
                 done()
             },
-            after: (math) => {
-                this.initHyperlinks()
-            }
         })
         
         this.router.onRoute('/settings', () => {
             console.log("Route: settings.")
             this.ui.clear()
             this.settings()
+            this.ui.initLinks()
         })
         this.router.onRoute('/', () => {
             console.log("Coute: home")
