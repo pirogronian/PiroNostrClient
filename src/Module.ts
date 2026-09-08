@@ -3,7 +3,7 @@ import $ from "jquery"
 import Navigo from "navigo"
 import NDK from "@nostr-dev-kit/ndk"
 import { Router } from "@/Router.js"
-import { InnerUrl } from "./various.js"
+import { InnerUrl, InnerLink, MakeLinkInner } from "./various.js"
 
 export class Module {
     settingsName!: string
@@ -54,6 +54,11 @@ export class Module {
         this.router?.onRoute(this.routingPath.concat(pattern), f)
     }
 
+    navigate(addr: string) {
+        console.log("Module.navigate:", addr)
+        this.router?.navigate(this.url(addr))
+    }
+
     setup() {}
 
     mainView(content = null) {
@@ -91,5 +96,42 @@ export class Module {
     clearUI() {
         this.hideMessages()
         this.mainView().empty()
+    }
+
+    url(addr: string): string {
+        return this.routingPath.concat(addr)
+    }
+
+    innerUrl(addr: string): string {
+        return InnerUrl(this.url(addr))
+    }
+
+    innerLink(addr: string, text: string) {
+        return `<a inner="${addr}" class="inner" href=${this.innerUrl(addr)}>${text}</a>`
+    }
+
+    makeLinkInner(node, addr: string, text: string|undefined|null = null) {
+        node.attr("inner", addr)
+        node.attr("href", this.innerUrl(addr))
+        node.attr("class", "inner")
+        if (text !== null)
+            node.text(text)
+        return node
+    }
+
+    activeLink(addr: string, text: string) {
+        const link = $(this.innerLink(addr, text))
+        link.click((e) => {
+            e.preventDefault()
+            this.navigate($(e.currentTarget).attr("inner"))
+        })
+    }
+
+    makeLinkActive(node, addr: string, text: string|undefined|null = null) {
+        const link = this.makeLinkInner(node, addr, text)
+        link.click((e) => {
+            e.preventDefault()
+            this.navigate($(e.currentTarget).attr("inner"))
+        })
     }
 }

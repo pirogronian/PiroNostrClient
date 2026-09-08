@@ -3,7 +3,7 @@ import $ from "jquery"
 import NDK, { NDKEvent, NDKRelay } from "@nostr-dev-kit/ndk";
 import type { NDKFilter, NDKSubscription } from "@nostr-dev-kit/ndk"
 
-import { safeAsync, EventTagValues, InnerUrl, MakeLinkInner, InnerLink, FormattedTime } from "@/various.js";
+import { safeAsync, EventTagValues, InnerUrl, InnerLink, MakeLinkInner, FormattedTime } from "@/various.js";
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
@@ -25,11 +25,11 @@ export class Articles extends Module {
         if (!TT) { TT = event.tagValue("d") }
         console.log(`Received article "${TT}"`)
         title.text(TT)
-        MakeLinkInner(title, `/article/${event.encode()}`)
+        App.get().article.makeLinkActive(title, `/${event.encode()}`)
 
         const user = await App.get().user.get(event.pubkey)
         if (user && user.profile) {
-            MakeLinkInner(Head.find("a.AuthorNick"), `/articles?author=${user.pubkey}`, user.profile.name)
+            this.makeLinkActive(Head.find("a.AuthorNick"), `?author=${user.pubkey}`, user.profile.name)
             Head.find("img.AuthorImg").attr("src", user.profile.picture)
             Head.find("div.CreationTime").text(FormattedTime(event.created_at))
         }
@@ -42,11 +42,11 @@ export class Articles extends Module {
             HeadTopics.append(a)
         })
 
-        Head.find("a.inner").click((event) => {
+        /*Head.find("a.inner").click((event) => {
             console.log("Additional link clicked.")
             event.preventDefault()
             App.get().router.navigate($(event.currentTarget).attr("inner"))
-        })
+        })*/
 
         const fr = this.mainView().find("#FinderResult")
         fr.append(Head)
