@@ -98,7 +98,13 @@ code {
 }
 
 #FinderForm {
-    @extend .MultirowFlexContainer
+    @extend .MultirowFlexContainer;
+    @extend .Frame
+}
+
+#FinderForm label {
+    padding: 0 2mm 0 2mm;
+    margin: 0
 }
 
 div.ArticleHead {
