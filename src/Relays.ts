@@ -44,6 +44,7 @@ type RelaySettingsDB = Record<string, RelaySettings>;
 
 export class Relays extends Module {
     autoUse: boolean = true
+    autoConnect: boolean = true
 
     known: RelaySettingsDB = {}
 
@@ -52,10 +53,12 @@ export class Relays extends Module {
 
     saveSettings() {
         this.settings("autoUse", this.autoUse ? "1" : null)
+        this.settings("autoConnect", this.autoConnect ? "1" : null)
     }
 
     loadSettins() {
         this.autoUse = this.settings("autoUse") ? true : false
+        this.autoConnect = this.settings("autoConnect") ? true : false
     }
 
     get() {
@@ -92,7 +95,7 @@ export class Relays extends Module {
         console.log(this.known)
         for(const [url, info] of Object.entries(this.known)) {
             if (info.use)
-                this.add(url)
+                this.add(url, this.autoConnect)
         }
     }
 
@@ -166,7 +169,7 @@ export class Relays extends Module {
 
         const NewUrl = $("input[name='NewRelayUrl']")
         Head.find("#AddRelayButton").click((e) => {
-            this.add(NewUrl.val())
+            this.add(NewUrl.val(), this.autoConnect)
             this.save()
             this.handle()
         })
@@ -175,6 +178,13 @@ export class Relays extends Module {
             aac.prop("checked", true)
         aac.change(() => {
             this.autoUse = aac.prop("checked")
+            this.saveSettings()
+        })
+        const acc = Head.find("input[name='AutoConnectRelay']")
+        if (this.autoConnect)
+            acc.prop("checked", true)
+        acc.change(() => {
+            this.autoConnect = acc.prop("checked")
             this.saveSettings()
         })
         Head.find("#AddDefaultsRelays").click(() => {
@@ -264,7 +274,7 @@ export class Relays extends Module {
                 urn.find(".UseRelayButton").hide()
                 urn.find(".DontUseRelayButton").hide()
                 urn.find("button.AddRelayButton").click(() => {
-                    this.add(url)
+                    this.add(url, this.autoConnect)
                     this.handle()
                 })
                 urn.find(".Challenge").text(this.challenges[url])
