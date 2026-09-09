@@ -138,6 +138,13 @@ export class Relays extends Module {
             this.known[relay] = new RelaySettings()
     }
 
+    makeKnownAll() {
+        const list = this.getUrls()
+        list.forEach((url) => {
+            this.makeKnown(url)
+        })
+    }
+
     markUsed(url: string, use: boolean = true) {
         if (!this.known[url])
             this.known[url] = new RelaySettings()
@@ -275,6 +282,8 @@ export class Relays extends Module {
     handle() {
         this.clearUI()
         this.loadSettins()
+        this.makeKnownAll()
+        this.save()
         this.show()
     }
 
@@ -284,9 +293,11 @@ export class Relays extends Module {
         })
         this.makeLinkActive($("#RelaysLink"), "")
         this.ndk.pool.on('relay:connect', (relay) => {
-            if (this.autoUse)
+            if (this.autoUse) {
                 this.markUsed(relay.url)
-                this.save();
+            } else
+                this.makeKnown(relay)
+            this.save();
             this.handle()
         });
         this.ndk.pool.on("relay:disconnect", () => {
