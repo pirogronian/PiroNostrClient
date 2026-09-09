@@ -260,6 +260,10 @@ export class Relays extends Module {
             arn.find("button.AddRelayButton").hide()
             arn.find("button.ForgetRelayButton").hide()
 
+            //arn.find(".RelayTrusted").text(relay.trusted)
+            //arn.find(".RelayAuth").text(relay.authPolicy)
+            //console.log(relay.authPolicy)
+
             UIList.append(arn)
         })
         const urls = Array.from(this.getUrls())

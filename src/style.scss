@@ -71,7 +71,7 @@ code {
 }
 
 .OnerowFlexContainer * {
-    /*display: inline-block;*/
+    display: inline-block;
     align-self: center;
     padding: 2mm;
     margin: 2mm;
@@ -135,6 +135,7 @@ div.ArticleHead div.CreationTime {
 #ArticleInfoHeader {
     @extend .Frame;
     @extend .OnerowFlexContainer;
+    width: 100%;
     padding: 0
 }
 
