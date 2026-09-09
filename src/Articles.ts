@@ -32,7 +32,8 @@ export class Articles extends Module {
             this.makeLinkActive(Head.find("a.AuthorNick"), `?author=${user.pubkey}`, user.profile.name)
             Head.find("img.AuthorImg").attr("src", user.profile.picture)
             Head.find("div.CreationTime").text(FormattedTime(event.created_at))
-        }
+        } else
+            console.log("No user or profile!")
 
         Head.find("div.Summary").text(event.tagValue("summary"))
         const topics = EventTagValues(event, "t")
