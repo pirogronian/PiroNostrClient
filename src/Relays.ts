@@ -134,6 +134,16 @@ export class Relays extends Module {
                 this.save()
                 this.handle()
             })
+            const urls = Array.from(this.getUrls())
+            stored.forEach((url) => {
+                if (!urls.includes(url)) {
+                    const urn = $(ActiveRelayHTML)
+                    urn.find("a").text(url).attr("href", url)
+                    const s = arn.find(".RelayStatus")
+                    s.text("unused")
+                    s.addClass("unused")
+                }
+            })
 
             UIList.append(arn)
         })
