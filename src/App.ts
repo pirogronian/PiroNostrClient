@@ -30,7 +30,7 @@ export class App extends Module {
         this.router = new Router()
         console.log("Router:", this.router)
         const cacheAdapter = new NDKCacheAdapterDexie({ dbName: 'wiki-nostr-cache' });
-        this.ndk = new NDK({ cacheAdapter });
+        this.ndk = new NDK({ cacheAdapter, enableOutboxModel: true });
         this.about = new About()
         this.about.register("about", "about", this)
         this.relays = new Relays()
