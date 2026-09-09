@@ -84,7 +84,8 @@ export class Relays extends Module {
 
     show() {
         this.mainView().html(RelaysHTML)
-        const list = this.get()
+        const used = this.get()
+        const stored = this.getStored()
         const Head = $("#ActiveRelaysHeader")
         const UIList = $("#ActiveRelays")
 
@@ -105,13 +106,17 @@ export class Relays extends Module {
             this.removeAll()
             this.handle()
         })
+        Head.find("#SaveAllRelays").click(() => {
+            this.save()
+            this.handle()
+        })
         Head.find("#RefreshActiveRelays").click(() => {
             this.handle()
         })
 
         UIList.html("")
 
-        list.forEach((relay : NDKRelay) => {
+        used.forEach((relay : NDKRelay) => {
             const arn = $(ActiveRelayHTML)
             console.log("Relay:", relay.url)
             arn.find("a").text(relay.url).attr("href", relay.url)
@@ -120,6 +125,9 @@ export class Relays extends Module {
             const s = arn.find(".RelayStatus")
             s.text(c)
             s.addClass(c)
+            if (!stored.includes(relay.url)) {
+                arn.find(".New").show()
+            }
             arn.find("button.RemoveRelayButton").click((e) => {
                 console.log("Removing:", relay.url)
                 this.remove(relay.url)
@@ -128,6 +136,9 @@ export class Relays extends Module {
             })
 
             UIList.append(arn)
+        })
+        stored.forEach((url) => {
+
         })
     }
 
