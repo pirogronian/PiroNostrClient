@@ -54,6 +54,7 @@ code {
 .MultirowFlexContainer {
     display: flex;
     flex-wrap: wrap;
+    width: fit-content
 }
 
 .MultirowFlexContainer * {
@@ -65,11 +66,12 @@ code {
 }
 
 .OnerowFlexContainer {
-    display: flex
+    display: flex;
+    width: fit-content
 }
 
 .OnerowFlexContainer * {
-    display: inline-block;
+    /*display: inline-block;*/
     align-self: center;
     padding: 2mm;
     margin: 2mm;
