@@ -106,15 +106,26 @@ div.ArticleHead {
     @extend .Frame
 }
 
+div.ArticleHead * {
+    margin: 0
+}
+
 div.ArticleHead img {
     padding: 0;
-    margin: 0;
     max-height: 1cm
 }
 
 div.ArticleHead div.ArticleAuthor {
+    display: flex;
     padding: 0;
+}
+
+div.ArticleHead div.ArticleAuthor * {
     margin: 0
+}
+
+div.ArticleHead div.CreationTime {
+    text-decoration: underline;
 }
 
 div.ArticleHead a.ArticleTitle {
@@ -124,12 +135,8 @@ div.ArticleHead a.ArticleTitle {
     margin-right: 5mm
 }
 
-div.ArticleHead div.ArticleAuthor {
-    display: flex;
-}
-
-div.ArticleHead div.CreationTime {
-    text-decoration: underline;
+div.ArticleHead div.Summary, div.ArticleHead div.Topics {
+    padding: 0
 }
 
 #ArticleInfoHeader {
