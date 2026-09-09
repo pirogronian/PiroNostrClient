@@ -17,6 +17,9 @@ const DEFAULT_RELAYS = [
 export class Relays extends Module {
     autoAdd: boolean = true
 
+    challenges: { [url: string] : string } = {}
+    notices: { [url: string] : string } = {}
+
     saveSettings() {
         this.settings("autoAdd", this.autoAdd ? "1" : null)
     }
@@ -129,7 +132,7 @@ export class Relays extends Module {
             this.handle()
         })
 
-        UIList.html("")
+        UIList.empty()
 
         used.forEach((relay : NDKRelay) => {
             const arn = $(ActiveRelayHTML)
@@ -143,21 +146,13 @@ export class Relays extends Module {
             if (!stored.includes(relay.url)) {
                 arn.find(".New").show()
             }
+            arn.find(".Challenge").text(this.challenges[relay.url])
+            arn.find(".Notice").text(this.notices[relay.url])
             arn.find("button.RemoveRelayButton").click((e) => {
                 console.log("Removing:", relay.url)
                 this.remove(relay.url)
                 this.save()
                 this.handle()
-            })
-            const urls = Array.from(this.getUrls())
-            stored.forEach((url) => {
-                if (!urls.includes(url)) {
-                    const urn = $(ActiveRelayHTML)
-                    urn.find("a").text(url).attr("href", url)
-                    const s = arn.find(".RelayStatus")
-                    s.text("unused")
-                    s.addClass("unused")
-                }
             })
 
             UIList.append(arn)
@@ -170,6 +165,8 @@ export class Relays extends Module {
                 const s = urn.find(".RelayStatus")
                 s.text("unused")
                 s.addClass("unused")
+                urn.find(".Challenge").text(this.challenges[url])
+                urn.find(".Notice").text(this.notices[url])
                 UIList.append(urn)
             }
         })
@@ -189,7 +186,30 @@ export class Relays extends Module {
         this.ndk.pool.on('relay:connect', () => {
             if (this.autoAdd)
                 this.save();
+            this.handle()
         });
+        this.ndk.pool.on("relay:disconnect", () => {
+            this.handle()
+        })
+        this.ndk.pool.on("relay:auth", (relay: NDKRelay, challenge: string) => {
+            this.challenges[relay.url] = challenge
+            this.handle()
+        })
+        this.ndk.pool.on("relay:authed", () => {
+            this.handle()
+        })
+        this.ndk.pool.on("notice", (relay: NDKRelay, notice: string) => {
+            this.notices[relay.url] = notice
+        })
+        this.ndk.pool.on("connect", () => {
+            this.handle()
+        })
+        this.ndk.pool.on("relay:connecting", () => {
+            this.handle()
+        })
+        this.ndk.pool.on("flapping", () => {
+            this.handle()
+        })
     }
 }
 
