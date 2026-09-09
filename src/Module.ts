@@ -46,7 +46,8 @@ export class Module {
         if (value) {
             return localStorage.setItem(key, value)
         }
-        if (typeof value === "null") {
+        if (value === null) {
+            console.log("Removing item:", key)
             return localStorage.removeItem(key)
         }
         return localStorage.getItem(key)
