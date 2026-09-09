@@ -197,10 +197,10 @@ export class Relays extends Module {
             this.removeAll()
             this.handle()
         })
-        Head.find("#SaveAllRelays").click(() => {
+        /*Head.find("#SaveAllRelays").click(() => {
             this.save()
             this.handle()
-        })
+        })*/
         Head.find("#RefreshActiveRelays").click(() => {
             this.handle()
         })
