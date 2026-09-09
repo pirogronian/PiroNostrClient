@@ -1,7 +1,8 @@
 
 import $ from "jquery"
 import NDK, { NDKRelay, NDKRelayStatus, NDKPool, NDKRelayAuthPolicies } from "@nostr-dev-kit/ndk";
-import { Module } from "./Module.js";
+import { Module } from "@/Module.js";
+import { App } from "@/App.js"
 
 import RelaysHTML from "@/Relays.html?raw"
 import ActiveRelayHTML from "@/ActiveRelay.html?raw"
@@ -291,6 +292,7 @@ export class Relays extends Module {
     }
 
     handle() {
+        if (App.get().current != "Relays")  return
         this.clearUI()
         this.loadSettins()
         this.show()
@@ -298,6 +300,7 @@ export class Relays extends Module {
 
     setup() {
         this.onRoute("", (match) => {
+            App.get().current = "Relays"
             this.handle()
         })
         this.makeLinkActive($("#RelaysLink"), "")

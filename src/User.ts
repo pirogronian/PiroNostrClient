@@ -2,6 +2,7 @@
 import NDK, { NDKUser, NDKNip07Signer } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 import { Module } from "@/Module.js"
+import { App } from "@/App.js"
 
 import UserHTML from "@/User.html?raw"
 
@@ -91,6 +92,7 @@ export class User extends Module{
 
     setup() {
         this.onRoute('', (match) => {
+            App.get().current = "User"
             this.clearUI()
             this.handle()
         })
