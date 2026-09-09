@@ -269,6 +269,7 @@ export class Relays extends Module {
                 })
                 urn.find(".Challenge").text(this.challenges[url])
                 urn.find(".Notice").text(this.notices[url])
+                urn.find(".RemoveRelayButton").hide()
                 urn.find("button.ForgetRelayButton").click(() => {
                     delete this.known[url]
                     this.save()
