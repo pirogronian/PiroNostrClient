@@ -1,6 +1,6 @@
 
 import $ from "jquery"
-import NDK, { NDKRelay, NDKRelayStatus, NDKRelayAuthPolicies } from "@nostr-dev-kit/ndk";
+import NDK, { NDKRelay, NDKRelayStatus, NDKPool, NDKRelayAuthPolicies } from "@nostr-dev-kit/ndk";
 import { Module } from "./Module.js";
 
 import RelaysHTML from "@/Relays.html?raw"
@@ -282,8 +282,6 @@ export class Relays extends Module {
     handle() {
         this.clearUI()
         this.loadSettins()
-        this.makeKnownAll()
-        this.save()
         this.show()
     }
 
@@ -292,6 +290,25 @@ export class Relays extends Module {
             this.handle()
         })
         this.makeLinkActive($("#RelaysLink"), "")
+
+        const originalAdd = this.ndk.pool.addRelay.bind(this.ndk.pool);
+        const originalRemove = this.ndk.pool.removeRelay.bind(this.ndk.pool);
+
+        // Nadpisujemy addRelay
+        this.ndk.pool.addRelay = function(relay: NDKRelay, connect?: boolean) {
+            const result = originalAdd(relay, connect);
+            this.emit('updated', { type: 'ADD', relay });
+            return result;
+        };
+
+        // Nadpisujemy removeRelay
+        this.ndk.pool.removeRelay = function(relayUrl: string) {
+            const result = originalRemove(relayUrl);
+            this.emit('updated', { type: 'REMOVE', relayUrl });
+            return result;
+        };
+
+
         this.ndk.pool.on('relay:connect', (relay) => {
             if (this.autoUse) {
                 this.markUsed(relay.url)
@@ -321,6 +338,10 @@ export class Relays extends Module {
         })
         this.ndk.pool.on("flapping", () => {
             this.handle()
+        })
+        this.ndk.pool.on("updated", () => {
+            this.makeKnownAll()
+            this.save()
         })
     }
 }
