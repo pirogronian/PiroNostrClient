@@ -68,11 +68,18 @@ export class Relays extends Module {
         })
     }
 
-    remove(url: string) {
+    remove(url: string): boolean {
         const relay = this.ndk.pool.relays.get(url)
-        if (!relay)  return
+        if (!relay)  return false
         relay.disconnect()
         this.ndk.pool.removeRelay(url)
+        return true
+    }
+
+    removeAll(): void {
+        this.ndk.pool.relays.forEach((relay, url) => {
+            this.remove(url)
+        })
     }
 
     show() {
@@ -85,6 +92,17 @@ export class Relays extends Module {
         Head.find("#AddRelayButton").click((e) => {
             this.add(NewUrl.val())
             this.save()
+            this.handle()
+        })
+        Head.find("#AddDefaultsRelays").click(() => {
+            DEFAULT_RELAYS.forEach((relay) => {
+                this.add(relay)
+            })
+            this.save()
+            this.handle()
+        })
+        Head.find("#RemoveAllRelays").click(() => {
+            this.removeAll()
             this.handle()
         })
         Head.find("#RefreshActiveRelays").click(() => {
