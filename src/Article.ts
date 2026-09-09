@@ -11,7 +11,8 @@ import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
 import { safeAsync, formatNip54TagD, EventTagValues, FormattedTime } from "@/various.js";
-import { UI } from "@/UI.js";
+
+import "@/style.scss"
 
 import ArticleViewHTML from '@/Article.html?raw';
 

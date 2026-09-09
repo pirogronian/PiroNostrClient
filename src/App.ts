@@ -1,7 +1,6 @@
 
 import NDK, { NDKEvent, NDKUser, NDKRelay } from "@nostr-dev-kit/ndk";
 import NDKCacheAdapterDexie from '@nostr-dev-kit/ndk-cache-dexie';
-import { UI } from "@/UI.js"
 import { Relays } from '@/Relays.js';
 import { User } from "@/User.js"
 
@@ -19,7 +18,6 @@ export class App extends Module {
     about: About
     relays: Relays
     user: User
-    ui: UI
     articles: Articles
     article: Article
 
@@ -43,7 +41,6 @@ export class App extends Module {
         this.articles.register("articles", "articles", this)
         this.article = new Article()
         this.article.register("article", "article", this)
-        this.ui = new UI(this.ndk)
         this.ndk.pool.on('relay:connect', () => {
             this.relays.save();
         });
@@ -99,23 +96,9 @@ export class App extends Module {
 
     login(method?: string) {
         this.user.login(method)
-        //this.settings()
     }
 
     logout() {
         this.user.logout()
-        //this.settings()
-    }
-
-    initUI() {
-        this.ui.init()
-    }
-
-    initHyperlinks() {
-        this.ui.initLinks()
-    }
-
-    home() {
-        this.ui.home()
     }
 }
