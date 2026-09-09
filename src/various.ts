@@ -53,11 +53,11 @@ export function MakeLinkInner(node, url: string, text: string|null = null) {
 }
 
 export function FormattedTime(seconds: number|undefined|null = null) {
-        let t: Date|null = null
-        if (seconds) {
-            seconds *= 1000;
-            t = new Date(seconds)
-        }
+    let t: Date|null = null
+    if (seconds) {
+        seconds *= 1000;
+        t = new Date(seconds)
+    } else
         t = new Date()
-        return t.toLocaleString()
-    }
+    return t.toLocaleString()
+}
