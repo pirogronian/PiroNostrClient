@@ -41,9 +41,6 @@ export class App extends Module {
         this.articles.register("articles", "articles", this)
         this.article = new Article()
         this.article.register("article", "article", this)
-        this.ndk.pool.on('relay:connect', () => {
-            this.relays.save();
-        });
         this.relays.load()
     }
 

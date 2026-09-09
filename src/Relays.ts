@@ -17,6 +17,14 @@ const DEFAULT_RELAYS = [
 export class Relays extends Module {
     autoAdd: boolean = true
 
+    saveSettings() {
+        this.settings("autoAdd", this.autoAdd ? "1" : null)
+    }
+
+    loadSettins() {
+        this.autoAdd = this.settings("autoAdd") ? true : false
+    }
+
     get() {
         return this.ndk.pool.relays.values();
     }
@@ -95,6 +103,13 @@ export class Relays extends Module {
             this.save()
             this.handle()
         })
+        const aac = Head.find("input[name='AutoAddRelay']")
+        if (this.autoAdd)
+            aac.prop("checked", true)
+        aac.change(() => {
+            this.autoAdd = aac.prop("checked")
+            this.saveSettings()
+        })
         Head.find("#AddDefaultsRelays").click(() => {
             DEFAULT_RELAYS.forEach((relay) => {
                 this.add(relay)
@@ -147,13 +162,22 @@ export class Relays extends Module {
 
             UIList.append(arn)
         })
+        const urls = Array.from(this.getUrls())
         stored.forEach((url) => {
-
+            if (!urls.includes(url)) {
+                const urn = $(ActiveRelayHTML)
+                urn.find("a").text(url).attr("href", url)
+                const s = urn.find(".RelayStatus")
+                s.text("unused")
+                s.addClass("unused")
+                UIList.append(urn)
+            }
         })
     }
 
     handle() {
         this.clearUI()
+        this.loadSettins()
         this.show()
     }
 
@@ -162,6 +186,10 @@ export class Relays extends Module {
             this.handle()
         })
         this.makeLinkActive($("#RelaysLink"), "")
+        this.ndk.pool.on('relay:connect', () => {
+            if (this.autoAdd)
+                this.save();
+        });
     }
 }
 
