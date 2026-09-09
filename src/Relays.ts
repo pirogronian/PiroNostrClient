@@ -1,12 +1,12 @@
 
 import $ from "jquery"
-import NDK, { NDKRelay, NDKRelayStatus } from "@nostr-dev-kit/ndk";
+import NDK, { NDKRelay, NDKRelayStatus, NDKRelayAuthPolicies } from "@nostr-dev-kit/ndk";
 import { Module } from "./Module.js";
 
 import RelaysHTML from "@/Relays.html?raw"
 import ActiveRelayHTML from "@/ActiveRelay.html?raw"
 
-const STORAGE_KEY = 'used';
+const STORAGE_KEY = 'known';
 
 const DEFAULT_RELAYS = [
     'wss://relay.damus.io',
@@ -14,18 +14,48 @@ const DEFAULT_RELAYS = [
     'wss://purplepag.es'
 ];
 
+interface RelaySettingsIface {
+    use: boolean
+    trusted: boolean
+    auth: string
+}
+
+class RelaySettings {
+    constructor(
+        public use: boolean = false,
+        public trusted: boolean = false,
+        public auth: string = "none"
+    ) {}
+
+    toJSON(): RelaySettingsIface {
+        return {
+            use: this.use,
+            trusted: this.trusted,
+            auth: this.auth
+        }
+    }
+
+    static fromJSON(json: RelaySettingsIface): RelaySettings {
+        return new RelaySettings(json.use, json.trusted, json.auth)
+    }
+}
+
+type RelaySettingsDB = Record<string, RelaySettings>;
+
 export class Relays extends Module {
-    autoAdd: boolean = true
+    autoUse: boolean = true
+
+    known: RelaySettingsDB = {}
 
     challenges: { [url: string] : string } = {}
     notices: { [url: string] : string } = {}
 
     saveSettings() {
-        this.settings("autoAdd", this.autoAdd ? "1" : null)
+        this.settings("autoUse", this.autoUse ? "1" : null)
     }
 
     loadSettins() {
-        this.autoAdd = this.settings("autoAdd") ? true : false
+        this.autoUse = this.settings("autoUse") ? true : false
     }
 
     get() {
@@ -37,38 +67,45 @@ export class Relays extends Module {
     }
 
     save(): void {
-        const relayUrls = Array.from(this.ndk.pool.relays.keys());
-        this.settings(STORAGE_KEY, JSON.stringify(relayUrls));
+        this.settings(STORAGE_KEY, JSON.stringify(this.known));
     }
 
-    getStored(): string[] {
+    getStored(): RelaySettingsDB {
         const saved = this.settings(STORAGE_KEY);
-        if (!saved) return []
+        if (!saved) return {}
 
         try {
-            const parsed = JSON.parse(saved);
-            return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_RELAYS;
+            const raw: Record<string, RelaySettingsIface> = JSON.parse(saved);
+            if (!raw)  return {}
+            const ret : RelaySettingsDB = {}
+            for (const [url, value] of Object.entries(raw)) {
+                ret[url] = RelaySettings.fromJSON(value)
+            }
+            return ret;
         } catch {
-            return [];
+            return {};
         }
     }
 
     load(): void {
-        const urls = this.getStored()
-        urls.forEach((url) => { 
-            this.add(url)
-        })
+        this.known = this.getStored()
+        console.log(this.known)
+        for(const [url, info] of Object.entries(this.known)) {
+            if (info.use)
+                this.add(url)
+        }
     }
 
-    add(url: string|NDKRelay) {
+    add(url: string|NDKRelay, connect: boolean = false) {
         let relay: NDKRelay
         if (typeof url == "string") {
             relay = new NDKRelay(url, undefined, this.ndk)
         }
         else
             relay = url
+
         if (relay)
-            this.ndk.pool.addRelay(relay, true)
+            this.ndk.pool.addRelay(relay, connect)
         else
             console.log("No relay created.")
     }
@@ -93,6 +130,26 @@ export class Relays extends Module {
         })
     }
 
+    makeKnown(relay: string|NDKRelay): void {
+        if (typeof relay != "string") {
+            relay = relay.url
+        }
+        if (!this.known[relay])
+            this.known[relay] = new RelaySettings()
+    }
+
+    markUsed(url: string, use: boolean = true) {
+        if (!this.known[url])
+            this.known[url] = new RelaySettings()
+        this.known[url].use = use
+    }
+
+    markUsedAll(use: boolean = true) {
+        for(const [url, info] of Object.entries(this.known)) {
+            this.markUsed(url, use)
+        }
+    }
+
     show() {
         this.mainView().html(RelaysHTML)
         const used = this.get()
@@ -107,17 +164,16 @@ export class Relays extends Module {
             this.handle()
         })
         const aac = Head.find("input[name='AutoAddRelay']")
-        if (this.autoAdd)
+        if (this.autoUse)
             aac.prop("checked", true)
         aac.change(() => {
-            this.autoAdd = aac.prop("checked")
+            this.autoUse = aac.prop("checked")
             this.saveSettings()
         })
         Head.find("#AddDefaultsRelays").click(() => {
             DEFAULT_RELAYS.forEach((relay) => {
                 this.add(relay)
             })
-            this.save()
             this.handle()
         })
         Head.find("#RemoveAllRelays").click(() => {
@@ -143,33 +199,77 @@ export class Relays extends Module {
             const s = arn.find(".RelayStatus")
             s.text(c)
             s.addClass(c)
-            if (!stored.includes(relay.url)) {
+            if (!this.known[relay.url]) {
                 arn.find(".New").show()
             }
             arn.find(".Challenge").text(this.challenges[relay.url])
             arn.find(".Notice").text(this.notices[relay.url])
-            arn.find("button.RemoveRelayButton").click((e) => {
-                console.log("Removing:", relay.url)
-                this.remove(relay.url)
+
+            if (relay.connected)
+                arn.find(".ConnectRelayButton").hide()
+            else
+                arn.find(".DisconnectRelayButton").hide()
+                arn.find(".ConnectRelayButton").click(() => {
+                relay.connect()
+            })
+            arn.find(".DisconnectRelayButton").click(() => {
+                relay.disconnect()
+            })
+
+            if (this.known[relay.url] && this.known[relay.url]?.use)
+                arn.find(".UseRelayButton").hide()
+            else
+                arn.find(".DontUseRelayButton").hide()
+            arn.find(".UseRelayButton").click(() => {
+                console.log("Use")
+                this.markUsed(relay.url)
                 this.save()
                 this.handle()
             })
+            arn.find(".DontUseRelayButton").click(() => {
+                console.log("Dont use")
+                this.markUsed(relay.url, false)
+                this.save()
+                this.handle()
+            })
+            arn.find("button.RemoveRelayButton").click((e) => {
+                console.log("Removing:", relay.url)
+                this.remove(relay.url)
+                this.markUsed(relay.url, false)
+                this.save()
+                this.handle()
+            })
+            arn.find("button.AddRelayButton").hide()
+            arn.find("button.ForgetRelayButton").hide()
 
             UIList.append(arn)
         })
         const urls = Array.from(this.getUrls())
-        stored.forEach((url) => {
+        for(const [url, info] of Object.entries(this.known)) {
             if (!urls.includes(url)) {
                 const urn = $(ActiveRelayHTML)
                 urn.find("a").text(url).attr("href", url)
                 const s = urn.find(".RelayStatus")
                 s.text("unused")
                 s.addClass("unused")
+                urn.find(".ConnectRelayButton").hide()
+                urn.find(".DisconnectRelayButton").hide()
+                urn.find(".UseRelayButton").hide()
+                urn.find(".DontUseRelayButton").hide()
+                urn.find("button.AddRelayButton").click(() => {
+                    this.add(url)
+                    this.handle()
+                })
                 urn.find(".Challenge").text(this.challenges[url])
                 urn.find(".Notice").text(this.notices[url])
+                urn.find("button.ForgetRelayButton").click(() => {
+                    delete this.known[url]
+                    this.save()
+                    this.handle()
+                })
                 UIList.append(urn)
             }
-        })
+        }
     }
 
     handle() {
@@ -183,8 +283,9 @@ export class Relays extends Module {
             this.handle()
         })
         this.makeLinkActive($("#RelaysLink"), "")
-        this.ndk.pool.on('relay:connect', () => {
-            if (this.autoAdd)
+        this.ndk.pool.on('relay:connect', (relay) => {
+            if (this.autoUse)
+                this.markUsed(relay.url)
                 this.save();
             this.handle()
         });
