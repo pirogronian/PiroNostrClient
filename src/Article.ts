@@ -170,14 +170,24 @@ export class Article extends Module {
     
         const user = await App.get().user.get(this.event.pubkey)
         if (user && user.profile) {
-            o.find("img#AuthorPicture").attr("src", user.profile.picture)
-            App.get().articles.makeLinkActive(o.find("a#AuthorNick"), `?author=${user.pubkey}`, user.profile.name)
+            const img = o.find("img#AuthorPicture")
+            if (user.profile.picture)
+                img.attr("src", user.profile.picture)
+            else
+                img.hide()
+            let nick = user.profile.name
+            if (!nick) nick = "author"
+            App.get().articles.makeLinkActive(o.find("a#AuthorNick"), `?author=${user.pubkey}`, nick)
             //o.find("a#AuthorNick").text(user.profile.name).attr("href", LocalUrl(`#/articles?author=${user.pubkey}`))
         }
         o.find("#CreationTime").text(FormattedTime(this.event.created_at))
         App.get().articles.makeLinkActive(o.find("a#ArticleId"), `?id=${this.event.tagValue("d")}`, this.event.tagValue("d"))
         //o.find("a#ArticleId").text(this.event.tagValue("d")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
-        o.find("#ArticleSummary").text(this.event.tagValue("summary"))
+        const summary = this.event.tagValue("summary")
+        if (summary)
+            o.find("#ArticleSummary").text(summary)
+        else
+            o.find("#ArticleSummary").hide()
 
         let origin = this.event.tagValue("e")
         if (!origin) origin = this.event.tagValue("a")
@@ -192,6 +202,8 @@ export class Article extends Module {
             const a = $(App.get().articles.activeLink(`?t=${topic}"`, topic))
             HeadTopics.append(a)
         })
+        if (!topics.length)
+            HeadTopics.hide()
 
         const co = o.find("#ArticleClient")
         const client = this.event.tagValue("client")
