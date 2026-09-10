@@ -147,9 +147,18 @@ div.ArticleHead div.Summary, div.ArticleHead div.Topics {
 
 #ArticleInfoHeader {
     @extend .Frame;
-    @extend .OnerowFlexContainer;
-    width: 100%;
+    display: flex;
+    align-items: center;
+    //@extend .OnerowFlexContainer;
     padding: 0
+}
+
+#ArticleInfoHeader * {
+    display: inline-flex;
+}
+
+#ArticleInfoHeader > * {
+    padding: 0 2mm 0 2mm
 }
 
 #ArticleInfoHeader img {
@@ -158,13 +167,12 @@ div.ArticleHead div.Summary, div.ArticleHead div.Topics {
 }
 
 #ArticleInfoHeader #ArticleTitleGroup {
-    display: flex;
     flex-direction: column;
     /*max-height: 2cm*/
 }
 
 #ArticleInfoHeader #ArticleTitleGroup {
-    margin: 0 5mm 0 5mm
+    padding: 0 5mm 0 5mm
 }
 
 #ArticleInfoHeader #ArticleTitleGroup div.row {
@@ -188,9 +196,8 @@ div.ArticleHead div.Summary, div.ArticleHead div.Topics {
 }
 
 #ArticleInfoHeader #AuthorNickAndCreationTime {
-    display: flex;
+    //display: flex;
     flex-direction: column;
-    padding: 0;
 }
 
 #ArticleInfoHeader #AuthorNickAndCreationTime * {
@@ -203,12 +210,12 @@ div.ArticleHead div.Summary, div.ArticleHead div.Topics {
     padding: 1mm 2mm 1mm 4mm
 }
 
-#ArticleInfoHeader, #ArticleSettingsHeader {
+/*#ArticleInfoHeader, #ArticleSettingsHeader {
     display: flex;
     flex-wrap: wrap
-}
+}*/
 
 #ArticleSettingsHeader {
     @extend .Frame;
-    @Extend .MultirowFlexContainer
+    //@extend .MultirowFlexContainer
 }
