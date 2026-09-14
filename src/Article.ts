@@ -45,7 +45,7 @@ export class Article extends Module {
     }
 
     showRawEvent(target) : void {
-        const rawObject = this.event.rawEvent();
+        const rawObject = this.event?.rawEvent();
   
         const jsonString = JSON.stringify(rawObject, null, 2);
 
