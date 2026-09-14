@@ -103,6 +103,21 @@ export class Relays extends Module {
         }
     }
 
+    reload() {
+        this.ndk.pool.relays.clear()
+        this.known = {}
+        this.challenges = {}
+        this.notices = {}
+        this.loadSettins()
+        this.load()
+    }
+
+    disconnectAll() {
+        this.ndk.pool.relays.forEach((relay, url) => {
+            relay.disconnect()
+        })
+    }
+
     add(url: string|NDKRelay, connect: boolean = false) {
         let relay: NDKRelay
         if (typeof url == "string") {
@@ -197,6 +212,9 @@ export class Relays extends Module {
             })
             this.handle()
         })
+        Head.find("#DisconnectAllRelays").click(() => {
+            this.disconnectAll()
+        })
         Head.find("#RemoveAllRelays").click(() => {
             this.removeAll()
             this.handle()
@@ -206,6 +224,10 @@ export class Relays extends Module {
             this.handle()
         })*/
         Head.find("#RefreshActiveRelays").click(() => {
+            this.handle()
+        })
+        Head.find("#ReloadActiveRelays").click(() => {
+            this.reload()
             this.handle()
         })
 
