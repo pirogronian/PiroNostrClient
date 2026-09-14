@@ -52,6 +52,8 @@ export class Relays extends Module {
     challenges: { [url: string] : string } = {}
     notices: { [url: string] : string } = {}
 
+    connectedNum: number = 0
+
     saveSettings() {
         this.settings("autoUse", this.autoUse ? "1" : null)
         this.settings("autoConnect", this.autoConnect ? "1" : null)
@@ -230,6 +232,9 @@ export class Relays extends Module {
             this.reload()
             this.handle()
         })
+        const inPool = this.ndk.pool.relays.size
+        const statStr = `Connected: ${this.connectedNum}/${inPool}`
+        $("#RelaysStats").text(statStr)
 
         UIList.empty()
 
@@ -363,6 +368,7 @@ export class Relays extends Module {
 
 
         this.ndk.pool.on('relay:connect', (relay) => {
+            this.connectedNum += 1
             if (this.autoUse) {
                 this.markUsed(relay.url)
             } else
@@ -371,20 +377,20 @@ export class Relays extends Module {
             this.handle()
         });
         this.ndk.pool.on("relay:disconnect", () => {
+            this.connectedNum -= 1
             this.handle()
         })
         this.ndk.pool.on("relay:auth", (relay: NDKRelay, challenge: string) => {
+            this.connectedNum -= 1
             this.challenges[relay.url] = challenge
             this.handle()
         })
         this.ndk.pool.on("relay:authed", () => {
+            this.connectedNum += 1
             this.handle()
         })
         this.ndk.pool.on("notice", (relay: NDKRelay, notice: string) => {
             this.notices[relay.url] = notice
-        })
-        this.ndk.pool.on("connect", () => {
-            this.handle()
         })
         this.ndk.pool.on("relay:connecting", () => {
             this.handle()
