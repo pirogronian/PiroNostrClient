@@ -71,6 +71,14 @@ export class Module {
         return this.ndk.fetchEvent(addr, options)
     }
 
+    eventSize(event: NDKEvent): number {
+        let ret = event.content.length
+        for (const tag of event.tags)
+            for (const value of tag)
+                ret += value.length
+        return ret
+    }
+
     setup() {}
 
     mainView(content = null) {

@@ -215,6 +215,7 @@ export class Article extends Module {
             let rn = $("<div>").text(relay.url)
             rc.append(rn)
         })
+        o.find("#EventSize").text(`Size: ${this.eventSize(this.event)}`)
 
         this.mainView(o)
 
