@@ -214,6 +214,10 @@ div.ArticleHead div.Summary, div.ArticleHead div.Topics {
     padding: 1mm 2mm 1mm 4mm
 }
 
+#ArticleInfoHeader #AuthorNickAndCreationTime #CreationTime {
+    padding-left: 2mm
+}
+
 /*#ArticleInfoHeader, #ArticleSettingsHeader {
     display: flex;
     flex-wrap: wrap
