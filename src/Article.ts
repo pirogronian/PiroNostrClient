@@ -211,10 +211,10 @@ export class Article extends Module {
         const rc = o.find("#ArticleRelays")
         let rn = $("<div>").text(this.event?.relay?.url)
         rc.append(rn)
-        for (const [key, value] of this.event.onRelays) {
-            let rn = $("<div>").text(value.url)
+        this.event.onRelays.forEach((relay) => {
+            let rn = $("<div>").text(relay.url)
             rc.append(rn)
-        }
+        })
 
         this.mainView(o)
 
