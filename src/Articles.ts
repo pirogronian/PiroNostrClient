@@ -28,12 +28,16 @@ export class Articles extends Module {
         App.get().article.makeLinkActive(title, `/${event.encode()}`)
 
         const user = await App.get().user.get(event.pubkey)
-        if (user && user.profile) {
-            this.makeLinkActive(Head.find("a.AuthorNick"), `?author=${user.pubkey}`, user.profile.name)
-            Head.find("img.AuthorImg").attr("src", user.profile.picture)
-            Head.find("div.CreationTime").text(FormattedTime(event.created_at))
-        } else
-            console.log("No user or profile!")
+        let nick = user?.profile?.name
+        if (!nick)  nick = "author"
+        this.makeLinkActive(Head.find("a.AuthorNick"), `?author=${event.pubkey}`, nick)
+        const picture = user?.profile?.picture
+        const img = Head.find("img.AuthorImg")
+        if (picture)
+            img.attr("src", picture)
+        else
+            img.hide()
+        Head.find("div.CreationTime").text(FormattedTime(event.created_at))
 
         Head.find("div.Summary").text(event.tagValue("summary"))
         const topics = EventTagValues(event, "t")
