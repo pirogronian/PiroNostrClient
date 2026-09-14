@@ -169,17 +169,15 @@ export class Article extends Module {
         o.find("#RawArticleContent").text(this.event.content)
     
         const user = await App.get().user.get(this.event.pubkey)
-        if (user && user.profile) {
-            const img = o.find("img#AuthorPicture")
-            if (user.profile.picture)
-                img.attr("src", user.profile.picture)
-            else
-                img.hide()
-            let nick = user.profile.name
-            if (!nick) nick = "author"
-            App.get().articles.makeLinkActive(o.find("a#AuthorNick"), `?author=${user.pubkey}`, nick)
+        const img = o.find("img#AuthorPicture")
+        if (user && user.profile && user.profile.picture)
+            img.attr("src", user.profile.picture)
+        else
+            img.hide()
+        let nick = user?.profile?.name
+        if (!nick) nick = "author"
+        App.get().articles.makeLinkActive(o.find("a#AuthorNick"), `?author=${this.event.pubkey}`, nick)
             //o.find("a#AuthorNick").text(user.profile.name).attr("href", LocalUrl(`#/articles?author=${user.pubkey}`))
-        }
         o.find("#CreationTime").text(FormattedTime(this.event.created_at))
         App.get().articles.makeLinkActive(o.find("a#ArticleId"), `?id=${this.event.tagValue("d")}`, this.event.tagValue("d"))
         //o.find("a#ArticleId").text(this.event.tagValue("d")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
