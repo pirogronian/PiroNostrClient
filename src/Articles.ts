@@ -38,6 +38,7 @@ export class Articles extends Module {
         else
             img.hide()
         Head.find("div.CreationTime").text(FormattedTime(event.created_at))
+        Head.find("div.Relay").text(event?.relay?.url)
 
         Head.find("div.Summary").text(event.tagValue("summary"))
         const topics = EventTagValues(event, "t")
