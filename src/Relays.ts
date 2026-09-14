@@ -58,8 +58,10 @@ export class Relays extends Module {
     }
 
     loadSettins() {
+        //console.log("Relays::loadSettings()")
         this.autoUse = this.settings("autoUse") ? true : false
         this.autoConnect = this.settings("autoConnect") ? true : false
+        //console.log("AutoConnect:", this.autoConnect)
     }
 
     get() {
@@ -92,8 +94,9 @@ export class Relays extends Module {
     }
 
     load(): void {
+        //console.log("Relays::load()")
         this.known = this.getStored()
-        console.log(this.known)
+        //console.log(this.known)
         for(const [url, info] of Object.entries(this.known)) {
             if (info.use)
                 this.add(url, this.autoConnect)
@@ -210,7 +213,7 @@ export class Relays extends Module {
 
         used.forEach((relay : NDKRelay) => {
             const arn = $(ActiveRelayHTML)
-            console.log("Relay:", relay.url)
+            //console.log("Relay:", relay.url)
             arn.find("a").text(relay.url).attr("href", relay.url)
             let c: string = NDKRelayStatus[relay.status]
             c = c.toLocaleLowerCase()
@@ -261,7 +264,7 @@ export class Relays extends Module {
             arn.find("button.ForgetRelayButton").hide()
 
             //arn.find(".RelayTrusted").text(relay.trusted)
-            //arn.find(".RelayAuth").text(relay.authPolicy)
+            arn.find(".RelayAuth").text(relay.authPolicy)
             //console.log(relay.authPolicy)
 
             UIList.append(arn)
@@ -296,10 +299,12 @@ export class Relays extends Module {
     }
 
     handle() {
+        //console.log("Relays::handle()")
         if (App.get().current != "Relays")  return
         this.clearUI()
         this.loadSettins()
         this.show()
+        //console.log("End Relays::handle()")
     }
 
     setup() {
@@ -314,15 +319,16 @@ export class Relays extends Module {
 
         // Nadpisujemy addRelay
         this.ndk.pool.addRelay = function(relay: NDKRelay, connect?: boolean) {
+            console.log("addRelay:", relay.url, connect)
             const result = originalAdd(relay, connect);
-            this.emit('updated', { type: 'ADD', relay });
+            this.emit('added', relay);
             return result;
         };
 
         // Nadpisujemy removeRelay
         this.ndk.pool.removeRelay = function(relayUrl: string) {
             const result = originalRemove(relayUrl);
-            this.emit('updated', { type: 'REMOVE', relayUrl });
+            this.emit('removed', { relayUrl });
             return result;
         };
 
@@ -357,10 +363,18 @@ export class Relays extends Module {
         this.ndk.pool.on("flapping", () => {
             this.handle()
         })
-        this.ndk.pool.on("updated", () => {
+        this.ndk.pool.on("added", (relay) => {
+            console.log("Added relay:", relay.url)
+            if (this.autoConnect) {
+                console.log("Autoconnecting...")
+                relay.connect()
+            }
             this.makeKnownAll()
             this.save()
         })
+
+        this.loadSettins()
+        this.load()
     }
 }
 

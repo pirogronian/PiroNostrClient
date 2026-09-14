@@ -42,7 +42,6 @@ export class App extends Module {
         this.articles.register("articles", "articles", this)
         this.article = new Article()
         this.article.register("article", "article", this)
-        this.relays.load()
     }
 
     static get() : App { return App._app }
