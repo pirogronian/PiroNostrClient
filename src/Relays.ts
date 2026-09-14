@@ -181,6 +181,25 @@ export class Relays extends Module {
         }
     }
 
+    onIncreaseConnected() {
+        this.connectedNum += 1
+        if (this.connectedNum > 0)
+            Module.offline = false
+    }
+
+    onDecreaseConnected() {
+        this.connectedNum -= 1
+        if (this.connectedNum <= 0)
+            Module.offline = true
+    }
+
+    onConnectedUpdate() {
+        if (this.connectedNum <= 0)
+            Module.offline = true
+        else
+            Module.offline = false
+    }
+
     show() {
         this.mainView().html(RelaysHTML)
         const used = this.get()
@@ -368,7 +387,7 @@ export class Relays extends Module {
 
 
         this.ndk.pool.on('relay:connect', (relay) => {
-            this.connectedNum += 1
+            this.onIncreaseConnected()
             if (this.autoUse) {
                 this.markUsed(relay.url)
             } else
@@ -377,16 +396,16 @@ export class Relays extends Module {
             this.handle()
         });
         this.ndk.pool.on("relay:disconnect", () => {
-            this.connectedNum -= 1
+            this.onDecreaseConnected()
             this.handle()
         })
         this.ndk.pool.on("relay:auth", (relay: NDKRelay, challenge: string) => {
-            this.connectedNum -= 1
+            this.onDecreaseConnected()
             this.challenges[relay.url] = challenge
             this.handle()
         })
         this.ndk.pool.on("relay:authed", () => {
-            this.connectedNum += 1
+            this.onIncreaseConnected()
             this.handle()
         })
         this.ndk.pool.on("notice", (relay: NDKRelay, notice: string) => {
@@ -410,6 +429,7 @@ export class Relays extends Module {
 
         this.loadSettins()
         this.load()
+        this.onConnectedUpdate()
     }
 }
 

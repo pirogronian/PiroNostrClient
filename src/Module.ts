@@ -1,7 +1,7 @@
 
 import $ from "jquery"
 import Navigo from "navigo"
-import NDK from "@nostr-dev-kit/ndk"
+import NDK, { NDKEvent, NDKSubscriptionCacheUsage } from "@nostr-dev-kit/ndk"
 import { Router } from "@/Router.js"
 import { InnerUrl, InnerLink, MakeLinkInner } from "./various.js"
 
@@ -15,6 +15,7 @@ export class Module {
     routingPath:string = ""
     router: Router|null = null
     ndk!: NDK
+    static offline: boolean|null = null
 
     register(name: string, routingNane: string|null = null, parent: Module|undefined = undefined) {
         this.settingsName = name
@@ -60,6 +61,14 @@ export class Module {
     navigate(addr: string = "") {
         console.log("Module.navigate:", addr)
         this.router?.navigate(this.url(addr))
+    }
+
+    async fetchEvent(addr: string): Promise<NDKEvent|null> {
+        let options = undefined
+        if (Module.offline)
+            options = { cacheUsage: NDKSubscriptionCacheUsage.ONLY_CACHE }
+        console.log("fetchEvent:", options)
+        return this.ndk.fetchEvent(addr, options)
     }
 
     setup() {}

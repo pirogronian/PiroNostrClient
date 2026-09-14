@@ -260,7 +260,7 @@ export class Article extends Module {
     }
 
     async load(addr : string) : Promise<NDKEvent|Error|string> {
-        const [err, wikiEvent] = await safeAsync(this.ndk.fetchEvent(addr));
+        const [err, wikiEvent] = await safeAsync(this.fetchEvent(addr));
         if (err) { return err
         } else {
             if (wikiEvent === null) {
