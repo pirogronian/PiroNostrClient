@@ -44,8 +44,8 @@ class RelaySettings {
 type RelaySettingsDB = Record<string, RelaySettings>;
 
 export class Relays extends Module {
-    autoUse: boolean = true
-    autoConnect: boolean = true
+    autoUse: boolean = false
+    autoConnect: boolean = false
 
     known: RelaySettingsDB = {}
 
