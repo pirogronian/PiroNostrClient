@@ -14,6 +14,7 @@ import ArtHeadHTML from "@/ArticleHeader.html?raw"
 export class Articles extends Module {
     sub: NDKSubscription | null = null
     enabled: boolean = false
+    resultSize: number = 0
 
     async articleHead(event: NDKEvent, relay?: NDKRelay) : Promise<void> {
         //console.log("Article event:", event)
@@ -47,11 +48,13 @@ export class Articles extends Module {
             const a = this.activeLink(`?t=${topic}`, topic)
             HeadTopics.append(a)
         })
-        Head.find(".EventSize").text(`${this.eventSize(event)}B`)
+        const es = this.eventSize(event)
+        Head.find(".EventSize").text(`${es}B`)
+        this.resultSize += es
 
         const fr = this.mainView().find("#FinderResult")
         fr.append(Head)
-        $("#FinderResultsNumber").text(`Results: ${fr.children().length}`)
+        $("#FinderResultsNumber").text(`Results: ${fr.children().length}, size: ${this.resultSize}B`)
 
     }
 
@@ -113,6 +116,7 @@ export class Articles extends Module {
         onEvent: (event: NDKEvent, relay?: NDKRelay) => any)
     {
         this.enabled = true
+        this.resultSize = 0
         const filter: NDKFilter = {
             kinds: [30818]
             //'#d': [pageSlug]
