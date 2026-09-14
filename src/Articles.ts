@@ -3,7 +3,7 @@ import $ from "jquery"
 import NDK, { NDKEvent, NDKRelay } from "@nostr-dev-kit/ndk";
 import type { NDKFilter, NDKSubscription } from "@nostr-dev-kit/ndk"
 
-import { safeAsync, EventTagValues, FormattedTime } from "@/various.js";
+import { safeAsync, EventTagValues, FormattedTime, FormattedBytes } from "@/various.js";
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
@@ -49,12 +49,12 @@ export class Articles extends Module {
             HeadTopics.append(a)
         })
         const es = this.eventSize(event)
-        Head.find(".EventSize").text(`${es}B`)
+        Head.find(".EventSize").text(`${FormattedBytes(es, 2)}`)
         this.resultSize += es
 
         const fr = this.mainView().find("#FinderResult")
         fr.append(Head)
-        $("#FinderResultsNumber").text(`Results: ${fr.children().length}, size: ${this.resultSize}B`)
+        $("#FinderResultsNumber").text(`Results: ${fr.children().length}, size: ${FormattedBytes(this.resultSize, 2)}`)
 
     }
 

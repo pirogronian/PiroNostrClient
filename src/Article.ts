@@ -10,7 +10,7 @@ import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
-import { safeAsync, formatNip54TagD, EventTagValues, FormattedTime } from "@/various.js";
+import { safeAsync, formatNip54TagD, EventTagValues, FormattedTime, FormattedBytes } from "@/various.js";
 
 import "@/style.scss"
 
@@ -215,7 +215,7 @@ export class Article extends Module {
             let rn = $("<div>").text(relay.url)
             rc.append(rn)
         })
-        o.find("#EventSize").text(`Size: ${this.eventSize(this.event)}`)
+        o.find("#EventSize").text(`Size: ${FormattedBytes(this.eventSize(this.event), 2)}`)
 
         this.mainView(o)
 
