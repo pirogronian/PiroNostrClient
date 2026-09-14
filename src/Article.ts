@@ -212,6 +212,8 @@ export class Article extends Module {
         let rn = $("<div>").text(this.event?.relay?.url)
         rc.append(rn)
         this.event.onRelays.forEach((relay) => {
+            if (relay.url == this.event?.relay?.url)
+                return
             let rn = $("<div>").text(relay.url)
             rc.append(rn)
         })
