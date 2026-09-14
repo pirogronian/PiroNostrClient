@@ -47,6 +47,7 @@ export class Articles extends Module {
             const a = this.activeLink(`?t=${topic}`, topic)
             HeadTopics.append(a)
         })
+        Head.find(".EventSize").text(`${this.eventSize(event)}B`)
 
         const fr = this.mainView().find("#FinderResult")
         fr.append(Head)
