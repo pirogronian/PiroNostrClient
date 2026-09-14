@@ -223,9 +223,16 @@ export class Relays extends Module {
             if (!this.known[relay.url]) {
                 arn.find(".New").show()
             }
-            arn.find(".Challenge").text(this.challenges[relay.url])
-            arn.find(".Notice").text(this.notices[relay.url])
-
+            const cn = arn.find(".Challenge")
+            if (this.challenges[relay.url])
+                cn.text(this.challenges[relay.url]).show()
+            else
+                cn.hide()
+            const nn = arn.find(".Notice")
+            if (this.notices[relay.url])
+                nn.text(this.notices[relay.url]).show()
+            else
+                nn.hide()
             if (relay.connected)
                 arn.find(".ConnectRelayButton").hide()
             else
