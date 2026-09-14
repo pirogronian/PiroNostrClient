@@ -54,7 +54,7 @@ code {
 .MultirowFlexContainer {
     display: flex;
     flex-wrap: wrap;
-    width: fit-content
+    min-width: fit-content
 }
 
 .MultirowFlexContainer * {
@@ -67,7 +67,7 @@ code {
 
 .OnerowFlexContainer {
     display: flex;
-    width: fit-content
+    min-width: fit-content
 }
 
 .OnerowFlexContainer * {
@@ -147,9 +147,9 @@ div.ArticleHead div.Summary, div.ArticleHead div.Topics {
 
 #ArticleInfoHeader {
     @extend .Frame;
-    display: flex;
-    align-items: center;
-    //@extend .OnerowFlexContainer;
+    /*display: flex;
+    align-items: center;*/
+    @extend .OnerowFlexContainer;
     padding: 0
 }
 
