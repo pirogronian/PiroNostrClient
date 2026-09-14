@@ -218,6 +218,15 @@ div.ArticleHead div.Summary, div.ArticleHead div.Topics {
     padding-left: 2mm
 }
 
+#ArticleInfoHeader #ArticleRelaysGroup * {
+    padding: 0;
+    margin: 0;
+}
+
+#ArticleInfoHeader #ArticleRelaysGroup #ArticleRelays * {
+    padding-left: 2mm
+}
+
 /*#ArticleInfoHeader, #ArticleSettingsHeader {
     display: flex;
     flex-wrap: wrap

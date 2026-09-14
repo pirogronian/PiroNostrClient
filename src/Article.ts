@@ -208,6 +208,14 @@ export class Article extends Module {
         if (client) co.text(`Created with: ${client}`)
         else co.hide()
 
+        const rc = o.find("#ArticleRelays")
+        let rn = $("<div>").text(this.event?.relay?.url)
+        rc.append(rn)
+        for (const [key, value] of this.event.onRelays) {
+            let rn = $("<div>").text(value.url)
+            rc.append(rn)
+        }
+
         this.mainView(o)
 
         const ulf = $("input[name='uselastformat']")
