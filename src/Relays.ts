@@ -219,7 +219,7 @@ export class Relays extends Module {
                     return info
                 }
 
-                console.log("Fetch infor manually for", url)
+                //console.log("Fetch info manually for", url)
                 try {
                     const httpUrl = url
                         .replace(/^wss:\/\//i, "https://")
@@ -239,7 +239,7 @@ export class Relays extends Module {
                         return info;
                     }
                 } catch (err) {
-                    console.warn(`Nie udało się pobrać NIP-11 przez HTTP dla ${url}`, err);
+                    console.warn(`Downloading of NIP-11 through HTTP failed for ${url}`, err);
                 }
             }
         }
@@ -377,7 +377,7 @@ export class Relays extends Module {
                 rn.find(".DontUseRelayButton").hide()
                 rn.find("button.AddRelayButton").click(() => {
                     this.add(url, this.autoConnect)
-                    this.handle()
+                    //this.handle()
                 })
                 rn.find(".RemoveRelayButton").hide()
                 rn.find("button.ForgetRelayButton").click(() => {
@@ -418,7 +418,7 @@ export class Relays extends Module {
                 this.remove(relay.url)
                 this.markUsed(relay.url, false)
                 this.save()
-                this.handle()
+                //this.handle()
             })
 
             rn.find("button.AddRelayButton").hide()
@@ -533,9 +533,11 @@ export class Relays extends Module {
             this.guiRefreshItem(relay)
         }
         const ORList = $("#OtherRelays")
+        ORList.empty()
         const urls = Array.from(this.getUrls())
         for(const [url, info] of Object.entries(this.known)) {
             if (!urls.includes(url)) {
+                //console.log("Creating item for unused", url)
                 const item = await this.guiCreateItem(url)
                 if (!this.isCurrent())  return
                 ORList.append(item)
