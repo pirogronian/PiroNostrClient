@@ -227,6 +227,7 @@ export class Relays extends Module {
     }
 
     markUsed(url: string, use: boolean = true) {
+        console.log("markUsed:", url, use)
         if (!this.known[url])
             this.known[url] = new RelaySettings()
         this.known[url].use = use
@@ -401,7 +402,7 @@ export class Relays extends Module {
     }
 
     guiRefreshItem(relay: NDKRelay) {
-        console.log("Refreshing", relay.url)
+        //console.log("Refreshing", relay.url)
         const ri = $(`div[relay='${relay.url}']`)
         let c: string = NDKRelayStatus[relay.status]
         c = c.toLocaleLowerCase()
@@ -504,13 +505,14 @@ export class Relays extends Module {
             UIList.append(item)
             this.guiRefreshItem(relay)
         }
-        const URList = $("#UnusedRelays")
+        const ORList = $("#OtherRelays")
         const urls = Array.from(this.getUrls())
         for(const [url, info] of Object.entries(this.known)) {
             if (!urls.includes(url)) {
+                console.log("Unused", url)
                 const item = await this.guiCreateItem(url)
                 if (!this.isCurrent())  return
-                URList.append(item)
+                ORList.append(item)
             }
         }
     }
