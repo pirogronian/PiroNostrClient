@@ -89,6 +89,16 @@ code {
     @extend .OnerowFlexContainer;
 }
 
+.ActiveRelay > * {
+    padding: 0;
+    margin: 0
+}
+
+.ActiveRelay label {
+    padding: 0;
+    margin: 0
+}
+
 #ActiveRelays .connected {
     background-color: green
 }
