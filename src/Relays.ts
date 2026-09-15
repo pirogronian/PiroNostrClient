@@ -7,6 +7,8 @@ import { safeAsync } from "@/various.js"
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
+import "@/Relays.scss"
+
 import RelaysHTML from "@/Relays.html?raw"
 import RelayHeadHTML from "@/RelayHead.html?raw"
 import RelayInfoHTML from "@/RelayInfo.html?raw"

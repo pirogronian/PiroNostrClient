@@ -1,0 +1,44 @@
+
+@use 'style';
+
+#ActiveRelaysHeader {
+    @extend .MultirowFlexContainer
+}
+
+.RelayHead {
+    @extend .OnerowFlexContainer;
+}
+
+.RelayHead > * {
+    padding: 0;
+    margin: 0
+}
+
+.RelayHead label {
+    padding: 0;
+    margin: 0
+}
+
+.RelayInfo * {
+    max-height: 2cm
+}
+
+.RelayInfo tbody tr:nth-child(odd) {
+    background: lightgrey
+}
+
+#ActiveRelays .connected {
+    background-color: green
+}
+
+#ActiveRelays .disconnected {
+    background-color: grey
+}
+
+.Challenge, .Notice {
+    display: none
+}
+
+#ActiveRelays div:nth-child(odd) .RelayHead, #OtherRelays div:nth-child(odd) .RelayHead {
+    background: lightgray
+}

@@ -12,6 +12,8 @@ import { Articles } from '@/Articles.js';
 import { Article } from "@/Article.js";
 import type { CallExpression } from 'typescript/unstable/ast';
 
+import "@/style.scss"
+
 export class App extends Module {
     router: Router
     ndk: NDK

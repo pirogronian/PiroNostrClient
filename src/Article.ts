@@ -12,8 +12,6 @@ import { Module } from "@/Module.js"
 import { App } from "@/App.js"
 import { safeAsync, formatNip54TagD, EventTagValues, FormattedTime, FormattedBytes } from "@/various.js";
 
-import "@/style.scss"
-
 import ArticleViewHTML from '@/Article.html?raw';
 
 const LAST_ARTICLE_FORMAT_KEY = "last_format"
