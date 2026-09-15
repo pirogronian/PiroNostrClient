@@ -566,6 +566,10 @@ export class Relays extends Module {
             this.onUpdate()
             this.guiRefreshItem(relay)
         })
+        this.ndk.pool.on("relay:connecting", (relay) => {
+            this.onUpdate()
+            this.guiRefreshItem(relay)
+        })
         this.ndk.pool.on("relay:auth", (relay: NDKRelay, challenge: string) => {
             //this.onDecreaseConnected()
             this.onUpdate()
@@ -577,13 +581,13 @@ export class Relays extends Module {
             this.onUpdate()
             this.guiRefreshItem(relay)
         })
+        this.ndk.pool.on("relay:ready", (relay) => {
+            this.onUpdate()
+            this.guiRefreshItem(relay)
+        })
         this.ndk.pool.on("notice", (relay: NDKRelay, notice: string) => {
             this.onUpdate()
             this.notices[relay.url] = notice
-            this.guiRefreshItem(relay)
-        })
-        this.ndk.pool.on("relay:connecting", (relay) => {
-            this.onUpdate()
             this.guiRefreshItem(relay)
         })
         this.ndk.pool.on("flapping", (relay) => {
