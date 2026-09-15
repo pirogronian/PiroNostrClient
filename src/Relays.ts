@@ -43,6 +43,12 @@ class RelaySettings {
 
 type RelaySettingsDB = Record<string, RelaySettings>;
 
+const AuthPolicies = {
+    none: null,
+    disconnect: NDKRelayAuthPolicies.disconnect,
+    signin: NDKRelayAuthPolicies.signIn
+}
+
 export class Relays extends Module {
     autoUse: boolean = false
     autoConnect: boolean = false
@@ -124,6 +130,8 @@ export class Relays extends Module {
         let relay: NDKRelay
         if (typeof url == "string") {
             relay = new NDKRelay(url, undefined, this.ndk)
+            relay.trusted = this.relaySettings(relay).trusted
+            relay.authPolicy = AuthPolicies[this.relaySettings(relay).auth]
         }
         else
             relay = url
@@ -160,6 +168,15 @@ export class Relays extends Module {
         }
         if (!this.known[relay])
             this.known[relay] = new RelaySettings()
+    }
+
+    relaySettings(relay: string|NDKRelay): RelaySettings {
+        if (typeof relay != "string") {
+            relay = relay.url
+        }
+        if (!this.known[relay])
+            this.known[relay] = new RelaySettings()
+        return this.known[relay]
     }
 
     makeKnownAll() {
@@ -317,7 +334,24 @@ export class Relays extends Module {
             arn.find("button.ForgetRelayButton").hide()
 
             //arn.find(".RelayTrusted").text(relay.trusted)
-            arn.find(".RelayAuth").text(relay.authPolicy)
+            const tn = arn.find("input.RelayTrusted")
+            tn.prop("checked", this.relaySettings(relay)?.trusted)
+            tn.change(() => {
+                const trusted = tn.prop("checked")
+                this.relaySettings(relay).trusted = trusted
+                relay.trusted = trusted
+                this.save()
+            })
+            const an = arn.find("select.RelayAuth")
+            an.prop("value", this.relaySettings(relay)?.auth)
+            an.change(() => {
+                const as = an.prop("value")
+                this.relaySettings(relay).auth = as
+                relay.authPolicy = AuthPolicies[as]
+                relay.disconnect()
+                relay.connect()
+                this.save()
+            })
             //console.log(relay.authPolicy)
 
             UIList.append(arn)
@@ -346,6 +380,22 @@ export class Relays extends Module {
                     this.save()
                     this.handle()
                 })
+                const tn = urn.find("input.RelayTrusted")
+                tn.prop("checked", this.relaySettings(url)?.trusted)
+                tn.change(() => {
+                    const trusted = tn.prop("checked")
+                    this.relaySettings(url).trusted = trusted
+                    this.save()
+                })
+                const an = urn.find("select.RelayAuth")
+                an.prop("value", this.relaySettings(url)?.auth)
+                an.change(() => {
+                    const as = an.prop("value")
+                    console.log("Set auth policy to", as)
+                    this.relaySettings(url).auth = as
+                    this.save()
+                })
+
                 UIList.append(urn)
             }
         }

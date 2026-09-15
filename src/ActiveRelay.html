@@ -14,7 +14,16 @@
     <button type="button" class="ForgetRelayButton">Forget</button>
 </div>
 <div>
-    <div class="RelayTrusted"></div>
-    <div class="RelayAuth"></div>
+    <label class="RelayTrusted Active">Trusted:
+        <input type="checkbox" class="RelayTrusted"/>
+    </label>
+    <label class="RelayAuth">
+        On auth:
+        <select class="RelayAuth">
+            <option value="none">None</option>
+            <option value="disconnect">Disconnect</option>
+            <option value="signin">Sign in</option>
+        </select>
+    </label>
 </div>
 </div>
