@@ -8,7 +8,7 @@ import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
 import RelaysHTML from "@/Relays.html?raw"
-import ActiveRelayHTML from "@/ActiveRelay.html?raw"
+import RelayHeadHTML from "@/RelayHead.html?raw"
 import RelayInfoHTML from "@/RelayInfo.html?raw"
 
 const STORAGE_KEY = 'known';
@@ -292,7 +292,7 @@ export class Relays extends Module {
     async guiCreateItem(relay: NDKRelay|string) {
         const url = typeof relay == "string" ? relay : relay.url
 
-        const rn = $(ActiveRelayHTML)
+        const rn = $(RelayHeadHTML)
         rn.attr("relay", url)
         rn.find("a").text(url).attr("href", url)
 

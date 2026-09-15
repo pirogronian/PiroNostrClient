@@ -85,16 +85,16 @@ code {
     @extend .MultirowFlexContainer
 }
 
-.ActiveRelay {
+.RelayHead {
     @extend .OnerowFlexContainer;
 }
 
-.ActiveRelay > * {
+.RelayHead > * {
     padding: 0;
     margin: 0
 }
 
-.ActiveRelay label {
+.RelayHead label {
     padding: 0;
     margin: 0
 }
