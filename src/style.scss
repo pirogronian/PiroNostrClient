@@ -99,6 +99,10 @@ code {
     margin: 0
 }
 
+.ActiveRelay .RelayInfo {
+    display: block
+}
+
 #ActiveRelays .connected {
     background-color: green
 }

@@ -1,11 +1,14 @@
 
 import $ from "jquery"
+import type { JQuery } from "jquery"
 import NDK, { NDKRelay, NDKRelayStatus, NDKPool, NDKRelayAuthPolicies } from "@nostr-dev-kit/ndk";
+import type { NDKRelayInformation } from "@nostr-dev-kit/ndk"
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
 import RelaysHTML from "@/Relays.html?raw"
 import ActiveRelayHTML from "@/ActiveRelay.html?raw"
+import RelayInfoHTML from "@/RelayInfo.html?raw"
 
 const STORAGE_KEY = 'known';
 
@@ -55,6 +58,8 @@ export class Relays extends Module {
 
     known: RelaySettingsDB = {}
 
+    infos: { [url: string]: NDKRelayInformation } = {}
+
     challenges: { [url: string] : string } = {}
     notices: { [url: string] : string } = {}
 
@@ -72,7 +77,11 @@ export class Relays extends Module {
         //console.log("AutoConnect:", this.autoConnect)
     }
 
-    get() {
+    get(url: string) {
+        return this.ndk.pool.getRelay(url)
+    }
+
+    getRelays() {
         return this.ndk.pool.relays.values();
     }
 
@@ -179,6 +188,36 @@ export class Relays extends Module {
         return this.known[relay]
     }
 
+    async relayInfo(relay: string|NDKRelay, force: boolean = false): Promise<NDKRelayInformation|undefined> {
+        let url = ""
+        let info: NDKRelayInformation|undefined
+        if (typeof relay == "string")
+            url = relay
+        else
+            url = relay.url
+        info = this.infos[url]
+        if (!info) {
+            if (typeof relay != "string") {
+                info = await relay.fetchInfo(force)
+                if (!this.isCurrent())  return
+                if (info)
+                    this.infos[url] = info
+                return info
+            } else {
+                relay = this.get(url)
+                if (!relay) {
+                    relay = new NDKRelay(url, undefined, this.ndk)
+                    info = await relay.fetchInfo(force)
+                    if (!this.isCurrent())  return
+                    if (info)
+                        this.infos[url] = info
+                    return info
+                }
+            }
+        }
+        return info
+    }
+
     makeKnownAll() {
         const list = this.getUrls()
         list.forEach((url) => {
@@ -226,9 +265,24 @@ export class Relays extends Module {
         this.connectedNum = stats.connected
     }
 
-    show() {
+    async info(relay: NDKRelay|string, node: JQuery<HTMLElement>): JQuery<HTMLElement> {
+        const url = typeof relay == "string" ? relay : relay.url
+        const info = await this.relayInfo(relay, true)
+        if (!this.isCurrent())  return
+        const rin = $(RelayInfoHTML)
+        rin.find(".RelayInfoName").text(info?.name)
+        rin.find(".RelayInfoDescription").text(info?.description)
+        rin.find(".RelayInfoBanner").text(info?.banner)
+        rin.find(".RelayInfoIcon img").prop("src", info?.icon)
+
+        node.append(rin)
+
+        return rin
+    }
+
+    async show() {
         this.mainView().html(RelaysHTML)
-        const used = this.get()
+        const used = this.getRelays()
         const stored = this.getStored()
         const Head = $("#ActiveRelaysHeader")
         const UIList = $("#ActiveRelays")
@@ -283,7 +337,7 @@ export class Relays extends Module {
 
         UIList.empty()
 
-        used.forEach((relay : NDKRelay) => {
+        used.forEach(async (relay : NDKRelay) => {
             const arn = $(ActiveRelayHTML)
             //console.log("Relay:", relay.url)
             arn.find("a").text(relay.url).attr("href", relay.url)
@@ -305,6 +359,12 @@ export class Relays extends Module {
                 nn.text(this.notices[relay.url]).show()
             else
                 nn.hide()
+            const i = await this.info(relay, arn)
+            if (!this.isCurrent())  return
+            i.hide()
+            arn.find(".RelayInfoButton").click(() => {
+                i.toggle()
+            })
             if (relay.connected)
                 arn.find(".ConnectRelayButton").hide()
             else
