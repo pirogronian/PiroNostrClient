@@ -171,6 +171,7 @@ export class Article extends Module {
         o.find("#RawArticleContent").text(this.event.content)
     
         const user = await App.get().user.get(this.event.pubkey)
+        if (!this.isCurrent())  return
         const img = o.find("img#AuthorPicture")
         if (user && user.profile && user.profile.picture)
             img.attr("src", user.profile.picture)
@@ -272,8 +273,9 @@ export class Article extends Module {
         this.showRawEvent($('#RawEventView').get(0))
     }
 
-    async load(addr : string) : Promise<NDKEvent|Error|string> {
+    async load(addr : string) : Promise<NDKEvent|Error|string|null> {
         const [err, wikiEvent] = await safeAsync(this.fetchEvent(addr));
+        if (!this.isCurrent())  return null
         if (err) { return err
         } else {
             if (wikiEvent === null) {
