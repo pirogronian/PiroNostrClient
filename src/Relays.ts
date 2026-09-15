@@ -412,7 +412,7 @@ export class Relays extends Module {
 
     handle() {
         //console.log("Relays::handle()")
-        if (App.get().current != "Relays")  return
+        if (!this.isCurrent())  return
         this.clearUI()
         this.loadSettins()
         this.show()
@@ -421,7 +421,7 @@ export class Relays extends Module {
 
     setup() {
         this.onRoute("", (match) => {
-            App.get().current = "Relays"
+            this.setCurrent()
             this.handle()
         })
         this.makeLinkActive($("#RelaysLink"), "")

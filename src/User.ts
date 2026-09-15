@@ -80,19 +80,23 @@ export class User extends Module{
         user.then((u) => {
             this.show(u, {
                 onLogin: (method:string) => {
-                    this.login(method);
-                    this.navigate()
+                    if (this.isCurrent()) {
+                        this.login(method);
+                        this.navigate()
+                    }
                 },
                 onLogout: () => {
-                    this.logout();
-                    this.navigate()
+                    if (this.isCurrent()) {
+                        this.logout();
+                        this.navigate()
+                    }
                 }})
         })
     }
 
     setup() {
         this.onRoute('', (match) => {
-            App.get().current = "User"
+            this.setCurrent()
             this.clearUI()
             this.handle()
         })

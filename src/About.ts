@@ -13,7 +13,7 @@ export class About extends Module {
 
     setup() {
         this.onRoute("", (match) => {
-            App.get().current = "About"
+            this.setCurrent()
             this.handle()
         })
         this.makeLinkActive($("#AboutLink"), "")

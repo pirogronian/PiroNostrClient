@@ -19,7 +19,7 @@ export class Articles extends Module {
 
     async articleHead(event: NDKEvent, relay?: NDKRelay) : Promise<void> {
         //console.log("Article event:", event)
-        if (App.get().current != "Articles") return
+        if (!this.isCurrent()) return
         //console.log("Articles enabled")
         const Head = $(ArtHeadHTML)
         const title = Head.find(".ArticleTitle")
@@ -194,7 +194,7 @@ export class Articles extends Module {
 
     setup() {
         this.onRoute('', (match) => {
-            App.get().current = "Articles"
+            this.setCurrent()
             console.log("Route: /articles")
             //console.log(match.params)
             if (this.isFinder()) {

@@ -15,6 +15,7 @@ export class Module {
     routingPath:string = ""
     router: Router|null = null
     ndk!: NDK
+    static current: string = ""
     static offline: boolean|null = null
 
     register(name: string, routingNane: string|null = null, parent: Module|undefined = undefined) {
@@ -52,6 +53,14 @@ export class Module {
             return localStorage.removeItem(key)
         }
         return localStorage.getItem(key)
+    }
+
+    isCurrent() {
+        return Module.current == this.routingPath
+    }
+
+    setCurrent() {
+        Module.current = this.routingPath
     }
 
     onRoute(pattern: string, f: Function) {

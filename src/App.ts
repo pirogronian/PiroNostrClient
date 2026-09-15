@@ -20,7 +20,6 @@ export class App extends Module {
     user: User
     articles: Articles
     article: Article
-    current: string = "App"
 
     static _app: App
 

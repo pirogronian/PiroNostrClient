@@ -136,8 +136,10 @@ export class Article extends Module {
         console.log("Showing content with format:", format)
         const p = this.createNode(format)
         p.then((n) => {
-            $("#ArticleContentView").html("")
-            $("#ArticleContentView").append(n)
+            if (this.isCurrent()) {
+                $("#ArticleContentView").html("")
+                $("#ArticleContentView").append(n)
+            }
         })
     }
 
@@ -291,7 +293,7 @@ export class Article extends Module {
         const ret = await this.load(addr)
         if (ret instanceof NDKEvent) {
             this.setEvent(ret)
-            this.show()
+            await this.show()
         } else {
             if (ret instanceof Error) {
                 this.error(ret.message)
@@ -304,7 +306,7 @@ export class Article extends Module {
 
     setup() {
         this.onRoute("/:id", (match) => {
-            App.get().current = "Article"
+            this.setCurrent()
             const addr = match.data.id
             this.handle(addr)
         })
