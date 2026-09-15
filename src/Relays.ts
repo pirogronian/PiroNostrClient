@@ -79,7 +79,8 @@ export class Relays extends Module {
     }
 
     get(url: string) {
-        return this.ndk.pool.getRelay(url)
+        if (url in this.ndk.pool.relays)
+            return this.ndk.pool.getRelay(url)
     }
 
     getRelays() {
@@ -139,6 +140,7 @@ export class Relays extends Module {
     add(url: string|NDKRelay, connect: boolean = false) {
         let relay: NDKRelay
         if (typeof url == "string") {
+            //console.log("Creating relay", url)
             relay = new NDKRelay(url, undefined, this.ndk)
             relay.trusted = this.relaySettings(relay).trusted
             relay.authPolicy = AuthPolicies[this.relaySettings(relay).auth]
@@ -196,23 +198,48 @@ export class Relays extends Module {
             url = relay
         else
             url = relay.url
+        //console.log("relayInfo for", url)
         info = this.infos[url]
         if (!info) {
             if (typeof relay != "string") {
+                //console.log(url, "- passed NDKRelay")
                 info = await relay.fetchInfo(force)
                 if (!this.isCurrent())  return
                 if (info)
                     this.infos[url] = info
                 return info
             } else {
-                relay = this.get(url)
-                if (!relay) {
-                    relay = new NDKRelay(url, undefined, this.ndk)
+                const relay = this.get(url)
+                if (relay) {
+                    //console.log(url, "- got NDKRelay")
                     info = await relay.fetchInfo(force)
                     if (!this.isCurrent())  return
                     if (info)
                         this.infos[url] = info
                     return info
+                }
+
+                console.log("Fetch infor manually for", url)
+                try {
+                    const httpUrl = url
+                        .replace(/^wss:\/\//i, "https://")
+                        .replace(/^ws:\/\//i, "http://");
+
+                    const response = await fetch(httpUrl, {
+                        headers: {
+                            "Accept": "application/nostr+json"
+                        }
+                    });
+
+                    if (!this.isCurrent()) return;
+
+                    if (response.ok) {
+                        const info: NDKRelayInformation = await response.json();
+                        this.infos[url] = info;
+                        return info;
+                    }
+                } catch (err) {
+                    console.warn(`Nie udało się pobrać NIP-11 przez HTTP dla ${url}`, err);
                 }
             }
         }
@@ -227,7 +254,6 @@ export class Relays extends Module {
     }
 
     markUsed(url: string, use: boolean = true) {
-        console.log("markUsed:", url, use)
         if (!this.known[url])
             this.known[url] = new RelaySettings()
         this.known[url].use = use
@@ -310,6 +336,7 @@ export class Relays extends Module {
 
         const [err, i] = await safeAsync(this.guiRelayInfo(relay, rn))
         if (!this.isCurrent())  return
+        //console.log("Check info for", url)
         if (i) {
             i.hide()
             rn.find(".RelayInfoButton").click(() => {
@@ -509,7 +536,6 @@ export class Relays extends Module {
         const urls = Array.from(this.getUrls())
         for(const [url, info] of Object.entries(this.known)) {
             if (!urls.includes(url)) {
-                console.log("Unused", url)
                 const item = await this.guiCreateItem(url)
                 if (!this.isCurrent())  return
                 ORList.append(item)
