@@ -2,6 +2,7 @@
 import $ from "jquery"
 import NDK, { NDKEvent, NDKRelay } from "@nostr-dev-kit/ndk";
 import type { NDKFilter, NDKSubscription } from "@nostr-dev-kit/ndk"
+//import NDKCacheAdapterDexie, { db } from '@nostr-dev-kit/ndk-cache-dexie';
 
 import { safeAsync, EventTagValues, FormattedTime, FormattedBytes } from "@/various.js";
 import { Module } from "@/Module.js";
@@ -117,6 +118,7 @@ export class Articles extends Module {
     {
         this.enabled = true
         this.resultSize = 0
+        //console.log(await db.events.count())
         const filter: NDKFilter = {
             kinds: [30818]
             //'#d': [pageSlug]

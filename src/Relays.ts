@@ -217,6 +217,15 @@ export class Relays extends Module {
             Module.offline = false
     }
 
+    onUpdate() {
+        const stats = this.ndk.pool.stats()
+        if (stats.connected > 0)
+            Module.offline = false
+        else
+            Module.offline = true
+        this.connectedNum = stats.connected
+    }
+
     show() {
         this.mainView().html(RelaysHTML)
         const used = this.get()
@@ -437,7 +446,8 @@ export class Relays extends Module {
 
 
         this.ndk.pool.on('relay:connect', (relay) => {
-            this.onIncreaseConnected()
+            this.onUpdate()
+            //this.onIncreaseConnected()
             if (this.autoUse) {
                 this.markUsed(relay.url)
             } else
@@ -446,28 +456,35 @@ export class Relays extends Module {
             this.handle()
         });
         this.ndk.pool.on("relay:disconnect", () => {
-            this.onDecreaseConnected()
+            //this.onDecreaseConnected()
+            this.onUpdate()
             this.handle()
         })
         this.ndk.pool.on("relay:auth", (relay: NDKRelay, challenge: string) => {
-            this.onDecreaseConnected()
+            //this.onDecreaseConnected()
+            this.onUpdate()
             this.challenges[relay.url] = challenge
             this.handle()
         })
         this.ndk.pool.on("relay:authed", () => {
-            this.onIncreaseConnected()
+            //this.onIncreaseConnected()
+            this.onUpdate()
             this.handle()
         })
         this.ndk.pool.on("notice", (relay: NDKRelay, notice: string) => {
+            this.onUpdate()
             this.notices[relay.url] = notice
         })
         this.ndk.pool.on("relay:connecting", () => {
+            this.onUpdate()
             this.handle()
         })
         this.ndk.pool.on("flapping", () => {
+            this.onUpdate()
             this.handle()
         })
         this.ndk.pool.on("added", (relay) => {
+            this.onUpdate()
             console.log("Added relay:", relay.url)
             if (this.autoConnect) {
                 console.log("Autoconnecting...")
@@ -475,6 +492,9 @@ export class Relays extends Module {
             }
             this.makeKnownAll()
             this.save()
+        })
+        this.ndk.pool.on("removed", (relay) => {
+            this.onUpdate()
         })
 
         this.loadSettins()
