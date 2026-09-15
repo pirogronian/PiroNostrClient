@@ -99,8 +99,8 @@ code {
     margin: 0
 }
 
-.ActiveRelay .RelayInfo {
-    display: block
+.RelayInfo * {
+    max-height: 2cm
 }
 
 #ActiveRelays .connected {

@@ -274,6 +274,13 @@ export class Relays extends Module {
         rin.find(".RelayInfoDescription").text(info?.description)
         rin.find(".RelayInfoBanner").text(info?.banner)
         rin.find(".RelayInfoIcon img").prop("src", info?.icon)
+        rin.find(".RelayInfoPubkey").text(info?.pubkey)
+        rin.find(".RelayInfoContact").text(info?.contact)
+        rin.find(".RelayInfoNIPs").text(info?.supported_nips)
+        rin.find(".RelayInfoSoftware").text(info?.software)
+        rin.find(".RelayInfoVersion").text(info?.version)
+        rin.find(".RelayInfoPrivacy").text(info?.privacy_policy)
+        rin.find(".RelayInfoService").text(info?.terms_of_service)
 
         node.append(rin)
 
