@@ -498,12 +498,12 @@ export class Relays extends Module {
 
         UIList.empty()
 
-        used.forEach(async (relay : NDKRelay) => {
+        for (const relay of used) {
             const item = await this.guiCreateItem(relay)
             if (!this.isCurrent())  return
             UIList.append(item)
             this.guiRefreshItem(relay)
-        })
+        }
         const URList = $("#UnusedRelays")
         const urls = Array.from(this.getUrls())
         for(const [url, info] of Object.entries(this.known)) {
