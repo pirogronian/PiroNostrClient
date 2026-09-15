@@ -103,6 +103,10 @@ code {
     max-height: 2cm
 }
 
+.RelayInfo tbody tr:nth-child(odd) {
+    background: lightgrey
+}
+
 #ActiveRelays .connected {
     background-color: green
 }
