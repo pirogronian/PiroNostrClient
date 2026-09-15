@@ -30,6 +30,7 @@ export class Articles extends Module {
         App.get().article.makeLinkActive(title, `/${event.encode()}`)
 
         const user = await App.get().user.get(event.pubkey)
+        if (!this.isCurrent()) return
         let nick = user?.profile?.name
         if (!nick)  nick = "author"
         this.makeLinkActive(Head.find("a.AuthorNick"), `?author=${event.pubkey}`, nick)
@@ -66,6 +67,7 @@ export class Articles extends Module {
         form.prop("action", this.innerUrl(""))
         const me = form.find("button#FinderAuthorMe")
         const user = await App.get().user.get(null, false)
+        if (!this.isCurrent()) return
         if (user && user.pubkey) {
             const ai = form.find("input[name='author']")
             me.click(function() {
