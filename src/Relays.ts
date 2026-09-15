@@ -3,6 +3,7 @@ import $ from "jquery"
 import type { JQuery } from "jquery"
 import NDK, { NDKRelay, NDKRelayStatus, NDKPool, NDKRelayAuthPolicies } from "@nostr-dev-kit/ndk";
 import type { NDKRelayInformation } from "@nostr-dev-kit/ndk"
+import { safeAsync } from "@/various.js"
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
@@ -263,9 +264,10 @@ export class Relays extends Module {
         else
             Module.offline = true
         this.connectedNum = stats.connected
+        this.guiUpdateStats()
     }
 
-    async info(relay: NDKRelay|string, node: JQuery<HTMLElement>): JQuery<HTMLElement> {
+    async guiRelayInfo(relay: NDKRelay|string, node: JQuery<HTMLElement>): JQuery<HTMLElement> {
         const url = typeof relay == "string" ? relay : relay.url
         const info = await this.relayInfo(relay, true)
         if (!this.isCurrent())  return
@@ -285,6 +287,161 @@ export class Relays extends Module {
         node.append(rin)
 
         return rin
+    }
+
+    async guiCreateItem(relay: NDKRelay|string) {
+        const url = typeof relay == "string" ? relay : relay.url
+
+        const rn = $(ActiveRelayHTML)
+        rn.attr("relay", url)
+        rn.find("a").text(url).attr("href", url)
+
+        const cn = rn.find(".Challenge")
+        if (this.challenges[url])
+            cn.text(this.challenges[url]).show()
+        else
+            cn.hide()
+        const nn = rn.find(".Notice")
+        if (this.notices[url])
+            nn.text(this.notices[url]).show()
+        else
+            nn.hide()
+
+        const [err, i] = await safeAsync(this.guiRelayInfo(relay, rn))
+        if (!this.isCurrent())  return
+        if (i) {
+            i.hide()
+            rn.find(".RelayInfoButton").click(() => {
+                i.toggle()
+            })
+        }
+
+        const tn = rn.find("input.RelayTrusted")
+        tn.prop("checked", this.relaySettings(relay)?.trusted)
+        tn.change(() => {
+            const trusted = tn.prop("checked")
+            this.relaySettings(relay).trusted = trusted
+            if (typeof relay == "object")
+                relay.trusted = trusted
+            this.save()
+        })
+        const an = rn.find("select.RelayAuth")
+        an.prop("value", this.relaySettings(relay)?.auth)
+        an.change(() => {
+            const as = an.prop("value")
+            this.relaySettings(relay).auth = as
+            if (typeof relay == "object") {
+                relay.authPolicy = AuthPolicies[as]
+                relay.disconnect()
+                relay.connect()
+            }
+            this.save()
+        })
+
+        if (typeof relay == "string") {
+            const s = rn.find(".RelayStatus")
+                s.text("unused")
+                s.addClass("unused")
+
+                rn.find(".ConnectRelayButton").hide()
+                rn.find(".DisconnectRelayButton").hide()
+                rn.find(".UseRelayButton").hide()
+                rn.find(".DontUseRelayButton").hide()
+                rn.find("button.AddRelayButton").click(() => {
+                    this.add(url, this.autoConnect)
+                    this.handle()
+                })
+                rn.find(".RemoveRelayButton").hide()
+                rn.find("button.ForgetRelayButton").click(() => {
+                    delete this.known[url]
+                    this.save()
+                    this.handle()
+                })
+        } else {
+            let c: string = NDKRelayStatus[relay.status]
+            c = c.toLocaleLowerCase()
+            const s = rn.find(".RelayStatus")
+            s.text(c)
+            s.addClass(c)
+            if (!this.known[relay.url]) {
+                rn.find(".New").show()
+            }
+
+            rn.find(".ConnectRelayButton").click(() => {
+                relay.connect()
+            })
+            rn.find(".DisconnectRelayButton").click(() => {
+                relay.disconnect()
+            })
+
+            rn.find(".UseRelayButton").click(() => {
+                this.markUsed(relay.url)
+                this.save()
+                this.guiRefreshItem(relay)
+            })
+            rn.find(".DontUseRelayButton").click(() => {
+                this.markUsed(relay.url, false)
+                this.save()
+                this.guiRefreshItem(relay)
+            })
+
+            rn.find("button.RemoveRelayButton").click(() => {
+                console.log("Removing:", relay.url)
+                this.remove(relay.url)
+                this.markUsed(relay.url, false)
+                this.save()
+                this.handle()
+            })
+
+            rn.find("button.AddRelayButton").hide()
+            rn.find("button.ForgetRelayButton").hide()
+        }
+
+        return rn
+    }
+
+    guiRefreshItem(relay: NDKRelay) {
+        console.log("Refreshing", relay.url)
+        const ri = $(`div[relay='${relay.url}']`)
+        let c: string = NDKRelayStatus[relay.status]
+        c = c.toLocaleLowerCase()
+        const s = ri.find(".RelayStatus")
+        s.text(c)
+        s.removeClass()
+        s.addClass("Status")
+        s.addClass(c)
+        const n = ri.find(".New")
+        if (!this.known[relay.url])
+            n.show()
+        else
+            n.hide()
+
+        const crb = ri.find(".ConnectRelayButton")
+        const drb = ri.find(".DisconnectRelayButton")
+        if (relay.connected) {
+            crb.hide()
+            drb.show()
+        } else {
+            crb.show()
+            drb.hide()
+        }
+
+        const urb = ri.find(".UseRelayButton")
+        const durb = ri.find(".DontUseRelayButton")
+        if (this.known[relay.url]?.use) {
+            urb.hide()
+            durb.show()
+        }
+        else {
+            urb.show()
+            durb.hide()
+        }
+    }
+
+    guiUpdateStats() {
+        const inPool = this.ndk.pool.relays.size
+        const statStr = `Connected: ${this.connectedNum}/${inPool}`
+        $("#RelaysStats").text(statStr)
     }
 
     async show() {
@@ -338,141 +495,21 @@ export class Relays extends Module {
             this.reload()
             this.handle()
         })
-        const inPool = this.ndk.pool.relays.size
-        const statStr = `Connected: ${this.connectedNum}/${inPool}`
-        $("#RelaysStats").text(statStr)
 
         UIList.empty()
 
         used.forEach(async (relay : NDKRelay) => {
-            const arn = $(ActiveRelayHTML)
-            //console.log("Relay:", relay.url)
-            arn.find("a").text(relay.url).attr("href", relay.url)
-            let c: string = NDKRelayStatus[relay.status]
-            c = c.toLocaleLowerCase()
-            const s = arn.find(".RelayStatus")
-            s.text(c)
-            s.addClass(c)
-            if (!this.known[relay.url]) {
-                arn.find(".New").show()
-            }
-            const cn = arn.find(".Challenge")
-            if (this.challenges[relay.url])
-                cn.text(this.challenges[relay.url]).show()
-            else
-                cn.hide()
-            const nn = arn.find(".Notice")
-            if (this.notices[relay.url])
-                nn.text(this.notices[relay.url]).show()
-            else
-                nn.hide()
-            const i = await this.info(relay, arn)
+            const item = await this.guiCreateItem(relay)
             if (!this.isCurrent())  return
-            i.hide()
-            arn.find(".RelayInfoButton").click(() => {
-                i.toggle()
-            })
-            if (relay.connected)
-                arn.find(".ConnectRelayButton").hide()
-            else
-                arn.find(".DisconnectRelayButton").hide()
-                arn.find(".ConnectRelayButton").click(() => {
-                relay.connect()
-            })
-            arn.find(".DisconnectRelayButton").click(() => {
-                relay.disconnect()
-            })
-
-            if (this.known[relay.url] && this.known[relay.url]?.use)
-                arn.find(".UseRelayButton").hide()
-            else
-                arn.find(".DontUseRelayButton").hide()
-            arn.find(".UseRelayButton").click(() => {
-                console.log("Use")
-                this.markUsed(relay.url)
-                this.save()
-                this.handle()
-            })
-            arn.find(".DontUseRelayButton").click(() => {
-                console.log("Dont use")
-                this.markUsed(relay.url, false)
-                this.save()
-                this.handle()
-            })
-            arn.find("button.RemoveRelayButton").click((e) => {
-                console.log("Removing:", relay.url)
-                this.remove(relay.url)
-                this.markUsed(relay.url, false)
-                this.save()
-                this.handle()
-            })
-            arn.find("button.AddRelayButton").hide()
-            arn.find("button.ForgetRelayButton").hide()
-
-            //arn.find(".RelayTrusted").text(relay.trusted)
-            const tn = arn.find("input.RelayTrusted")
-            tn.prop("checked", this.relaySettings(relay)?.trusted)
-            tn.change(() => {
-                const trusted = tn.prop("checked")
-                this.relaySettings(relay).trusted = trusted
-                relay.trusted = trusted
-                this.save()
-            })
-            const an = arn.find("select.RelayAuth")
-            an.prop("value", this.relaySettings(relay)?.auth)
-            an.change(() => {
-                const as = an.prop("value")
-                this.relaySettings(relay).auth = as
-                relay.authPolicy = AuthPolicies[as]
-                relay.disconnect()
-                relay.connect()
-                this.save()
-            })
-            //console.log(relay.authPolicy)
-
-            UIList.append(arn)
+            UIList.append(item)
+            this.guiRefreshItem(relay)
         })
         const urls = Array.from(this.getUrls())
         for(const [url, info] of Object.entries(this.known)) {
             if (!urls.includes(url)) {
-                const urn = $(ActiveRelayHTML)
-                urn.find("a").text(url).attr("href", url)
-                const s = urn.find(".RelayStatus")
-                s.text("unused")
-                s.addClass("unused")
-                urn.find(".ConnectRelayButton").hide()
-                urn.find(".DisconnectRelayButton").hide()
-                urn.find(".UseRelayButton").hide()
-                urn.find(".DontUseRelayButton").hide()
-                urn.find("button.AddRelayButton").click(() => {
-                    this.add(url, this.autoConnect)
-                    this.handle()
-                })
-                urn.find(".Challenge").text(this.challenges[url])
-                urn.find(".Notice").text(this.notices[url])
-                urn.find(".RemoveRelayButton").hide()
-                urn.find("button.ForgetRelayButton").click(() => {
-                    delete this.known[url]
-                    this.save()
-                    this.handle()
-                })
-                const tn = urn.find("input.RelayTrusted")
-                tn.prop("checked", this.relaySettings(url)?.trusted)
-                tn.change(() => {
-                    const trusted = tn.prop("checked")
-                    this.relaySettings(url).trusted = trusted
-                    this.save()
-                })
-                const an = urn.find("select.RelayAuth")
-                an.prop("value", this.relaySettings(url)?.auth)
-                an.change(() => {
-                    const as = an.prop("value")
-                    console.log("Set auth policy to", as)
-                    this.relaySettings(url).auth = as
-                    this.save()
-                })
-
-                UIList.append(urn)
+                const item = await this.guiCreateItem(url)
+                if (!this.isCurrent())  return
+                UIList.append(item)
             }
         }
     }
@@ -483,6 +520,7 @@ export class Relays extends Module {
         this.clearUI()
         this.loadSettins()
         this.show()
+        this.guiUpdateStats()
         //console.log("End Relays::handle()")
     }
 
@@ -520,35 +558,36 @@ export class Relays extends Module {
             } else
                 this.makeKnown(relay)
             this.save();
-            this.handle()
+            this.guiRefreshItem(relay)
         });
-        this.ndk.pool.on("relay:disconnect", () => {
+        this.ndk.pool.on("relay:disconnect", (relay) => {
             //this.onDecreaseConnected()
             this.onUpdate()
-            this.handle()
+            this.guiRefreshItem(relay)
         })
         this.ndk.pool.on("relay:auth", (relay: NDKRelay, challenge: string) => {
             //this.onDecreaseConnected()
             this.onUpdate()
             this.challenges[relay.url] = challenge
-            this.handle()
+            this.guiRefreshItem(relay)
         })
-        this.ndk.pool.on("relay:authed", () => {
+        this.ndk.pool.on("relay:authed", (relay) => {
             //this.onIncreaseConnected()
             this.onUpdate()
-            this.handle()
+            this.guiRefreshItem(relay)
         })
         this.ndk.pool.on("notice", (relay: NDKRelay, notice: string) => {
             this.onUpdate()
             this.notices[relay.url] = notice
+            this.guiRefreshItem(relay)
         })
-        this.ndk.pool.on("relay:connecting", () => {
+        this.ndk.pool.on("relay:connecting", (relay) => {
             this.onUpdate()
-            this.handle()
+            this.guiRefreshItem(relay)
         })
-        this.ndk.pool.on("flapping", () => {
+        this.ndk.pool.on("flapping", (relay) => {
             this.onUpdate()
-            this.handle()
+            this.guiRefreshItem(relay)
         })
         this.ndk.pool.on("added", (relay) => {
             this.onUpdate()
@@ -559,9 +598,11 @@ export class Relays extends Module {
             }
             this.makeKnownAll()
             this.save()
+            this.handle()
         })
         this.ndk.pool.on("removed", (relay) => {
             this.onUpdate()
+            this.handle()
         })
 
         this.loadSettins()
