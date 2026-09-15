@@ -504,12 +504,13 @@ export class Relays extends Module {
             UIList.append(item)
             this.guiRefreshItem(relay)
         })
+        const URList = $("#UnusedRelays")
         const urls = Array.from(this.getUrls())
         for(const [url, info] of Object.entries(this.known)) {
             if (!urls.includes(url)) {
                 const item = await this.guiCreateItem(url)
                 if (!this.isCurrent())  return
-                UIList.append(item)
+                URList.append(item)
             }
         }
     }
