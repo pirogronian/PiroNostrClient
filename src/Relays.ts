@@ -195,7 +195,7 @@ export class Relays extends Module {
 
     async relayInfo(relay: string|NDKRelay, force: boolean = false): Promise<NDKRelayInformation|undefined> {
         let url = ""
-        let info: NDKRelayInformation|undefined
+        let info: NDKRelayInformation|undefined = undefined
         if (typeof relay == "string")
             url = relay
         else
@@ -218,7 +218,12 @@ export class Relays extends Module {
                 let relay = this.get(url)
                 if (relay) {
                     //console.log(url, "- got NDKRelay")
-                    info = await relay.fetchInfo(force)
+                    try {
+                        info = await relay.fetchInfo(force)
+                    } catch (err) {
+                        console.warn(`Downloading of NIP-11 through HTTP failed for ${url}`, err);
+                        return
+                    }
                     if (info)
                         this.infos[url] = info
                     return info
