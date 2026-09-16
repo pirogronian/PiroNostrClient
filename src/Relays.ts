@@ -249,6 +249,7 @@ export class Relays extends Module {
                 return info
             }
         }
+        //console.debug("Cached info for", url)
         return info
     }
 
@@ -344,8 +345,16 @@ export class Relays extends Module {
 
         const p = this.relayInfo(relay)
         p.then((info) => {
-            if (!this.sameContext(context) || !info)  return
+            if (!this.sameContext(context))  return
+            if (!info) {
+                console.debug("No info for", url)
+                return
+            }
             const i = this.guiCreateInfo(info)
+            if (!i.length) {
+                console.warn("Found info but widget is absent for", url)
+            }
+            console.debug(i)
             rn.append(i)
             i.hide()
             rn.find(".RelayInfoButton").show().click(() => {
