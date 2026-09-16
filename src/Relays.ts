@@ -324,7 +324,7 @@ export class Relays extends Module {
         return rin
     }
 
-    async guiCreateItem(relay: NDKRelay|string) {
+    guiCreateItem(relay: NDKRelay|string) {
         const context = this.context
         const url = typeof relay == "string" ? relay : relay.url
 
@@ -354,7 +354,7 @@ export class Relays extends Module {
             if (!i.length) {
                 console.warn("Found info but widget is absent for", url)
             }
-            console.debug(i)
+            //console.debug(i)
             rn.append(i)
             i.hide()
             rn.find(".RelayInfoButton").show().click(() => {
@@ -557,19 +557,19 @@ export class Relays extends Module {
         $("#RelaysStats").text(statStr)
     }
 
-    async guiPopulateActive() {
+    guiPopulateActive() {
         const context = this.context
         const used = this.getRelays()
         const list = this.guiActiveContainer()
         for (const relay of used) {
-            const item = await this.guiCreateItem(relay)
+            const item = this.guiCreateItem(relay)
             if (!this.sameContext(context))  return
             list.append(item)
             this.guiRefreshItem(relay)
         }
     }
 
-    async guiPopulateOther() {
+    guiPopulateOther() {
         const context = this.context
         const list = this.guiOtherContainer()
         const stored = this.getStored()
@@ -577,7 +577,7 @@ export class Relays extends Module {
         for(const [url, info] of Object.entries(this.known)) {
             if (!urls.includes(url)) {
                 //console.log("Creating item for unused", url)
-                const item = await this.guiCreateItem(url)
+                const item = this.guiCreateItem(url)
                 if (!this.sameContext(context))  return
                 list.append(item)
             }
