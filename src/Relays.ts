@@ -471,20 +471,12 @@ export class Relays extends Module {
         }
     }
 
-    guiUpdateStats() {
-        const inPool = this.ndk.pool.relays.size
-        const statStr = `Connected: ${this.connectedNum}/${inPool}`
-        $("#RelaysStats").text(statStr)
-    }
-
-    async show() {
-        this.newContext()
-        const context = this.context
-        this.mainView().html(RelaysHTML)
-        const used = this.getRelays()
-        const stored = this.getStored()
-        const Head = $("#ActiveRelaysHeader")
-        const UIList = $("#ActiveRelays")
+    guiCreateMain() {
+        const rmw = $(RelaysHTML)
+        this.mainView().append(rmw)
+        const Head = rmw.find("#ActiveRelaysHeader")
+        const arl = rmw.find("#ActiveRelays")
+        const orl = rmw.find("#OtherRelays")
 
         const NewUrl = $("input[name='NewRelayUrl']")
         Head.find("#AddRelayButton").click(() => {
@@ -531,7 +523,23 @@ export class Relays extends Module {
             this.handle()
         })
 
-        UIList.empty()
+        return [Head, arl, orl]
+    }
+
+    guiUpdateStats() {
+        const inPool = this.ndk.pool.relays.size
+        const statStr = `Connected: ${this.connectedNum}/${inPool}`
+        $("#RelaysStats").text(statStr)
+    }
+
+    async show() {
+        this.newContext()
+        const context = this.context
+
+        const [Header, UIList, ORList] = this.guiCreateMain()
+
+        const used = this.getRelays()
+        const stored = this.getStored()
 
         for (const relay of used) {
             const item = await this.guiCreateItem(relay)
@@ -539,8 +547,7 @@ export class Relays extends Module {
             UIList.append(item)
             this.guiRefreshItem(relay)
         }
-        const ORList = $("#OtherRelays")
-        ORList.empty()
+
         const urls = Array.from(this.getUrls())
         for(const [url, info] of Object.entries(this.known)) {
             if (!urls.includes(url)) {
