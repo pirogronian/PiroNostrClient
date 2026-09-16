@@ -290,11 +290,7 @@ export class Relays extends Module {
         this.guiUpdateStats()
     }
 
-    async guiRelayInfo(relay: NDKRelay|string, node: JQuery<HTMLElement>): JQuery<HTMLElement> {
-        const context = this.context
-        const url = typeof relay == "string" ? relay : relay.url
-        const info = await this.relayInfo(relay, true)
-        if (!this.sameContext(context) || !info)  return
+    guiCreateInfo(info: NDKRelayInformation) {
         const rin = $(RelayInfoHTML)
         rin.find(".RelayInfoName").text(info?.name)
         rin.find(".RelayInfoDescription").text(info?.description)
@@ -313,8 +309,6 @@ export class Relays extends Module {
         rin.find(".RelayInfoVersion").text(info?.version)
         rin.find(".RelayInfoPrivacy").text(info?.privacy_policy)
         rin.find(".RelayInfoService").text(info?.terms_of_service)
-
-        node.append(rin)
 
         return rin
     }
@@ -338,15 +332,18 @@ export class Relays extends Module {
         else
             nn.hide()
 
-        const [err, i] = await safeAsync(this.guiRelayInfo(relay, rn))
-        if (!this.sameContext(context))  return
-        //console.log("Check info for", url)
-        if (i) {
+        const p = this.relayInfo(relay)
+        p.then((info) => {
+            if (!this.sameContext(context) || !info)  return
+            const i = this.guiCreateInfo(info)
+            rn.append(i)
             i.hide()
-            rn.find(".RelayInfoButton").click(() => {
+            rn.find(".RelayInfoButton").show().click(() => {
+                //console.debug("Toggle info of", url)
+                //console.debug(i)
                 i.toggle()
             })
-        }
+        })
 
         const tn = rn.find("input.RelayTrusted")
         tn.prop("checked", this.relaySettings(relay)?.trusted)
