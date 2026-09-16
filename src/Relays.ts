@@ -526,37 +526,53 @@ export class Relays extends Module {
         return [Head, arl, orl]
     }
 
+    guiActiveContainer() {
+        return $("#ActiveRelays")
+    }
+
+    guiOtherContainer() {
+        return $("#OtherRelays")
+    }
+
     guiUpdateStats() {
         const inPool = this.ndk.pool.relays.size
         const statStr = `Connected: ${this.connectedNum}/${inPool}`
         $("#RelaysStats").text(statStr)
     }
 
-    async show() {
-        this.newContext()
+    async guiPopulateActive() {
         const context = this.context
-
-        const [Header, UIList, ORList] = this.guiCreateMain()
-
         const used = this.getRelays()
-        const stored = this.getStored()
-
+        const list = this.guiActiveContainer()
         for (const relay of used) {
             const item = await this.guiCreateItem(relay)
             if (!this.sameContext(context))  return
-            UIList.append(item)
+            list.append(item)
             this.guiRefreshItem(relay)
         }
+    }
 
+    async guiPopulateOther() {
+        const context = this.context
+        const list = this.guiOtherContainer()
+        const stored = this.getStored()
         const urls = Array.from(this.getUrls())
         for(const [url, info] of Object.entries(this.known)) {
             if (!urls.includes(url)) {
                 //console.log("Creating item for unused", url)
                 const item = await this.guiCreateItem(url)
                 if (!this.sameContext(context))  return
-                ORList.append(item)
+                list.append(item)
             }
         }
+    }
+
+    async show() {
+        this.newContext()
+        
+        this.guiCreateMain()
+        this.guiPopulateActive()
+        this.guiPopulateOther()
     }
 
     handle() {
