@@ -567,7 +567,7 @@ export class Relays extends Module {
         }
     }
 
-    async show() {
+    show() {
         this.newContext()
         
         this.guiCreateMain()
