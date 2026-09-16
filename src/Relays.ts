@@ -403,7 +403,7 @@ export class Relays extends Module {
                 rn.find("button.ForgetRelayButton").click(() => {
                     delete this.known[url]
                     this.save()
-                    this.handle()
+                    this.guiRefreshItems()
                 })
         } else {
             let c: string = NDKRelayStatus[relay.status]
