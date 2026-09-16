@@ -194,6 +194,7 @@ export class Relays extends Module {
     }
 
     async relayInfo(relay: string|NDKRelay, force: boolean = false): Promise<NDKRelayInformation|undefined> {
+        const context = this.context
         let url = ""
         let info: NDKRelayInformation|undefined
         if (typeof relay == "string")
@@ -206,7 +207,7 @@ export class Relays extends Module {
             if (typeof relay != "string") {
                 //console.log(url, "- passed NDKRelay")
                 info = await relay.fetchInfo(force)
-                if (!this.isCurrent())  return
+                if (!this.sameContext(context))  return
                 if (info)
                     this.infos[url] = info
                 return info
@@ -215,7 +216,7 @@ export class Relays extends Module {
                 if (relay) {
                     //console.log(url, "- got NDKRelay")
                     info = await relay.fetchInfo(force)
-                    if (!this.isCurrent())  return
+                    if (!this.sameContext(context))  return
                     if (info)
                         this.infos[url] = info
                     return info
@@ -233,7 +234,7 @@ export class Relays extends Module {
                         }
                     });
 
-                    if (!this.isCurrent()) return;
+                    if (!this.sameContext(context)) return;
 
                     if (response.ok) {
                         const info: NDKRelayInformation = await response.json();
@@ -297,9 +298,10 @@ export class Relays extends Module {
     }
 
     async guiRelayInfo(relay: NDKRelay|string, node: JQuery<HTMLElement>): JQuery<HTMLElement> {
+        const context = this.context
         const url = typeof relay == "string" ? relay : relay.url
         const info = await this.relayInfo(relay, true)
-        if (!this.isCurrent())  return
+        if (!this.sameContext(context))  return
         const rin = $(RelayInfoHTML)
         rin.find(".RelayInfoName").text(info?.name)
         rin.find(".RelayInfoDescription").text(info?.description)
@@ -319,6 +321,7 @@ export class Relays extends Module {
     }
 
     async guiCreateItem(relay: NDKRelay|string) {
+        const context = this.context
         const url = typeof relay == "string" ? relay : relay.url
 
         const rn = $(RelayHeadHTML)
@@ -337,7 +340,7 @@ export class Relays extends Module {
             nn.hide()
 
         const [err, i] = await safeAsync(this.guiRelayInfo(relay, rn))
-        if (!this.isCurrent())  return
+        if (!this.sameContext(context))  return
         //console.log("Check info for", url)
         if (i) {
             i.hide()
@@ -475,6 +478,8 @@ export class Relays extends Module {
     }
 
     async show() {
+        this.newContext()
+        const context = this.context
         this.mainView().html(RelaysHTML)
         const used = this.getRelays()
         const stored = this.getStored()
@@ -482,7 +487,7 @@ export class Relays extends Module {
         const UIList = $("#ActiveRelays")
 
         const NewUrl = $("input[name='NewRelayUrl']")
-        Head.find("#AddRelayButton").click((e) => {
+        Head.find("#AddRelayButton").click(() => {
             this.add(NewUrl.val(), this.autoConnect)
             this.save()
             this.handle()
@@ -530,7 +535,7 @@ export class Relays extends Module {
 
         for (const relay of used) {
             const item = await this.guiCreateItem(relay)
-            if (!this.isCurrent())  return
+            if (!this.sameContext(context))  return
             UIList.append(item)
             this.guiRefreshItem(relay)
         }
@@ -541,7 +546,7 @@ export class Relays extends Module {
             if (!urls.includes(url)) {
                 //console.log("Creating item for unused", url)
                 const item = await this.guiCreateItem(url)
-                if (!this.isCurrent())  return
+                if (!this.sameContext(context))  return
                 ORList.append(item)
             }
         }

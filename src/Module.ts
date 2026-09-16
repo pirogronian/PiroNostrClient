@@ -17,6 +17,7 @@ export class Module {
     ndk!: NDK
     static current: string = ""
     static offline: boolean|null = null
+    context: number = 0
 
     register(name: string, routingNane: string|null = null, parent: Module|undefined = undefined) {
         this.settingsName = name
@@ -61,6 +62,14 @@ export class Module {
 
     setCurrent() {
         Module.current = this.routingPath
+    }
+
+    newContext() {
+        this.context += 1
+    }
+
+    sameContext(context: number): boolean {
+        return this.isCurrent() && this.context == context
     }
 
     onRoute(pattern: string, f: Function) {
