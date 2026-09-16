@@ -438,10 +438,11 @@ export class Relays extends Module {
         const ri = $(`div[relay='${relay.url}']`)
         let c: string = NDKRelayStatus[relay.status]
         c = c.toLocaleLowerCase()
+        //console.debug("Refresh item for", relay.url, c)
         const s = ri.find(".RelayStatus")
         s.text(c)
         s.removeClass()
-        s.addClass("Status")
+        s.addClass("RelayStatus")
         s.addClass(c)
         const n = ri.find(".New")
         if (!this.known[relay.url])
@@ -574,7 +575,7 @@ export class Relays extends Module {
 
         // Nadpisujemy addRelay
         this.ndk.pool.addRelay = function(relay: NDKRelay, connect?: boolean) {
-            console.log("addRelay:", relay.url, connect)
+            //console.log("addRelay:", relay.url, connect)
             const result = originalAdd(relay, connect);
             this.emit('added', relay);
             return result;
@@ -589,8 +590,8 @@ export class Relays extends Module {
 
 
         this.ndk.pool.on('relay:connect', (relay) => {
+            //console.debug("On realy:connect:", relay.url)
             this.onUpdate()
-            //this.onIncreaseConnected()
             if (this.autoUse) {
                 this.markUsed(relay.url)
             } else
@@ -633,9 +634,9 @@ export class Relays extends Module {
         })
         this.ndk.pool.on("added", (relay) => {
             this.onUpdate()
-            console.log("Added relay:", relay.url)
+            //console.log("Added relay:", relay.url)
             if (this.autoConnect) {
-                console.log("Autoconnecting...")
+                //console.log("Autoconnecting...")
                 relay.connect()
             }
             this.makeKnownAll()
@@ -646,6 +647,8 @@ export class Relays extends Module {
             this.onUpdate()
             this.handle()
         })
+
+        //console.debug("Event handler are set.")
 
         this.loadSettins()
         this.load()
