@@ -67,6 +67,7 @@ export class Relays extends Module {
     notices: { [url: string] : string } = {}
 
     connectedNum: number = 0
+    poolEvent: boolean = true
 
     saveSettings() {
         this.settings("autoUse", this.autoUse ? "1" : null)
@@ -125,12 +126,14 @@ export class Relays extends Module {
     }
 
     reload() {
+        this.poolEvent = false
         this.ndk.pool.relays.clear()
         this.known = {}
         this.challenges = {}
         this.notices = {}
         this.loadSettins()
         this.load()
+        this.poolEvent = true
     }
 
     disconnectAll() {
@@ -171,9 +174,11 @@ export class Relays extends Module {
     }
 
     removeAll(): void {
+        this.poolEvent = false
         this.ndk.pool.relays.forEach((relay, url) => {
             this.remove(url)
         })
+        this.poolEvent = true
     }
 
     makeKnown(relay: string|NDKRelay): void {
@@ -484,7 +489,6 @@ export class Relays extends Module {
         Head.find("#AddRelayButton").click(() => {
             this.add(NewUrl.val(), this.autoConnect)
             this.save()
-            this.handle()
         })
         const aac = Head.find("input[name='AutoAddRelay']")
         if (this.autoUse)
@@ -501,28 +505,30 @@ export class Relays extends Module {
             this.saveSettings()
         })
         Head.find("#AddDefaultsRelays").click(() => {
+            this.poolEvent = false
             DEFAULT_RELAYS.forEach((relay) => {
                 this.add(relay)
             })
-            this.handle()
+            this.poolEvent = true
+            this.guiRefreshItems()
         })
         Head.find("#DisconnectAllRelays").click(() => {
             this.disconnectAll()
         })
         Head.find("#RemoveAllRelays").click(() => {
             this.removeAll()
-            this.handle()
+            this.guiRefreshItems()
         })
         /*Head.find("#SaveAllRelays").click(() => {
             this.save()
             this.handle()
         })*/
         Head.find("#RefreshActiveRelays").click(() => {
-            this.handle()
+            this.guiRefreshItems()
         })
         Head.find("#ReloadActiveRelays").click(() => {
             this.reload()
-            this.handle()
+            this.guiRefreshItems()
         })
 
         return [Head, arl, orl]
@@ -604,18 +610,21 @@ export class Relays extends Module {
         const originalAdd = this.ndk.pool.addRelay.bind(this.ndk.pool);
         const originalRemove = this.ndk.pool.removeRelay.bind(this.ndk.pool);
 
+        const poolEvent = this.poolEvent
         // Nadpisujemy addRelay
         this.ndk.pool.addRelay = function(relay: NDKRelay, connect?: boolean) {
             //console.log("addRelay:", relay.url, connect)
             const result = originalAdd(relay, connect);
-            this.emit('added', relay);
+            if (poolEvent)
+                this.emit('added', relay);
             return result;
         };
 
         // Nadpisujemy removeRelay
         this.ndk.pool.removeRelay = function(relayUrl: string) {
             const result = originalRemove(relayUrl);
-            this.emit('removed', { relayUrl });
+            if (poolEvent)
+                this.emit('removed', { relayUrl });
             return result;
         };
 
