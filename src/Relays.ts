@@ -69,6 +69,8 @@ export class Relays extends Module {
     connectedNum: number = 0
     poolEvent: boolean = true
 
+    relays: { [url: string]: NDKRelay } = {}
+
     saveSettings() {
         this.settings("autoUse", this.autoUse ? "1" : null)
         this.settings("autoConnect", this.autoConnect ? "1" : null)
@@ -78,7 +80,34 @@ export class Relays extends Module {
         //console.log("Relays::loadSettings()")
         this.autoUse = this.settings("autoUse") ? true : false
         this.autoConnect = this.settings("autoConnect") ? true : false
+        this.loadKnown()
         //console.log("AutoConnect:", this.autoConnect)
+    }
+
+    get(url: string) {
+        return this.relays[url]
+    }
+
+    avaliable(url: string) {
+        return url in this.relays
+    }
+
+    create(url: string) {
+        const relay = new NDKRelay(url, undefined, this.ndk)
+        const settings = this.relaySettings(url)
+        relay.trusted = settings.trusted
+        relay.authPolicy = AuthPolicies[settings.auth]
+        this.relays[url] = relay
+        return relay
+    }
+
+    createUnique(url: string) {
+        let ret = this.get(url)
+        if (ret) {
+            console.warn("Try create already avaliable relay", url)
+            return ret
+        }
+        return this.create(url)
     }
 
     getPooled(url: string) {
@@ -98,30 +127,29 @@ export class Relays extends Module {
         return url in this.ndk.pool.relays
     }
 
-    save(): void {
+    saveKnown(): void {
         this.settings(STORAGE_KEY, JSON.stringify(this.known));
     }
 
-    getStored(): RelaySettingsDB {
+    loadKnown() {
         const saved = this.settings(STORAGE_KEY);
         if (!saved) return {}
 
         try {
             const raw: Record<string, RelaySettingsIface> = JSON.parse(saved);
-            if (!raw)  return {}
+            if (!raw)  return
             const ret : RelaySettingsDB = {}
             for (const [url, value] of Object.entries(raw)) {
                 ret[url] = RelaySettings.fromJSON(value)
             }
-            return ret;
-        } catch {
-            return {};
+            this.known = ret;
+        } catch (err) {
+            console.error("Unable to load known relays:", err)
         }
     }
 
     load(): void {
         //console.log("Relays::load()")
-        this.known = this.getStored()
         //console.log(this.known)
         for(const [url, info] of Object.entries(this.known)) {
             if (info.use)
@@ -375,7 +403,7 @@ export class Relays extends Module {
             this.relaySettings(relay).trusted = trusted
             if (typeof relay == "object")
                 relay.trusted = trusted
-            this.save()
+            this.saveKnown()
         })
         const an = rn.find("select.RelayAuth")
         an.prop("value", this.relaySettings(relay)?.auth)
@@ -387,7 +415,7 @@ export class Relays extends Module {
                 relay.disconnect()
                 relay.connect()
             }
-            this.save()
+            this.saveKnown()
         })
 
         if (typeof relay == "string") {
@@ -406,7 +434,7 @@ export class Relays extends Module {
                 rn.find(".RemoveRelayButton").hide()
                 rn.find("button.ForgetRelayButton").click(() => {
                     delete this.known[url]
-                    this.save()
+                    this.saveKnown()
                     this.guiRefreshItems()
                 })
         } else {
@@ -428,12 +456,12 @@ export class Relays extends Module {
 
             rn.find(".UseRelayButton").click(() => {
                 this.markUsed(relay.url)
-                this.save()
+                this.saveKnown()
                 this.guiRefreshItem(relay)
             })
             rn.find(".DontUseRelayButton").click(() => {
                 this.markUsed(relay.url, false)
-                this.save()
+                this.saveKnown()
                 this.guiRefreshItem(relay)
             })
 
@@ -441,7 +469,7 @@ export class Relays extends Module {
                 console.log("Removing:", relay.url)
                 this.remove(relay.url)
                 this.markUsed(relay.url, false)
-                this.save()
+                this.saveKnown()
                 //this.handle()
             })
 
@@ -501,7 +529,7 @@ export class Relays extends Module {
         const NewUrl = $("input[name='NewRelayUrl']")
         Head.find("#AddRelayButton").click(() => {
             this.add(NewUrl.val(), this.autoConnect)
-            this.save()
+            this.saveKnown()
         })
         const aac = Head.find("input[name='AutoAddRelay']")
         if (this.autoUse)
@@ -576,7 +604,6 @@ export class Relays extends Module {
     guiPopulateOther() {
         const context = this.context
         const list = this.guiOtherContainer()
-        const stored = this.getStored()
         const urls = Array.from(this.getPooledUrls())
         for(const [url, info] of Object.entries(this.known)) {
             if (!urls.includes(url)) {
@@ -650,7 +677,7 @@ export class Relays extends Module {
                 this.markUsed(relay.url)
             } else
                 this.makeKnown(relay)
-            this.save();
+            this.saveKnown();
             this.guiRefreshItem(relay)
         });
         this.ndk.pool.on("relay:disconnect", (relay) => {
@@ -694,11 +721,12 @@ export class Relays extends Module {
                 relay.connect()
             }
             this.makeKnownAll()
-            this.save()
+            //this.saveKnown()
             this.guiRefreshItems()
         })
         this.ndk.pool.on("removed", (relay) => {
             this.onUpdate()
+            //this.saveKnown()
             this.guiRefreshItems()
         })
 
