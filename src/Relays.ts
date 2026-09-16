@@ -206,13 +206,18 @@ export class Relays extends Module {
         if (!info) {
             if (typeof relay != "string") {
                 //console.log(url, "- passed NDKRelay")
-                info = await relay.fetchInfo(force)
+                try {
+                    info = await relay.fetchInfo(force)
+                } catch (err) {
+                    console.warn(`Downloading of NIP-11 through HTTP failed for ${url}`, err);
+                    return
+                }
                 if (!this.sameContext(context))  return
                 if (info)
                     this.infos[url] = info
                 return info
             } else {
-                const relay = this.get(url)
+                let relay = this.get(url)
                 if (relay) {
                     //console.log(url, "- got NDKRelay")
                     info = await relay.fetchInfo(force)
@@ -223,27 +228,20 @@ export class Relays extends Module {
                 }
 
                 //console.log("Fetch info manually for", url)
+                relay = new NDKRelay(url, undefined, this.ndk)
+                if (!relay)  return
+                relay.trusted = this.relaySettings(url).trusted
+                relay.authPolicy = AuthPolicies[this.relaySettings(url).auth]
                 try {
-                    const httpUrl = url
-                        .replace(/^wss:\/\//i, "https://")
-                        .replace(/^ws:\/\//i, "http://");
-
-                    const response = await fetch(httpUrl, {
-                        headers: {
-                            "Accept": "application/nostr+json"
-                        }
-                    });
-
-                    if (!this.sameContext(context)) return;
-
-                    if (response.ok) {
-                        const info: NDKRelayInformation = await response.json();
-                        this.infos[url] = info;
-                        return info;
-                    }
+                    info = await relay.fetchInfo(force)
                 } catch (err) {
                     console.warn(`Downloading of NIP-11 through HTTP failed for ${url}`, err);
+                    return
                 }
+                if (!this.sameContext(context))  return
+                if (info)
+                    this.infos[url] = info
+                return info
             }
         }
         return info
