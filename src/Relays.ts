@@ -569,6 +569,13 @@ export class Relays extends Module {
         }
     }
 
+    guiRefreshItems() {
+        this.guiActiveContainer().empty()
+        this.guiOtherContainer().empty()
+        this.guiPopulateActive()
+        this.guiPopulateOther()
+    }
+
     show() {
         this.newContext()
         
@@ -665,11 +672,11 @@ export class Relays extends Module {
             }
             this.makeKnownAll()
             this.save()
-            this.handle()
+            this.guiRefreshItems()
         })
         this.ndk.pool.on("removed", (relay) => {
             this.onUpdate()
-            this.handle()
+            this.guiRefreshItems()
         })
 
         //console.debug("Event handler are set.")
