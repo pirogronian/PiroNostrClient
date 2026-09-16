@@ -81,17 +81,21 @@ export class Relays extends Module {
         //console.log("AutoConnect:", this.autoConnect)
     }
 
-    get(url: string) {
+    getPooled(url: string) {
         if (url in this.ndk.pool.relays)
             return this.ndk.pool.getRelay(url)
     }
 
-    getRelays() {
+    getPooledRelays() {
         return this.ndk.pool.relays.values();
     }
 
-    getUrls() {
+    getPooledUrls() {
         return this.ndk.pool.relays.keys();
+    }
+
+    inPool(url:string) {
+        return url in this.ndk.pool.relays
     }
 
     save(): void {
@@ -220,7 +224,7 @@ export class Relays extends Module {
                     this.infos[url] = info
                 return info
             } else {
-                let relay = this.get(url)
+                let relay = this.getPooled(url)
                 if (relay) {
                     //console.log(url, "- got NDKRelay")
                     try {
@@ -254,7 +258,7 @@ export class Relays extends Module {
     }
 
     makeKnownAll() {
-        const list = this.getUrls()
+        const list = this.getPooledUrls()
         list.forEach((url) => {
             this.makeKnown(url)
         })
@@ -559,7 +563,7 @@ export class Relays extends Module {
 
     guiPopulateActive() {
         const context = this.context
-        const used = this.getRelays()
+        const used = this.getPooledRelays()
         const list = this.guiActiveContainer()
         for (const relay of used) {
             const item = this.guiCreateItem(relay)
@@ -573,7 +577,7 @@ export class Relays extends Module {
         const context = this.context
         const list = this.guiOtherContainer()
         const stored = this.getStored()
-        const urls = Array.from(this.getUrls())
+        const urls = Array.from(this.getPooledUrls())
         for(const [url, info] of Object.entries(this.known)) {
             if (!urls.includes(url)) {
                 //console.log("Creating item for unused", url)
@@ -610,7 +614,7 @@ export class Relays extends Module {
     }
 
     setup() {
-        this.onRoute("", (match) => {
+        this.onRoute("", () => {
             this.setCurrent()
             this.handle()
         })
@@ -640,6 +644,7 @@ export class Relays extends Module {
 
         this.ndk.pool.on('relay:connect', (relay) => {
             //console.debug("On realy:connect:", relay.url)
+            delete this.challenges[relay.url]
             this.onUpdate()
             if (this.autoUse) {
                 this.markUsed(relay.url)
