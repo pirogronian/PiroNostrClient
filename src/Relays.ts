@@ -301,7 +301,7 @@ export class Relays extends Module {
         const context = this.context
         const url = typeof relay == "string" ? relay : relay.url
         const info = await this.relayInfo(relay, true)
-        if (!this.sameContext(context))  return
+        if (!this.sameContext(context) || !info)  return
         const rin = $(RelayInfoHTML)
         rin.find(".RelayInfoName").text(info?.name)
         rin.find(".RelayInfoDescription").text(info?.description)
