@@ -73,8 +73,9 @@ export class User extends Module{
             NickHtml.text("")
             PubkeyHtml.text("")
             LoginForm.show()
-            $("#LoginMethodSelect").change((e) => {
-                this.login($(e.currentTarget).val())
+            const selector = $("#LoginMethodSelect")
+            selector.change(() => {
+                this.login(selector.val())
                 if (this.isCurrent())
                     this.navigate()
             })
