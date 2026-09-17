@@ -7,11 +7,14 @@
 
 .RelayHeadMain {
     @extend .OnerowFlexContainer;
-    border: white solid 1mm
 }
 
 .RelayHeadMore {
     @extend .OnerowFlexContainer;
+}
+
+.RelayHeadMain > *, .RelayHeadMore > * {
+    margin: 1mm
 }
 
 .RelayHead > * {
@@ -32,6 +35,10 @@
     background: lightgrey
 }
 
+.RelayHead {
+    border: white solid 1mm
+}
+
 .RelayHead .connected {
     background-color: green
 }
@@ -44,12 +51,15 @@
     display: none
 }
 
-#ActiveRelays div:nth-child(odd) .RelayHeadMain, #OtherRelays div:nth-child(odd) .RelayHeadMain {
+#ActiveRelays div:nth-child(odd) .RelayHead, #OtherRelays div:nth-child(odd) .RelayHead {
     background: lightgray;
+}
+
+#ActiveRelays div:nth-child(odd) .RelayHead, #OtherRelays div:nth-child(odd) .RelayHead {
     border: lightgrey solid 1mm
 }
 
-#ActiveRelays .RelayHeadMain:hover, #OtherRelays .RelayHeadMain:hover,
-#ActiveRelays div:nth-child(odd) .RelayHeadMain:hover, #OtherRelays div:nth-child(odd) .RelayHeadMain:hover {
+#ActiveRelays .RelayHead:hover, #OtherRelays .RelayHead:hover,
+#ActiveRelays div:nth-child(odd) .RelayHead:hover, #OtherRelays div:nth-child(odd) .RelayHead:hover {
     border: lightcoral solid 1mm
 }
