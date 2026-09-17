@@ -424,6 +424,17 @@ export class Relays extends Module {
         rsb.click(() => { sn.toggle() })
         sn.hide()
 
+        rn.find(".UseRelayButton").click(() => {
+            this.markUsed(url)
+            this.saveKnown()
+            this.guiRefreshItem(url)
+        })
+        rn.find(".DontUseRelayButton").click(() => {
+            this.markUsed(url, false)
+            this.saveKnown()
+            this.guiRefreshItem(relay)
+        })
+
         if (typeof relay == "string") {
             const s = rn.find(".RelayStatus")
                 s.text("unused")
@@ -448,17 +459,6 @@ export class Relays extends Module {
                 relay.disconnect()
             })
 
-            rn.find(".UseRelayButton").click(() => {
-                this.markUsed(relay.url)
-                this.saveKnown()
-                this.guiRefreshItem(relay)
-            })
-            rn.find(".DontUseRelayButton").click(() => {
-                this.markUsed(relay.url, false)
-                this.saveKnown()
-                this.guiRefreshItem(relay)
-            })
-
             rn.find("button.RemoveRelayButton").click(() => {
                 console.log("Removing:", relay.url)
                 this.remove(relay.url)
@@ -469,8 +469,6 @@ export class Relays extends Module {
         }
 
         if (typeof relay == "string" || !this.inPool(relay.url)) {
-            rn.find(".UseRelayButton").hide()
-            rn.find(".DontUseRelayButton").hide()
             rn.find(".RemoveRelayButton").hide()
             rn.find("button.AddRelayButton").click(() => {
                 this.add(url, this.autoConnect)
@@ -489,36 +487,40 @@ export class Relays extends Module {
         return rn
     }
 
-    guiRefreshItem(relay: NDKRelay) {
+    guiRefreshItem(relay: NDKRelay|string) {
         //console.log("Refreshing", relay.url)
-        const ri = $(`div[relay='${relay.url}']`)
-        let c: string = NDKRelayStatus[relay.status]
-        c = c.toLocaleLowerCase()
-        //console.debug("Refresh item for", relay.url, c)
-        const s = ri.find(".RelayStatus")
-        s.text(c)
-        s.removeClass()
-        s.addClass("RelayStatus")
-        s.addClass(c)
+        const url = typeof relay == "string" ? relay : relay.url
+        const ri = $(`div[relay='${url}']`)
+        if (typeof relay != "string") {
+            let c: string = NDKRelayStatus[relay.status]
+            c = c.toLocaleLowerCase()
+            //console.debug("Refresh item for", relay.url, c)
+            const s = ri.find(".RelayStatus")
+            s.text(c)
+            s.removeClass()
+            s.addClass("RelayStatus")
+            s.addClass(c)
+
+            const crb = ri.find(".ConnectRelayButton")
+            const drb = ri.find(".DisconnectRelayButton")
+            if (relay.connected) {
+                crb.hide()
+                drb.show()
+            } else {
+                crb.show()
+                drb.hide()
+            }
+        }
+
         const n = ri.find(".New")
-        if (!this.known[relay.url])
+        if (!this.known[url])
             n.show()
         else
             n.hide()
 
-        const crb = ri.find(".ConnectRelayButton")
-        const drb = ri.find(".DisconnectRelayButton")
-        if (relay.connected) {
-            crb.hide()
-            drb.show()
-        } else {
-            crb.show()
-            drb.hide()
-        }
-
         const urb = ri.find(".UseRelayButton")
         const durb = ri.find(".DontUseRelayButton")
-        if (this.known[relay.url]?.use) {
+        if (this.known[url]?.use) {
             urb.hide()
             durb.show()
         }
@@ -623,8 +625,7 @@ export class Relays extends Module {
                 const item = this.guiCreateItem(relay)
                 if (!this.sameContext(context))  return
                 list.append(item)
-                if(typeof relay != "string")
-                    this.guiRefreshItem(relay)
+                this.guiRefreshItem(relay)
             }
         }
     }
