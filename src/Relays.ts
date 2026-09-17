@@ -620,7 +620,7 @@ export class Relays extends Module {
         const context = this.context
         const list = this.guiOtherContainer()
         const urls = Array.from(this.getPooledUrls())
-        console.debug("Existing relay objects:", this.relays, "End of relays.")
+        //console.debug("Existing relay objects:", this.relays, "End of relays.")
         for(const [url, info] of Object.entries(this.known)) {
             if (!urls.includes(url)) {
                 let relay: NDKRelay|string|undefined = this.relays[url]

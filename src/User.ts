@@ -12,7 +12,6 @@ const NIP46 = "nip46"
 const PIVATEKEY = "privatekey"
 
 export class User extends Module{
-
     async get(npub: string|null|undefined = null, profile: boolean = true) : Promise<NDKUser|null|undefined> {
         let user : NDKUser|null|undefined = null
 
@@ -39,6 +38,9 @@ export class User extends Module{
             case NIP07:
                 this.loginNip07()
                 break;
+            case NIP46:
+                this.loginNip46Prepare()
+                break;
         }
     }
 
@@ -46,6 +48,20 @@ export class User extends Module{
         const signer = new NDKNip07Signer()
         this.ndk.signer = signer
         this.settings(SIGNER_KEY, NIP07)
+        if (this.isCurrent())
+            this.navigate()
+    }
+
+    loginNip46Prepare() {
+        console.debug("Nip-46 prepare.")
+
+        const form = $("#UserLoginNIP46")
+        form.show()
+    }
+
+    cancelNip46Login() {
+        //this.ndk.signer = undefined
+        $("#UserLoginNIP46").hide()
     }
 
     logout() {
@@ -58,6 +74,10 @@ export class User extends Module{
         const UserHTML = $("#LoggedUser")
         const NickHtml = $("#LoggedUserNick")
         const PubkeyHtml = $("#LoggedUserPubkey")
+        $("#UserLoginNIP46Cancel").click(() => {
+            this.cancelNip46Login()
+        })
+
         if (user) {
             LoginForm.hide()
             UserHTML.show()
@@ -76,8 +96,6 @@ export class User extends Module{
             const selector = $("#LoginMethodSelect")
             selector.change(() => {
                 this.login(selector.val())
-                if (this.isCurrent())
-                    this.navigate()
             })
         }
     }
