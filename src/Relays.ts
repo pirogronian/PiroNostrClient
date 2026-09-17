@@ -477,7 +477,7 @@ export class Relays extends Module {
             rn.find("button.ForgetRelayButton").click(() => {
                 delete this.known[url]
                 this.saveKnown()
-                this.guiRefreshItems()
+                this.guiReloadItems()
             })
         } else {
             rn.find("button.AddRelayButton").hide()
@@ -562,25 +562,25 @@ export class Relays extends Module {
                 this.add(relay)
             })
             this.poolEvent = true
-            this.guiRefreshItems()
+            this.guiReloadItems()
         })
         Head.find("#DisconnectAllRelays").click(() => {
             this.disconnectAll()
         })
         Head.find("#RemoveAllRelays").click(() => {
             this.removeAll()
-            this.guiRefreshItems()
+            this.guiReloadItems()
         })
         /*Head.find("#SaveAllRelays").click(() => {
             this.save()
             this.handle()
         })*/
-        Head.find("#RefreshActiveRelays").click(() => {
-            this.guiRefreshItems()
+        Head.find("#ReloadRelaysItems").click(() => {
+            this.guiReloadItems()
         })
-        Head.find("#ReloadActiveRelays").click(() => {
+        Head.find("#ReloadRelays").click(() => {
             this.reload()
-            this.guiRefreshItems()
+            this.guiReloadItems()
         })
 
         return [Head, arl, orl]
@@ -630,7 +630,7 @@ export class Relays extends Module {
         }
     }
 
-    guiRefreshItems() {
+    guiReloadItems() {
         this.guiActiveContainer().empty()
         this.guiOtherContainer().empty()
         this.guiPopulateActive()
@@ -737,12 +737,12 @@ export class Relays extends Module {
             }
             this.makeKnownAll()
             //this.saveKnown()
-            this.guiRefreshItems()
+            this.guiReloadItems()
         })
         this.ndk.pool.on("removed", (relay) => {
             this.onUpdate()
             //this.saveKnown()
-            this.guiRefreshItems()
+            this.guiReloadItems()
         })
 
         //console.debug("Event handler are set.")
