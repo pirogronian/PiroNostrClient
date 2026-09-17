@@ -1,5 +1,5 @@
 
-import NDK, { NDKUser, NDKNip07Signer } from "@nostr-dev-kit/ndk";
+import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer, NDKPrivateKeySigner } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
@@ -8,6 +8,7 @@ import UserHTML from "@/User.html?raw"
 
 const SIGNER_KEY = "signer"
 const NIP07 = "nip07"
+const NIP46 = "nip46"
 const PIVATEKEY = "privatekey"
 
 export class User extends Module{

@@ -1,18 +1,24 @@
 <div id="Login" class="Frame">
-    <label for="LoginMethod">Login with:</label>
-    <select name="LoginMethod" id="LoginMethodSelect">
-      <option value="">None</option>
-      <option value="nip07">NIP-07</option>
-    </select>
+  <label for="LoginMethod">Login with:</label>
+  <select name="LoginMethod" id="LoginMethodSelect">
+    <option value="">None</option>
+    <option value="nip07">NIP-07</option>
+    <option value="nip46">NIP-46</option>
+  </select>
+  <div id="UserLoginNIP46" style="display: none">
+    <label for="UserLoginNIP46BunkerUrl">Bunker url:
+      <input type="text" name="UserLoginNIP46BunkerUrl"/>
+      <button type="button">Enter</button>
+    </label>
   </div>
-  <div id="LoggedUser">
-    <div>Logged user:</div>
-    <dl>
-      <dt>Nick:</dt>
-      <dd id="LoggedUserNick"></dd>
-      <dt>Pubkey:</dt>
-      <dd id="LoggedUserPubkey"></dd>
-    </dl>
-    <button type="button" id="Logout">Logout</button>
-  </div>
+</div>
+<div id="LoggedUser">
+  <div>Logged user:</div>
+  <dl>
+    <dt>Nick:</dt>
+    <dd id="LoggedUserNick"></dd>
+    <dt>Pubkey:</dt>
+    <dd id="LoggedUserPubkey"></dd>
+  </dl>
+  <button type="button" id="Logout">Logout</button>
 </div>
