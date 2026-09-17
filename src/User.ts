@@ -53,7 +53,7 @@ export class User extends Module{
         this.settings(SIGNER_KEY, null)
     }
 
-    show(user: NDKUser | null, handlers: { onLogin: (method: string) => any, onLogout: () => any}) {
+    show(user: NDKUser | null) {
         const LoginForm = $("#Login")
         const UserHTML = $("#LoggedUser")
         const NickHtml = $("#LoggedUserNick")
@@ -63,14 +63,20 @@ export class User extends Module{
             UserHTML.show()
             NickHtml.text(user.profile?.name || user.profile?.displayName || "")
             PubkeyHtml.text(user.pubkey)
-            $("#Logout").click(() => { handlers.onLogout() })
+            $("#Logout").click(() => {
+                this.logout()
+                if (this.isCurrent())
+                    this.navigate()
+            })
         } else {
             UserHTML.hide()
             NickHtml.text("")
             PubkeyHtml.text("")
             LoginForm.show()
             $("#LoginMethodSelect").change((e) => {
-                handlers.onLogin($(e.currentTarget).val())
+                this.login($(e.currentTarget).val())
+                if (this.isCurrent())
+                    this.navigate()
             })
         }
     }
@@ -79,24 +85,12 @@ export class User extends Module{
         const user = this.get()
         this.mainView().html(UserHTML)
         user.then((u) => {
-            this.show(u, {
-                onLogin: (method:string) => {
-                    if (this.isCurrent()) {
-                        this.login(method);
-                        this.navigate()
-                    }
-                },
-                onLogout: () => {
-                    if (this.isCurrent()) {
-                        this.logout();
-                        this.navigate()
-                    }
-                }})
+            this.show(u)
         })
     }
 
     setup() {
-        this.onRoute('', (match) => {
+        this.onRoute('', () => {
             this.setCurrent()
             this.clearUI()
             this.handle()
