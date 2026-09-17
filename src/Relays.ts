@@ -533,7 +533,7 @@ export class Relays extends Module {
     guiCreateMain() {
         const rmw = $(RelaysHTML)
         this.mainView().append(rmw)
-        const Head = rmw.find("#ActiveRelaysHeader")
+        const Head = rmw.find("#RelaysHeader")
         const arl = rmw.find("#ActiveRelays")
         const orl = rmw.find("#OtherRelays")
 
