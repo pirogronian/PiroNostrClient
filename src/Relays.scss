@@ -7,6 +7,7 @@
 
 .RelayHead {
     @extend .OnerowFlexContainer;
+    border: white solid 1mm
 }
 
 .RelayHead > * {
@@ -40,5 +41,11 @@
 }
 
 #ActiveRelays div:nth-child(odd) .RelayHead, #OtherRelays div:nth-child(odd) .RelayHead {
-    background: lightgray
+    background: lightgray;
+    border: lightgrey solid 1mm
+}
+
+#ActiveRelays .RelayHead:hover, #OtherRelays .RelayHead:hover,
+#ActiveRelays div:nth-child(odd) .RelayHead:hover, #OtherRelays div:nth-child(odd) .RelayHead:hover {
+    border: lightcoral solid 1mm
 }
