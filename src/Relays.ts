@@ -575,6 +575,10 @@ export class Relays extends Module {
             this.save()
             this.handle()
         })*/
+
+        Head.find("RefreshRelayItems").click(() => {
+            this.guiRefreshItems()
+        })
         Head.find("#ReloadRelaysItems").click(() => {
             this.guiReloadItems()
         })
@@ -627,6 +631,12 @@ export class Relays extends Module {
                 list.append(item)
                 this.guiRefreshItem(relay)
             }
+        }
+    }
+
+    guiRefreshItems() {
+        for (const [url, setting] of Object.entries(this.known)) {
+            this.guiRefreshItem(url)
         }
     }
 
