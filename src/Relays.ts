@@ -391,7 +391,7 @@ export class Relays extends Module {
             //console.debug(i)
             rn.append(i)
             i.hide()
-            rn.find(".RelayInfoButton").show().click(() => {
+            rn.find(".RelayInfoButton").prop("disabled", false).click(() => {
                 //console.debug("Toggle info of", url)
                 //console.debug(i)
                 i.toggle()
