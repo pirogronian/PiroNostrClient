@@ -5,6 +5,18 @@
     @extend .MultirowFlexContainer
 }
 
+#RelaysHeader > * {
+    margin-right: 3mm
+}
+
+#RelaysNewUrl input {
+    margin-left: 2mm
+}
+
+#RelaysHeader > #RelaysButtons * {
+    margin: 1mm
+}
+
 .RelayHeadMain {
     @extend .OnerowFlexContainer;
 }

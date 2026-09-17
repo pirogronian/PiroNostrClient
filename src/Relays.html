@@ -1,6 +1,6 @@
 <div>
     <div id="RelaysHeader">
-        <label for="NewRelayUrl">Url:
+        <label for="NewRelayUrl" id="RelaysNewUrl">Url:
             <input type="text" name="NewRelayUrl"/>
             <button type="button" id="AddRelayButton">Add</button>
         </label>
@@ -10,13 +10,15 @@
         <label for="AutoAddRelay">Auto connect:
             <input type="checkbox" name="AutoConnectRelay"/>
         </label>
-        <button type="button" id="AddDefaultsRelays">Add defaults</button>
-        <!--<button type="button" id="DisconnectAllRelays">Disconnect all</button>-->
-        <button type="button" id="RemoveAllRelays">Remove all</button>
-        <!--<button type="button" id="SaveAllRelays">Save all</button>-->
-        <button type="button" id="RefreshRelaysItems">Refresh items</button>
-        <button type="button" id="ReloadRelaysItems">Reload items</button>
-        <button type="button" id="ReloadRelays">Reload</button>
+        <div id="RelaysButtons">
+            <button type="button" id="AddDefaultsRelays">Add defaults</button>
+            <!--<button type="button" id="DisconnectAllRelays">Disconnect all</button>-->
+            <button type="button" id="RemoveAllRelays">Remove all</button>
+            <!--<button type="button" id="SaveAllRelays">Save all</button>-->
+            <button type="button" id="RefreshRelaysItems">Refresh items</button>
+            <button type="button" id="ReloadRelaysItems">Reload items</button>
+            <button type="button" id="ReloadRelays">Reload</button>
+        </div>
     </div>
     <div>Active relays:</div>
     <div id="RelaysStats"></div>
