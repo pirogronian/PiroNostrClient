@@ -13,7 +13,7 @@ const PIVATEKEY = "privatekey"
 
 export class User extends Module{
 
-    async get(npub: string|null = null, profile: boolean = true) : Promise<NDKUser|null|undefined> {
+    async get(npub: string|null|undefined = null, profile: boolean = true) : Promise<NDKUser|null|undefined> {
         let user : NDKUser|null|undefined = null
 
         if (!npub && this.ndk.signer) {
@@ -53,7 +53,7 @@ export class User extends Module{
         this.settings(SIGNER_KEY, null)
     }
 
-    show(user: NDKUser | null) {
+    show(user: NDKUser|null|undefined) {
         const LoginForm = $("#Login")
         const UserHTML = $("#LoggedUser")
         const NickHtml = $("#LoggedUserNick")
