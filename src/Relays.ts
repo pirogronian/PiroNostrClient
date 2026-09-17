@@ -419,6 +419,10 @@ export class Relays extends Module {
             }
             this.saveKnown()
         })
+        const sn = rn.find(".RelayHeadMore")
+        const rsb = rn.find(".RelaySettingsButton")
+        rsb.click(() => { sn.toggle() })
+        sn.hide()
 
         if (typeof relay == "string") {
             const s = rn.find(".RelayStatus")

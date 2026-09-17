@@ -5,9 +5,13 @@
     @extend .MultirowFlexContainer
 }
 
-.RelayHead {
+.RelayHeadMain {
     @extend .OnerowFlexContainer;
     border: white solid 1mm
+}
+
+.RelayHeadMore {
+    @extend .OnerowFlexContainer;
 }
 
 .RelayHead > * {
@@ -40,12 +44,12 @@
     display: none
 }
 
-#ActiveRelays div:nth-child(odd) .RelayHead, #OtherRelays div:nth-child(odd) .RelayHead {
+#ActiveRelays div:nth-child(odd) .RelayHeadMain, #OtherRelays div:nth-child(odd) .RelayHeadMain {
     background: lightgray;
     border: lightgrey solid 1mm
 }
 
-#ActiveRelays .RelayHead:hover, #OtherRelays .RelayHead:hover,
-#ActiveRelays div:nth-child(odd) .RelayHead:hover, #OtherRelays div:nth-child(odd) .RelayHead:hover {
+#ActiveRelays .RelayHeadMain:hover, #OtherRelays .RelayHeadMain:hover,
+#ActiveRelays div:nth-child(odd) .RelayHeadMain:hover, #OtherRelays div:nth-child(odd) .RelayHeadMain:hover {
     border: lightcoral solid 1mm
 }
