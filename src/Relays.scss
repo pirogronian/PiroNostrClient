@@ -13,8 +13,20 @@
     @extend .OnerowFlexContainer;
 }
 
-.RelayHeadMain > *, .RelayHeadMore > * {
-    margin: 1mm
+.RelayHeadMore label.RelayTrusted {
+    margin-left: auto
+}
+
+.RelayHead * {
+    margin: 1mm;
+}
+
+.RelayHeadMain > div.RelayStatus {
+    margin-left: auto
+}
+
+.RelayHeadMain > a.RelayUrl {
+    margin-left: 1mm
 }
 
 .RelayHead > * {
