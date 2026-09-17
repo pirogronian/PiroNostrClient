@@ -88,7 +88,7 @@ export class Relays extends Module {
         return this.relays[url]
     }
 
-    avaliable(url: string) {
+    exists(url: string) {
         return url in this.relays
     }
 
@@ -110,6 +110,10 @@ export class Relays extends Module {
         return this.create(url)
     }
 
+    destroy(url: string) {
+        delete this.relays[url]
+    }
+
     getPooled(url: string) {
         if (url in this.ndk.pool.relays)
             return this.ndk.pool.getRelay(url)
@@ -124,7 +128,7 @@ export class Relays extends Module {
     }
 
     inPool(url:string) {
-        return url in this.ndk.pool.relays
+        return this.ndk.pool.relays.has(url)
     }
 
     saveKnown(): void {
@@ -178,9 +182,7 @@ export class Relays extends Module {
         let relay: NDKRelay
         if (typeof url == "string") {
             //console.log("Creating relay", url)
-            relay = new NDKRelay(url, undefined, this.ndk)
-            relay.trusted = this.relaySettings(relay).trusted
-            relay.authPolicy = AuthPolicies[this.relaySettings(relay).auth]
+            relay = this.create(url)
         }
         else
             relay = url
@@ -425,18 +427,6 @@ export class Relays extends Module {
 
                 rn.find(".ConnectRelayButton").hide()
                 rn.find(".DisconnectRelayButton").hide()
-                rn.find(".UseRelayButton").hide()
-                rn.find(".DontUseRelayButton").hide()
-                rn.find("button.AddRelayButton").click(() => {
-                    this.add(url, this.autoConnect)
-                    //this.handle()
-                })
-                rn.find(".RemoveRelayButton").hide()
-                rn.find("button.ForgetRelayButton").click(() => {
-                    delete this.known[url]
-                    this.saveKnown()
-                    this.guiRefreshItems()
-                })
         } else {
             let c: string = NDKRelayStatus[relay.status]
             c = c.toLocaleLowerCase()
@@ -472,7 +462,22 @@ export class Relays extends Module {
                 this.saveKnown()
                 //this.handle()
             })
+        }
 
+        if (typeof relay == "string" || !this.inPool(relay.url)) {
+            rn.find(".UseRelayButton").hide()
+            rn.find(".DontUseRelayButton").hide()
+            rn.find(".RemoveRelayButton").hide()
+            rn.find("button.AddRelayButton").click(() => {
+                this.add(url, this.autoConnect)
+                //this.handle()
+            })
+            rn.find("button.ForgetRelayButton").click(() => {
+                delete this.known[url]
+                this.saveKnown()
+                this.guiRefreshItems()
+            })
+        } else {
             rn.find("button.AddRelayButton").hide()
             rn.find("button.ForgetRelayButton").hide()
         }
@@ -605,12 +610,17 @@ export class Relays extends Module {
         const context = this.context
         const list = this.guiOtherContainer()
         const urls = Array.from(this.getPooledUrls())
+        console.debug("Existing relay objects:", this.relays, "End of relays.")
         for(const [url, info] of Object.entries(this.known)) {
             if (!urls.includes(url)) {
+                let relay: NDKRelay|string|undefined = this.relays[url]
+                if (!relay)  relay = url
                 //console.log("Creating item for unused", url)
-                const item = this.guiCreateItem(url)
+                const item = this.guiCreateItem(relay)
                 if (!this.sameContext(context))  return
                 list.append(item)
+                if(typeof relay != "string")
+                    this.guiRefreshItem(relay)
             }
         }
     }
