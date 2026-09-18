@@ -20,13 +20,15 @@
     <button id="UserLoginNIP46Forget">Forget</button>
   </div>
 </div>
-<div id="LoggedUser">
-  <div>Logged user:</div>
-  <dl>
-    <dt>Nick:</dt>
-    <dd id="LoggedUserNick"></dd>
-    <dt>Pubkey:</dt>
-    <dd id="LoggedUserPubkey"></dd>
-  </dl>
+<div id="UserProfile">
+  <table>
+    <tbody>
+      <tr><td>Public key:</td><td id="UserPubkey"></td></tr>
+      <tr><td>Name:</td><td id="UserName"></td></tr>
+      <tr><td>Display name:</td><td id="UserDisplayName"></td></tr>
+      <tr><td>Created at:</td><td id="UserCreatedAt"></td></tr>
+    </tbody>
+  </table>
   <button type="button" id="Logout" style="display: none">Logout</button>
 </div>
+<a id="UserArticlesLink">User's articles</a>

@@ -206,18 +206,22 @@ export class User extends Module {
             if (user)  me = true
         }
         const LoginForm = $("#Login")
-        const UserHTML = $("#LoggedUser")
-        const NickHtml = $("#LoggedUserNick")
-        const PubkeyHtml = $("#LoggedUserPubkey")
+        const upn = $("#UserProfile")
+        const upkn = $("#UserPubkey")
+        const unn = $("#UserName")
+        const udnn = $("#UserDisplayName")
         $("#UserLoginNIP46Cancel").click(() => {
             this.cancelNip46Login()
         })
 
         if (user) {
             LoginForm.hide()
-            UserHTML.show()
-            NickHtml.text(user.profile?.name || user.profile?.displayName || "")
-            PubkeyHtml.text(user.pubkey)
+            upn.show()
+            upkn.text(user.pubkey)
+            unn.text(user.profile?.name)
+            udnn.text(user.profile?.displayName)
+            const ualn = $("#UserArticlesLink")
+            App.get().articles.makeLinkActive(ualn, `?author=${user.pubkey}`)
             if (me) {
                 $("#Logout").show().click(() => {
                     this.logout()
@@ -226,9 +230,9 @@ export class User extends Module {
                 })
             }
         } else {
-            UserHTML.hide()
-            NickHtml.text("")
-            PubkeyHtml.text("")
+            upn.hide()
+            upkn.text("")
+            unn.text("")
             LoginForm.show()
             const selector = this.guiLoginSelector()
             selector.change(() => {
