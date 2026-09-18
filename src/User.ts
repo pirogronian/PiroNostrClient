@@ -2,9 +2,12 @@
 import QRCode from "qrcode";
 import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer, NDKPrivateKeySigner, NDKRelay } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
+
+import { FormattedTime } from "./various.js";
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
 
+import "@/User.scss"
 import UserHTML from "@/User.html?raw"
 import { InstallRelayDebugHandlers } from "./various.js";
 
@@ -223,13 +226,29 @@ export class User extends Module {
 
         if (user) {
             const upkn = $("#UserPubkey")
+            const ca = $("#UserCreatedAt")
             const unn = $("#UserName")
             const udnn = $("#UserDisplayName")
+            const upictn = $("#UserPicture")
+            const ubannern = $("#UserBanner")
+            const ubion = $("#UserBio")
+            const unip05n = $("#UserNip05")
+            const ulud06n = $("#UserLud06")
+            const ulud16n = $("#UserLud16")
+            const uwebn = $("#UserWebsite a")
             LoginForm.hide()
             upn.show()
             upkn.text(user.pubkey)
+            ca.text(FormattedTime(user.profile?.created_at))
             unn.text(user.profile?.name)
             udnn.text(user.profile?.displayName)
+            upictn.find("img").prop("src", user.profile?.picture)
+            ubannern.find("img").prop("src", user.profile?.banner)
+            ubion.text(user.profile?.bio)
+            unip05n.text(user.profile?.nip05)
+            ulud06n.text(user.profile?.lud06)
+            ulud16n.text(user.profile?.lud16)
+            uwebn.text(user.profile?.website).prop("href", user.profile?.website)
             
             const ualn = $("#UserArticlesLink")
             App.get().articles.makeLinkActive(ualn, `?author=${user.pubkey}`)
