@@ -177,7 +177,7 @@ export class Article extends Module {
             img.hide()
         let nick = user?.profile?.name
         if (!nick) nick = "author"
-        App.get().articles.makeLinkActive(o.find("a#AuthorNick"), `?author=${this.event.pubkey}`, nick)
+        App.get().user.makeLinkActive(o.find("a#AuthorNick"), `/${this.event.pubkey}`, nick)
             //o.find("a#AuthorNick").text(user.profile.name).attr("href", LocalUrl(`#/articles?author=${user.pubkey}`))
         o.find("#CreationTime").text(FormattedTime(this.event.created_at))
         App.get().articles.makeLinkActive(o.find("a#ArticleId"), `?id=${this.event.tagValue("d")}`, this.event.tagValue("d"))
