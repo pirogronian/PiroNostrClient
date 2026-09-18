@@ -104,9 +104,9 @@ export class User extends Module {
 
     installNip46DebugHandlers() {
         const liveRelays = Array.from(this.waitingSigner?.rpc.pool.relays)
-        console.debug("Rpc relays:", liveRelays)
+        //console.debug("Rpc relays:", liveRelays)
         liveRelays.forEach((relay) => {
-            console.debug("Rpc relay:", relay)
+            //console.debug("Rpc relay:", relay)
             if (typeof relay == "object" && relay[1] instanceof NDKRelay) {
                 const r = relay[1]
                 r.on("published", (event) => {
