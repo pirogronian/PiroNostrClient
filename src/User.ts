@@ -18,6 +18,7 @@ const CONFIGKEY_NIP46_SECKEY = "nip46.seckey"
 const CONFIGKEY_NIP46_RELAYS = "nip46.relays"
 
 export class User extends Module {
+    foreign: boolean = false
     tmpSigner?: NDKPrivateKeySigner
     waitingSigner?: NDKNip46Signer
     nip46autologin: boolean = false
@@ -37,7 +38,14 @@ export class User extends Module {
         }
         if (npub) {
             user = await this.ndk.fetchUser(npub)
-            if (user && profile) await user.fetchProfile()
+            if (user && profile) {
+                console.debug("Fetch user profile for", user.pubkey)
+                await user.fetchProfile()
+                if (user.profile)
+                    console.debug("Profile loaded.")
+                else
+                    console.warn("Profile not loaded!")
+            }
         }
         return user
     }
@@ -64,6 +72,11 @@ export class User extends Module {
         }
     }
 
+    loginReload() {
+        if (this.isCurrent() && !this.foreign)
+            this.navigate()
+    }
+
     guiLoginSelector() {
         return $("#LoginMethodSelect")
     }
@@ -72,8 +85,7 @@ export class User extends Module {
         const signer = new NDKNip07Signer()
         this.ndk.signer = signer
         this.settings(SIGNER_KEY, NIP07)
-        if (this.isCurrent())
-            this.navigate()
+        this.loginReload()
     }
 
     encodeRelays(relays: string[]): string {
@@ -129,8 +141,7 @@ export class User extends Module {
         p.then((user) => {
             console.debug("Remote signer accepted login as", user.pubkey)
             this.nostrConnectFinalize()
-            if (this.isCurrent())
-                this.navigate()
+            this.loginReload()
         })
     }
 
@@ -167,8 +178,7 @@ export class User extends Module {
             console.log("Auto-login by NIP-46 accepted as", user.pubkey)
             this.ndk.signer = this.waitingSigner
             this.nip46autologin = false
-            if (this.isCurrent())
-                this.navigate()
+            this.loginReload()
         })
         return true
     }
@@ -207,38 +217,36 @@ export class User extends Module {
         }
         const LoginForm = $("#Login")
         const upn = $("#UserProfile")
-        const upkn = $("#UserPubkey")
-        const unn = $("#UserName")
-        const udnn = $("#UserDisplayName")
         $("#UserLoginNIP46Cancel").click(() => {
             this.cancelNip46Login()
         })
 
         if (user) {
+            const upkn = $("#UserPubkey")
+            const unn = $("#UserName")
+            const udnn = $("#UserDisplayName")
             LoginForm.hide()
             upn.show()
             upkn.text(user.pubkey)
             unn.text(user.profile?.name)
             udnn.text(user.profile?.displayName)
+            
             const ualn = $("#UserArticlesLink")
             App.get().articles.makeLinkActive(ualn, `?author=${user.pubkey}`)
             if (me) {
                 $("#Logout").show().click(() => {
                     this.logout()
-                    if (this.isCurrent())
-                        this.navigate()
+                    this.loginReload()
                 })
             }
         } else {
             upn.hide()
-            upkn.text("")
-            unn.text("")
             LoginForm.show()
             const selector = this.guiLoginSelector()
             selector.change(() => {
                 this.login(selector.val())
             })
-            if (this.nip46autologin)
+            if (this.nip46autologin && !this.foreign)
                 this.guiNip46Autologin()
         }
     }
@@ -246,8 +254,11 @@ export class User extends Module {
     async handle(id: string|undefined = undefined) {
         this.mainView().html(UserHTML)
         let user = undefined
-        if (id)
+        if (id) {
             user = await this.get(id)
+            this.foreign = true
+        } else this.foreign = false
+            
         this.show(user)
     }
 
