@@ -12,6 +12,10 @@ const NIP07 = "nip07"
 const NIP46 = "nip46"
 const PIVATEKEY = "privatekey"
 
+const CONFIGKEY_NIP46_PUBKEY = "nip46.pubkey"
+const CONFIGKEY_NIP46_SECKEY = "nip46.seckey"
+const CONFIGKEY_NIP46_RELAYS = "nip46.relays"
+
 export class User extends Module {
     tmpSigner?: NDKPrivateKeySigner
     waitingSigner?: NDKNip46Signer
@@ -43,7 +47,16 @@ export class User extends Module {
                 this.loginNip07()
                 break;
             case NIP46:
-                this.loginNip46Prepare()
+                if (this.restoreNip46Login()) {
+                    const nip46waitui = $("#UserLoginNIP46Restore")
+                    const fb = $("#UserLoginNIP46Forget")
+                    fb.click(() => {
+                        this.forgetNip46Login()
+                        nip46waitui.hide()
+                    })
+                    nip46waitui.show()
+                }
+                else this.loginNip46Prepare()
                 break;
         }
     }
@@ -58,6 +71,10 @@ export class User extends Module {
         this.settings(SIGNER_KEY, NIP07)
         if (this.isCurrent())
             this.navigate()
+    }
+
+    encodeRelays(relays: string[]): string {
+        return relays.map(r => `relay=${encodeURIComponent(r)}`).join("&")
     }
 
     async loginNip46Prepare() {
@@ -78,11 +95,58 @@ export class User extends Module {
         $("#UserLoginNIP46").show()
 
         console.debug("Waiting for remote signer to accept.")
-        const user = await this.waitingSigner.blockUntilReady()
-        console.debug("Remote signer accepted login as", user.pubkey)
+        const p = this.waitingSigner.blockUntilReady()
+        p.then((user) => {
+            console.debug("Remote signer accepted login as", user.pubkey)
+            this.nostrConnectFinalize()
+            if (this.isCurrent())
+                this.navigate()
+        })
+    }
+
+    saveNip46() {
+        this.settings(CONFIGKEY_NIP46_PUBKEY, this.waitingSigner?.pubkey)
+        this.settings(CONFIGKEY_NIP46_SECKEY, this.waitingSigner?.localSigner.privateKey)
+        this.settings(CONFIGKEY_NIP46_RELAYS, JSON.stringify(this.waitingSigner?.relayUrls))
+    }
+
+    restoreNip46Login(): boolean {
+        const pubkey = this.settings(CONFIGKEY_NIP46_PUBKEY)
+        if (!pubkey)  return false
+        const seckey = this.settings(CONFIGKEY_NIP46_SECKEY)
+        if (!seckey)  return false
+        const relaysRaw = this.settings(CONFIGKEY_NIP46_RELAYS)
+        let relays = []
+        if (typeof relaysRaw == "string")
+            relays = JSON.parse(relaysRaw)
+        else return false
+        this.tmpSigner = new NDKPrivateKeySigner(seckey)
+        const token = `bunker://${pubkey}?${this.encodeRelays(relays)}`
+        console.log("Restore session with bunker URI", token)
+        this.waitingSigner = new NDKNip46Signer(this.ndk, token, this.tmpSigner, relays)
+        this.waitingSigner.on("authUrl", (url) => { window.open(url, "auth") })
+        //this.waitingSigner = NDKNip46Signer.bunker(this.ndk, token, this.tmpSigner)
+        const p = this.waitingSigner.user()
+        console.log("Waiting for remote signer to accept restored session.")
+        p.then((user) => {
+            console.log("Auto-login by NIP-46 accepted as", user.pubkey)
+            this.ndk.signer = this.waitingSigner
+            if (this.isCurrent())
+                this.navigate()
+        })
+        return true
+    }
+
+    forgetNip46Login() {
+        this.settings(CONFIGKEY_NIP46_PUBKEY, null)
+        this.settings(CONFIGKEY_NIP46_SECKEY, null)
+        this.settings(CONFIGKEY_NIP46_RELAYS, null)
+    }
+
+    nostrConnectFinalize() {
         this.ndk.signer = this.waitingSigner
-        if (this.isCurrent())
-            this.navigate()
+        this.settings(SIGNER_KEY, NIP46)
+        this.saveNip46()
     }
 
     cancelNip46Login() {
