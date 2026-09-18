@@ -199,7 +199,12 @@ export class User extends Module {
         this.settings(SIGNER_KEY, null)
     }
 
-    show(user: NDKUser|null|undefined) {
+    async show(user: NDKUser|null|undefined = undefined) {
+        let me = false
+        if (!user) {
+            user = await this.get()
+            if (user)  me = true
+        }
         const LoginForm = $("#Login")
         const UserHTML = $("#LoggedUser")
         const NickHtml = $("#LoggedUserNick")
@@ -213,11 +218,13 @@ export class User extends Module {
             UserHTML.show()
             NickHtml.text(user.profile?.name || user.profile?.displayName || "")
             PubkeyHtml.text(user.pubkey)
-            $("#Logout").click(() => {
-                this.logout()
-                if (this.isCurrent())
-                    this.navigate()
-            })
+            if (me) {
+                $("#Logout").show().click(() => {
+                    this.logout()
+                    if (this.isCurrent())
+                        this.navigate()
+                })
+            }
         } else {
             UserHTML.hide()
             NickHtml.text("")
@@ -232,12 +239,12 @@ export class User extends Module {
         }
     }
 
-    handle() {
-        const user = this.get()
+    async handle(id: string|undefined = undefined) {
         this.mainView().html(UserHTML)
-        user.then((u) => {
-            this.show(u)
-        })
+        let user = undefined
+        if (id)
+            user = await this.get(id)
+        this.show(user)
     }
 
     setup() {
@@ -245,6 +252,11 @@ export class User extends Module {
             this.setCurrent()
             this.clearUI()
             this.handle()
+        })
+        this.onRoute('/:id', (match) => {
+            this.setCurrent()
+            this.clearUI()
+            this.handle(match.data.id)
         })
         this.makeLinkActive($("#UserLink"), "")
     }
