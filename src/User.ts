@@ -2,6 +2,7 @@
 import QRCode from "qrcode";
 import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer, NDKPrivateKeySigner, NDKRelay } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
+import type JQuery from "jquery"
 
 import { FormattedTime } from "./various.js";
 import { Module } from "@/Module.js"
@@ -232,7 +233,7 @@ export class User extends Module {
             const upictn = $("#UserPicture")
             const ubannern = $("#UserBanner")
             const ubion = $("#UserBio")
-            const unip05n = $("#UserNip05")
+            const unip05n: JQuery<HTMLElement> = $("#UserNip05")
             const ulud06n = $("#UserLud06")
             const ulud16n = $("#UserLud16")
             const uwebn = $("#UserWebsite a")
@@ -246,6 +247,12 @@ export class User extends Module {
             ubannern.find("img").prop("src", user.profile?.banner)
             ubion.text(user.profile?.bio)
             unip05n.text(user.profile?.nip05)
+            if (user.profile?.nip05) {
+                user.validateNip05(user.profile.nip05).then((valid) => {
+                    if (valid)  unip05n.parent().find(".Valid").show()
+                    else  unip05n.parent().find(".Invalid").show()
+                })
+            }
             ulud06n.text(user.profile?.lud06)
             ulud16n.text(user.profile?.lud16)
             uwebn.text(user.profile?.website).prop("href", user.profile?.website)
