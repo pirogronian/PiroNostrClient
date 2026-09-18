@@ -123,14 +123,20 @@ export class User extends Module {
         this.tmpSigner = new NDKPrivateKeySigner(seckey)
         const token = `bunker://${pubkey}?${this.encodeRelays(relays)}`
         console.log("Restore session with bunker URI", token)
+        const rM = App.get().relays
+        relays.forEach(url => {
+            if (!rM.inPool(url))  console.warn(url, "not in pool!")
+            if (!rM.exists(url) || rM.relays[url]?.connected)  console.warn(url, "not exists or connected!")
+            rM.add(url)
+        });
         this.waitingSigner = new NDKNip46Signer(this.ndk, token, this.tmpSigner, relays)
         this.waitingSigner.on("authUrl", (url) => { window.open(url, "auth") })
         //this.waitingSigner = NDKNip46Signer.bunker(this.ndk, token, this.tmpSigner)
+        this.ndk.signer = this.waitingSigner
         const p = this.waitingSigner.user()
         console.log("Waiting for remote signer to accept restored session.")
         p.then((user) => {
             console.log("Auto-login by NIP-46 accepted as", user.pubkey)
-            this.ndk.signer = this.waitingSigner
             if (this.isCurrent())
                 this.navigate()
         })
