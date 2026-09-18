@@ -1,4 +1,5 @@
 
+import QRCode from "qrcode";
 import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer, NDKPrivateKeySigner } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 import { Module } from "@/Module.js"
@@ -11,7 +12,10 @@ const NIP07 = "nip07"
 const NIP46 = "nip46"
 const PIVATEKEY = "privatekey"
 
-export class User extends Module{
+export class User extends Module {
+    tmpSigner?: NDKPrivateKeySigner
+    waitingSigner?: NDKNip46Signer
+
     async get(npub: string|null|undefined = null, profile: boolean = true) : Promise<NDKUser|null|undefined> {
         let user : NDKUser|null|undefined = null
 
@@ -44,6 +48,10 @@ export class User extends Module{
         }
     }
 
+    guiLoginSelector() {
+        return $("#LoginMethodSelect")
+    }
+
     loginNip07() {
         const signer = new NDKNip07Signer()
         this.ndk.signer = signer
@@ -52,16 +60,37 @@ export class User extends Module{
             this.navigate()
     }
 
-    loginNip46Prepare() {
+    async loginNip46Prepare() {
         console.debug("Nip-46 prepare.")
+        const relays = Array.from(this.ndk.pool.relays.keys())
+        this.tmpSigner = NDKPrivateKeySigner.generate()
+        const tmpUser = await this.tmpSigner.user()
+        this.waitingSigner = new NDKNip46Signer(this.ndk, undefined, this.tmpSigner, relays, { name: App.get().settingsName })
+        //this.waitingSigner = NDKNip46Signer.nostrconnect(this.ndk, relays[0], this.tmpSigner)
+        //this.waitingSigner.relayUrls = relays
 
-        const form = $("#UserLoginNIP46")
-        form.show()
+        const relayParams = relays.map(r => `relay=${encodeURIComponent(r)}`).join("&")
+        const connectionURI = `${this.waitingSigner.nostrConnectUri}&${relayParams}`
+        //const canvas = $("#UserLoginNIP46NostrconnectURI").get(0)
+        const canvas = $("#UserLoginNIP46QrCode").get(0)
+        await QRCode.toCanvas(canvas, connectionURI)
+        $("#UserLoginNIP46NostrconnectURI").text(connectionURI)
+        $("#UserLoginNIP46").show()
+
+        console.debug("Waiting for remote signer to accept.")
+        const user = await this.waitingSigner.blockUntilReady()
+        console.debug("Remote signer accepted login as", user.pubkey)
+        this.ndk.signer = this.waitingSigner
+        if (this.isCurrent())
+            this.navigate()
     }
 
     cancelNip46Login() {
         //this.ndk.signer = undefined
+        delete this.waitingSigner
+        delete this.tmpSigner
         $("#UserLoginNIP46").hide()
+        this.guiLoginSelector().val("")
     }
 
     logout() {
@@ -93,7 +122,7 @@ export class User extends Module{
             NickHtml.text("")
             PubkeyHtml.text("")
             LoginForm.show()
-            const selector = $("#LoginMethodSelect")
+            const selector = this.guiLoginSelector()
             selector.change(() => {
                 this.login(selector.val())
             })
