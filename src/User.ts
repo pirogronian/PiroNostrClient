@@ -227,6 +227,8 @@ export class User extends Module {
 
         if (user) {
             const upkn = $("#UserPubkey")
+            const unpn = $("#UserNPub")
+            const unprn = $("#UserNProfile")
             const ca = $("#UserCreatedAt")
             const unn = $("#UserName")
             const udnn = $("#UserDisplayName")
@@ -240,6 +242,17 @@ export class User extends Module {
             LoginForm.hide()
             upn.show()
             upkn.text(user.pubkey)
+            upkn.click(() => {
+                navigator.clipboard.writeText(user.pubkey)
+            })
+            unpn.text(user.npub)
+            unpn.click(() => {
+                navigator.clipboard.writeText(user.npub)
+            })
+            unprn.text(user.nprofile)
+            unprn.click(() => {
+                navigator.clipboard.writeText(user.nprofile)
+            })
             ca.text(FormattedTime(user.profile?.created_at))
             unn.text(user.profile?.name)
             udnn.text(user.profile?.displayName)
