@@ -252,6 +252,7 @@ export class User extends Module {
             
             const ualn = $("#UserArticlesLink")
             App.get().articles.makeLinkActive(ualn, `?author=${user.pubkey}`)
+            ualn.show()
             if (me) {
                 $("#Logout").show().click(() => {
                     this.logout()
