@@ -33,7 +33,7 @@ export class Articles extends Module {
         if (!this.isCurrent()) return
         let nick = user?.profile?.name
         if (!nick)  nick = "author"
-        this.makeLinkActive(Head.find("a.AuthorNick"), `?author=${event.pubkey}`, nick)
+        App.get().user.makeLinkActive(Head.find("a.AuthorNick"), `/${event.pubkey}`, nick)
         const picture = user?.profile?.picture
         const img = Head.find("img.AuthorImg")
         if (picture)
