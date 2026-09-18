@@ -1,11 +1,12 @@
 
 import QRCode from "qrcode";
-import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer, NDKPrivateKeySigner } from "@nostr-dev-kit/ndk";
+import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer, NDKPrivateKeySigner, NDKRelay } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
 
 import UserHTML from "@/User.html?raw"
+import { InstallRelayDebugHandlers } from "./various.js";
 
 const SIGNER_KEY = "signer"
 const NIP07 = "nip07"
@@ -19,6 +20,7 @@ const CONFIGKEY_NIP46_RELAYS = "nip46.relays"
 export class User extends Module {
     tmpSigner?: NDKPrivateKeySigner
     waitingSigner?: NDKNip46Signer
+    nip46autologin: boolean = false
 
     async get(npub: string|null|undefined = null, profile: boolean = true) : Promise<NDKUser|null|undefined> {
         let user : NDKUser|null|undefined = null
@@ -40,23 +42,24 @@ export class User extends Module {
         return user
     }
 
-    login(method: string|null = null) {
-        if (!method) { method = localStorage.getItem(SIGNER_KEY) }
+    login(method: string|void|null = null) {
+        if (!method) {
+            method = this.settings(SIGNER_KEY)
+            console.debug("Choose login method from stored setting:", method)
+        }
         switch (method) {
             case NIP07:
                 this.loginNip07()
                 break;
             case NIP46:
                 if (this.restoreNip46Login()) {
-                    const nip46waitui = $("#UserLoginNIP46Restore")
-                    const fb = $("#UserLoginNIP46Forget")
-                    fb.click(() => {
-                        this.forgetNip46Login()
-                        nip46waitui.hide()
-                    })
-                    nip46waitui.show()
+                    if (this.isCurrent())
+                        this.guiNip46Autologin()
                 }
-                else this.loginNip46Prepare()
+                else{
+                    if (this.isCurrent())
+                        this.loginNip46Prepare()
+                }
                 break;
         }
     }
@@ -77,12 +80,39 @@ export class User extends Module {
         return relays.map(r => `relay=${encodeURIComponent(r)}`).join("&")
     }
 
+    guiNip46Autologin() {
+        const nip46waitui = $("#UserLoginNIP46Restore")
+        const fb = $("#UserLoginNIP46Forget")
+        fb.click(() => {
+            this.forgetNip46Login()
+            nip46waitui.hide()
+        })
+        nip46waitui.show()
+    }
+
+    installNip46DebugHandlers() {
+        const liveRelays = Array.from(this.waitingSigner?.rpc.pool.relays)
+        console.debug("Rpc relays:", liveRelays)
+        liveRelays.forEach((relay) => {
+            console.debug("Rpc relay:", relay)
+            if (typeof relay == "object" && relay[1] instanceof NDKRelay) {
+                const r = relay[1]
+                r.on("published", (event) => {
+                    if (event.kind == 24133)
+                        console.debug("p tag:", event.tagValue("p"))
+                })
+            }
+                //InstallRelayDebugHandlers(relay[1])
+        })
+    }
+
     async loginNip46Prepare() {
         console.debug("Nip-46 prepare.")
         const relays = Array.from(this.ndk.pool.relays.keys())
         this.tmpSigner = NDKPrivateKeySigner.generate()
         const tmpUser = await this.tmpSigner.user()
         this.waitingSigner = new NDKNip46Signer(this.ndk, undefined, this.tmpSigner, relays, { name: App.get().settingsName })
+        //this.installNip46DebugHandlers()
         //this.waitingSigner = NDKNip46Signer.nostrconnect(this.ndk, relays[0], this.tmpSigner)
         //this.waitingSigner.relayUrls = relays
 
@@ -105,12 +135,16 @@ export class User extends Module {
     }
 
     saveNip46() {
-        this.settings(CONFIGKEY_NIP46_PUBKEY, this.waitingSigner?.pubkey)
+        //console.debug("user pubkey:", this.waitingSigner?.userPubkey)
+        //console.debug("pubkey:", this.waitingSigner?.pubkey)
+        //console.debug("remote user pubkey:", this.waitingSigner?.bunkerPubkey)
+        this.settings(CONFIGKEY_NIP46_PUBKEY, this.waitingSigner?.bunkerPubkey)
         this.settings(CONFIGKEY_NIP46_SECKEY, this.waitingSigner?.localSigner.privateKey)
         this.settings(CONFIGKEY_NIP46_RELAYS, JSON.stringify(this.waitingSigner?.relayUrls))
     }
 
     restoreNip46Login(): boolean {
+        this.nip46autologin = true
         const pubkey = this.settings(CONFIGKEY_NIP46_PUBKEY)
         if (!pubkey)  return false
         const seckey = this.settings(CONFIGKEY_NIP46_SECKEY)
@@ -123,20 +157,16 @@ export class User extends Module {
         this.tmpSigner = new NDKPrivateKeySigner(seckey)
         const token = `bunker://${pubkey}?${this.encodeRelays(relays)}`
         console.log("Restore session with bunker URI", token)
-        const rM = App.get().relays
-        relays.forEach(url => {
-            if (!rM.inPool(url))  console.warn(url, "not in pool!")
-            if (!rM.exists(url) || rM.relays[url]?.connected)  console.warn(url, "not exists or connected!")
-            rM.add(url)
-        });
         this.waitingSigner = new NDKNip46Signer(this.ndk, token, this.tmpSigner, relays)
         this.waitingSigner.on("authUrl", (url) => { window.open(url, "auth") })
         //this.waitingSigner = NDKNip46Signer.bunker(this.ndk, token, this.tmpSigner)
-        this.ndk.signer = this.waitingSigner
+        this.installNip46DebugHandlers()
         const p = this.waitingSigner.user()
         console.log("Waiting for remote signer to accept restored session.")
         p.then((user) => {
             console.log("Auto-login by NIP-46 accepted as", user.pubkey)
+            this.ndk.signer = this.waitingSigner
+            this.nip46autologin = false
             if (this.isCurrent())
                 this.navigate()
         })
@@ -147,6 +177,7 @@ export class User extends Module {
         this.settings(CONFIGKEY_NIP46_PUBKEY, null)
         this.settings(CONFIGKEY_NIP46_SECKEY, null)
         this.settings(CONFIGKEY_NIP46_RELAYS, null)
+        this.nip46autologin = false
     }
 
     nostrConnectFinalize() {
@@ -196,6 +227,8 @@ export class User extends Module {
             selector.change(() => {
                 this.login(selector.val())
             })
+            if (this.nip46autologin)
+                this.guiNip46Autologin()
         }
     }
 

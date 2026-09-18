@@ -3,7 +3,7 @@ import $ from "jquery"
 import type { JQuery } from "jquery"
 import NDK, { NDKRelay, NDKRelayStatus, NDKPool, NDKRelayAuthPolicies } from "@nostr-dev-kit/ndk";
 import type { NDKRelayInformation } from "@nostr-dev-kit/ndk"
-import { safeAsync } from "@/various.js"
+import { safeAsync, InstallRelayDebugHandlers } from "@/various.js"
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
@@ -98,6 +98,7 @@ export class Relays extends Module {
         relay.trusted = settings.trusted
         relay.authPolicy = AuthPolicies[settings.auth]
         this.relays[url] = relay
+        //InstallRelayDebugHandlers(relay)
         return relay
     }
 
