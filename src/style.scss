@@ -28,6 +28,10 @@ a:not(:where(#ArticleView a)):hover, label.active:not(:where(#ArticleView label)
     margin: 0.2cm
 }
 
+table.Info tbody tr:nth-child(odd) {
+    background: lightgrey
+}
+
 #MainNav {
     display: block flow-root;
     margin-bottom: 0.5cm;
