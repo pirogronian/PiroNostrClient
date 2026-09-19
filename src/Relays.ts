@@ -492,6 +492,9 @@ export class Relays extends Module {
         //console.log("Refreshing", relay.url)
         const url = typeof relay == "string" ? relay : relay.url
         const ri = $(`div[relay='${url}']`)
+
+        const crb = ri.find(".ConnectRelayButton")
+        const drb = ri.find(".DisconnectRelayButton")
         if (typeof relay != "string") {
             let c: string = NDKRelayStatus[relay.status]
             c = c.toLocaleLowerCase()
@@ -502,8 +505,6 @@ export class Relays extends Module {
             s.addClass("RelayStatus")
             s.addClass(c)
 
-            const crb = ri.find(".ConnectRelayButton")
-            const drb = ri.find(".DisconnectRelayButton")
             if (relay.connected) {
                 crb.hide()
                 drb.show()
@@ -511,6 +512,9 @@ export class Relays extends Module {
                 crb.show()
                 drb.hide()
             }
+        } else {
+            crb.hide()
+            drb.hide()
         }
 
         const n = ri.find(".New")
