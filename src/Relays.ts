@@ -348,6 +348,19 @@ export class Relays extends Module {
             return img
         }
 
+        function fillUrl(selector: string, value: string|undefined, parent: JQuery<HTMLElement> = rin): JQuery<HTMLElement> {
+            const node = parent.find(selector)
+            const link = $("<a>")
+            if (value) {
+                link.text(value)
+                link.prop("href", value)
+                node.append(link)
+            }
+            else node.parent().remove()
+
+            return link
+        }
+
         //rin.find(".RelayInfoName").text(info.name)
         fillText(".RelayInfoName", info.name)
         //rin.find(".RelayInfoDescription").text(info.description)
@@ -366,8 +379,8 @@ export class Relays extends Module {
         fillText(".RelayInfoNIPs", info.supported_nips)
         fillText(".RelayInfoSoftware", info.software)
         fillText(".RelayInfoVersion", info.version)
-        fillText(".RelayInfoPrivacy", info.privacy_policy)
-        fillText(".RelayInfoService", info.terms_of_service)
+        fillUrl(".RelayInfoPrivacy", info.privacy_policy)
+        fillUrl(".RelayInfoService", info.terms_of_service)
 
         const limits = info.limitation
         const rln = rin.find("table.RelayLimitations")
@@ -397,7 +410,7 @@ export class Relays extends Module {
         fillText(".LanguageTags", info.language_tags)
         fillText(".Tags", info.tags)
         fillText(".PostingPolicy", info.posting_policy)
-        fillText(".PaymentsUrl", info.payments_url)
+        fillUrl(".PaymentsUrl", info.payments_url)
 
         return rin
     }
