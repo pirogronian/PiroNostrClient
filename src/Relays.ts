@@ -307,18 +307,6 @@ export class Relays extends Module {
         }
     }
 
-    onIncreaseConnected() {
-        this.connectedNum += 1
-        if (this.connectedNum > 0)
-            Module.offline = false
-    }
-
-    onDecreaseConnected() {
-        this.connectedNum -= 1
-        if (this.connectedNum <= 0)
-            Module.offline = true
-    }
-
     onConnectedUpdate() {
         if (this.connectedNum <= 0)
             Module.offline = true
