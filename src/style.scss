@@ -32,6 +32,10 @@ table.Info tbody tr:nth-child(odd) {
     background: lightgrey
 }
 
+table.Info td {
+    padding: 1mm
+}
+
 #MainNav {
     display: block flow-root;
     margin-bottom: 0.5cm;
