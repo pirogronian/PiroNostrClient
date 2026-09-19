@@ -1,4 +1,6 @@
 
+@use "Relays";
+
 #UserPicture img, #UserBanner img {
     max-height: 8cm
 }
@@ -19,3 +21,10 @@
     border: red solid 0.5mm
 }
 
+#UserReadRelays {
+    @extend .RelaysList
+}
+
+#UserWriteRelays {
+    @extend .RelaysList
+}

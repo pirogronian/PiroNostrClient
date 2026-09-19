@@ -214,6 +214,19 @@ export class User extends Module {
         this.settings(SIGNER_KEY, null)
     }
 
+    async relays(user: NDKUser|string|undefined = undefined) {
+        let pubkey:string|undefined = ""
+        if (!user)  pubkey = this.user?.pubkey
+        if (typeof user == "object")  pubkey = user.pubkey
+        if (!pubkey)  return
+        const event = await this.ndk.fetchEvent({
+            kinds: [10002],
+            authors: [pubkey]
+        })
+        if (event)
+            return NDKRelayList.from(event)
+    }
+
     async show(user: NDKUser|null|undefined = undefined) {
         const context = this.context
         const LoginForm = $("#Login")
@@ -291,7 +304,22 @@ export class User extends Module {
                 })
             }
 
-            const rl = NDKRelayList.from
+            const rl = await this.relays()
+            //console.debug("User relays:", rl?.readRelayUrls, rl?.writeRelayUrls)
+            const rrn = $("#UserReadRelays")
+            if (typeof rl?.readRelayUrls == "object") {
+                for (const url of rl?.readRelayUrls) {
+                    if (url)
+                        rrn.append(App.get().relays.guiCreateItem(url))
+                }
+            }
+                
+            const wrn = $("#UserWriteRelays")
+            if (typeof rl?.writeRelayUrls == "object")
+                for (const url of rl?.writeRelayUrls) {
+                    if (url)
+                        wrn.append(App.get().relays.guiCreateItem(url))
+            }
         } else {
             upn.hide()
             LoginForm.show()

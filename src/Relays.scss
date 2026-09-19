@@ -55,31 +55,31 @@
     max-height: 2cm
 }
 
-.RelayHead {
+.RelaysList .RelayHead {
     border: white solid 1mm
 }
 
-.RelayHead .connected {
+.RelaysList .RelayHead .connected {
     background-color: green
 }
 
-.RelayHead .disconnected {
+.RelaysList .RelayHead .disconnected {
     background-color: grey
 }
 
-.RelayHead .Challenge, .Notice {
+.RelaysList .RelayHead .Challenge, .Notice {
     display: none
 }
 
-#ActiveRelays div:nth-child(odd) .RelayHead, #OtherRelays div:nth-child(odd) .RelayHead {
+.RelaysList div:nth-child(odd) .RelayHead {
     background: lightgray;
-}
-
-#ActiveRelays div:nth-child(odd) .RelayHead, #OtherRelays div:nth-child(odd) .RelayHead {
     border: lightgrey solid 1mm
 }
 
-#ActiveRelays .RelayHead:hover, #OtherRelays .RelayHead:hover,
-#ActiveRelays div:nth-child(odd) .RelayHead:hover, #OtherRelays div:nth-child(odd) .RelayHead:hover {
+.RelaysList .RelayHead:hover, .RelaysList div:nth-child(odd):hover .RelayHead {
     border: lightcoral solid 1mm
+}
+
+#ActiveRelays, #OtherRelays {
+    @extend .RelaysList
 }
