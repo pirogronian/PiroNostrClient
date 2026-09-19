@@ -296,6 +296,7 @@ export class Relays extends Module {
     }
 
     markUsed(url: string, use: boolean = true) {
+        console.debug("Set bootstrap", use, "for", url)
         if (!this.known[url])
             this.known[url] = new RelaySettings()
         this.known[url].use = use
@@ -375,6 +376,12 @@ export class Relays extends Module {
                 i.toggle()
             })
         })
+        const bn = rn.find("input.RelayBootstrap")
+        bn.change(() => {
+            this.markUsed(url, bn.prop("checked"))
+            this.saveKnown()
+            this.guiRefreshItem(url)
+        })
 
         const tn = rn.find("input.RelayTrusted")
         tn.prop("checked", this.relaySettings(relay)?.trusted)
@@ -402,7 +409,7 @@ export class Relays extends Module {
         rsb.click(() => { sn.toggle() })
         sn.hide()
 
-        rn.find(".UseRelayButton").click(() => {
+        /*rn.find(".UseRelayButton").click(() => {
             this.markUsed(url)
             this.saveKnown()
             this.guiRefreshItem(url)
@@ -411,7 +418,7 @@ export class Relays extends Module {
             this.markUsed(url, false)
             this.saveKnown()
             this.guiRefreshItem(url)
-        })
+        })*/
 
         rn.find(".ConnectRelayButton").click(() => {
             const relay = this.get(url)
@@ -445,7 +452,7 @@ export class Relays extends Module {
     guiRefreshItem(relay: NDKRelay|string|undefined) {
         if (relay == undefined)  return
         const url = typeof relay == "string" ? relay : relay.url
-        console.log("Refreshing", url)
+        //console.log("Refreshing", url)
         if (typeof relay == "string")
             relay = this.relays[url]
         if (!relay)  relay = url
@@ -515,6 +522,9 @@ export class Relays extends Module {
             arb.show()
             frb.show()
         }
+
+        const bn = ri.find("input.RelayBootstrap")
+        bn.prop("checked", this.relaySettings(url).use)
     }
 
     guiCreateMain() {
