@@ -362,25 +362,9 @@ export class Relays extends Module {
 
             return img
         }
-/*
-        function fillUrl(selector: string, value: string|undefined, parent: JQuery<HTMLElement> = rin): JQuery<HTMLElement> {
-            const node = parent.find(selector)
-            const link = $("<a>")
-            if (value) {
-                link.text(value)
-                link.prop("href", value)
-                node.append(link)
-            }
-            else node.parent().remove()
 
-            return link
-        }*/
-
-        //rin.find(".RelayInfoName").text(info.name)
         fill(".RelayInfoName", info.name)
-        //rin.find(".RelayInfoDescription").text(info.description)
         fill(".RelayInfoDescription", info.description)
-        //rin.find(".RelayInfoBanner img").prop("src", info.banner).click(() => {
         fillImg(".RelayInfoBanner", info.banner).click(() => {
             navigator.clipboard.writeText(info.banner ? info.banner : "")
         })
@@ -415,12 +399,6 @@ export class Relays extends Module {
             fill(".DefaultLimit", limits.default_limit, rln)
         } else rln.remove()
 
-        /*const reten = info.retention
-        const rrn = rin.find("table.RelayRetention")
-        if (reten) {
-            fill(".Kinds", reten.)
-        } else rrn.remove()*/
-
         fill(".RelayCountries", info.relay_countries)
         fill(".LanguageTags", info.language_tags)
         fill(".Tags", info.tags)
@@ -431,7 +409,6 @@ export class Relays extends Module {
     }
 
     guiCreateItem(relay: NDKRelay|string, url: string|undefined = undefined) {
-        //const context = this.context
         url = url? url : typeof relay == "string" ? relay : relay.url
 
         const rn = $(RelayHeadHTML)
@@ -440,7 +417,6 @@ export class Relays extends Module {
 
         const p = this.relayInfo(relay)
         p.then((info) => {
-            //if (!this.sameContext(context))  return
             if (!info) {
                 console.debug("No info for", url)
                 return
