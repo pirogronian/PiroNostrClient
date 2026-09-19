@@ -332,7 +332,7 @@ export class Relays extends Module {
             const node = parent.find(selector)
 
             if (value)  node.text(value)
-            else node.parent().hide()
+            else node.parent().remove()
 
             return node
         }
@@ -343,7 +343,7 @@ export class Relays extends Module {
             if (value) {
                 img.prop("src", value)
             }
-            else node.parent().hide()
+            else node.parent().remove()
 
             return img
         }
@@ -372,7 +372,6 @@ export class Relays extends Module {
         const limits = info.limitation
         const rln = rin.find("table.RelayLimitations")
         if (limits) {
-            const rln = rin.find("table.RelayLimitations")
             fillText(".MaxMessageLength", FormattedBytes(limits.max_message_length), rln)
             fillText(".MaxSubscriptions", limits.max_subscriptions, rln)
             fillText(".MaxSubidLength", FormattedBytes(limits.max_subid_length), rln)
@@ -386,7 +385,13 @@ export class Relays extends Module {
             fillText(".CreatedLowerLimit", FormattedTime(limits.created_at_lower_limit), rln)
             fillText(".CreatedUpperLimit", FormattedTime(limits.created_at_upper_limit), rln)
             fillText(".DefaultLimit", limits.default_limit, rln)
-        } else rln.hide()
+        } else rln.remove()
+
+        const reten = info.retention
+        const rrn = rin.find("table.RelayRetention")
+        if (reten) {
+
+        } else rrn.remove()
 
         return rin
     }
