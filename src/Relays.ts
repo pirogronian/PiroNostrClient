@@ -459,10 +459,7 @@ export class Relays extends Module {
         const ri = $(`div[relay='${url}']`)
 
         const cn = ri.find(".Challenge")
-        if (this.challenges[url])
-            cn.text(this.challenges[url]).show()
-        else
-            cn.hide()
+        cn.hide()
         const nn = ri.find(".Notice")
         if (this.notices[url])
             nn.text(this.notices[url]).show()
@@ -472,6 +469,10 @@ export class Relays extends Module {
         const crb = ri.find(".ConnectRelayButton")
         const drb = ri.find(".DisconnectRelayButton")
         if (typeof relay != "string") {
+            if (relay.status == NDKRelayStatus.AUTH_REQUESTED) {
+                if (this.challenges[url])
+                    cn.text(this.challenges[url]).show()
+            }
             let c: string = NDKRelayStatus[relay.status]
             c = c.toLocaleLowerCase()
             //console.debug("Refresh item for", relay.url, c)
