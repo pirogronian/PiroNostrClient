@@ -355,17 +355,6 @@ export class Relays extends Module {
         rn.attr("relay", url)
         rn.find("a").text(url).attr("href", url)
 
-        const cn = rn.find(".Challenge")
-        if (this.challenges[url])
-            cn.text(this.challenges[url]).show()
-        else
-            cn.hide()
-        const nn = rn.find(".Notice")
-        if (this.notices[url])
-            nn.text(this.notices[url]).show()
-        else
-            nn.hide()
-
         const p = this.relayInfo(relay)
         p.then((info) => {
             //if (!this.sameContext(context))  return
@@ -479,6 +468,17 @@ export class Relays extends Module {
             relay = this.relays[url]
         if (!relay)  relay = url
         const ri = $(`div[relay='${url}']`)
+
+        const cn = ri.find(".Challenge")
+        if (this.challenges[url])
+            cn.text(this.challenges[url]).show()
+        else
+            cn.hide()
+        const nn = ri.find(".Notice")
+        if (this.notices[url])
+            nn.text(this.notices[url]).show()
+        else
+            nn.hide()
 
         const crb = ri.find(".ConnectRelayButton")
         const drb = ri.find(".DisconnectRelayButton")
