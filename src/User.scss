@@ -1,9 +1,21 @@
 
-#UserPicture img {
-    max-height: 2cm
+#UserPicture img, #UserBanner img {
+    max-height: 8cm
 }
 
-#UserPubkey:hover, #UserNPub:hover, #UserNProfile:hover {
+#UserPubkey:hover, #UserNPub:hover, #UserNProfile:hover, #UserLud16, #UserNip05 {
     cursor: pointer
+}
+
+.Valid {
+    color: green;
+    padding: 0 1mm 0 1mm;
+    border: green solid 0.5mm
+}
+
+.Invalid {
+    color: red;
+    padding: 0 1mm 0 1mm;
+    border: red solid 0.5mm
 }
 

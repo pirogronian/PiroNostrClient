@@ -262,13 +262,21 @@ export class User extends Module {
             ubion.text(user.profile?.bio)
             unip05n.text(user.profile?.nip05)
             if (user.profile?.nip05) {
+                unip05n.click(() => {
+                    navigator.clipboard.writeText(user.nprofile)
+                })
                 user.validateNip05(user.profile.nip05).then((valid) => {
-                    if (valid)  unip05n.parent().find(".Valid").show()
-                    else  unip05n.parent().find(".Invalid").show()
+                    if (valid) {
+                        unip05n.parent().prop("title", "Valid").find(".Valid").show()
+                    }
+                    else  unip05n.parent().prop("title", "Invalid!").find(".Invalid").show()
                 })
             }
             ulud06n.text(user.profile?.lud06)
             ulud16n.text(user.profile?.lud16)
+            ulud16n.click(() => {
+                navigator.clipboard.writeText(user.profile?.lud16 ? user.profile?.lud16 : "")
+            })
             uwebn.text(user.profile?.website).prop("href", user.profile?.website)
             
             const ualn = $("#UserArticlesLink")
