@@ -51,12 +51,21 @@
     margin: 0
 }
 
+.RelayInfo {
+    background: white;
+}
+
 .RelayInfo * {
     max-height: 2cm
 }
 
-.RelaysList .RelayHead {
-    border: white solid 1mm
+.RelayInfo table {
+    background: white;
+}
+
+.RelaysList .RelayItem {
+    border: white solid 1mm;
+    margin: 0
 }
 
 .RelaysList .RelayHead .connected {
@@ -71,12 +80,12 @@
     display: none
 }
 
-.RelaysList div:nth-child(odd) .RelayHead {
+.RelaysList .RelayItem:nth-child(odd) {
     background: lightgray;
     border: lightgrey solid 1mm
 }
 
-.RelaysList .RelayHead:hover, .RelaysList div:nth-child(odd):hover .RelayHead {
+.RelaysList .RelayItem:hover {
     border: lightcoral solid 1mm
 }
 
