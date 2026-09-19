@@ -359,9 +359,9 @@ export class Relays extends Module {
         return rin
     }
 
-    guiCreateItem(relay: NDKRelay|string) {
+    guiCreateItem(relay: NDKRelay|string, url: string|undefined = undefined) {
         const context = this.context
-        const url = typeof relay == "string" ? relay : relay.url
+        url = url? url : typeof relay == "string" ? relay : relay.url
 
         const rn = $(RelayHeadHTML)
         rn.attr("relay", url)
@@ -626,7 +626,7 @@ export class Relays extends Module {
                 let relay: NDKRelay|string|undefined = this.relays[url]
                 if (!relay)  relay = url
                 //console.log("Creating item for unused", url)
-                const item = this.guiCreateItem(relay)
+                const item = this.guiCreateItem(relay, url)
                 if (!this.sameContext(context))  return
                 list.append(item)
                 this.guiRefreshItem(relay)
