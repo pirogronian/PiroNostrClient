@@ -328,10 +328,25 @@ export class Relays extends Module {
     guiCreateInfo(info: NDKRelayInformation) {
         const rin = $(RelayInfoHTML)
 
-        function fillText(selector: string, value: any, parent: JQuery<HTMLElement> = rin): JQuery<HTMLElement> {
+        function fill(selector: string, value: any, parent: JQuery<HTMLElement> = rin): JQuery<HTMLElement> {
             const node = parent.find(selector)
 
-            if (value)  node.text(value)
+            if (value) {
+                let url
+                if (typeof value == "string") {
+                    try {
+                        url = new URL(value)
+                    } catch {}
+                }
+                if (url) {
+                    const link = $("<a>")
+                    link.text(value)
+                    link.prop("href", value)
+                    node.append(link)        
+                } else
+                    node.text(value)
+                
+            }
             else node.parent().remove()
 
             return node
@@ -347,7 +362,7 @@ export class Relays extends Module {
 
             return img
         }
-
+/*
         function fillUrl(selector: string, value: string|undefined, parent: JQuery<HTMLElement> = rin): JQuery<HTMLElement> {
             const node = parent.find(selector)
             const link = $("<a>")
@@ -359,12 +374,12 @@ export class Relays extends Module {
             else node.parent().remove()
 
             return link
-        }
+        }*/
 
         //rin.find(".RelayInfoName").text(info.name)
-        fillText(".RelayInfoName", info.name)
+        fill(".RelayInfoName", info.name)
         //rin.find(".RelayInfoDescription").text(info.description)
-        fillText(".RelayInfoDescription", info.description)
+        fill(".RelayInfoDescription", info.description)
         //rin.find(".RelayInfoBanner img").prop("src", info.banner).click(() => {
         fillImg(".RelayInfoBanner", info.banner).click(() => {
             navigator.clipboard.writeText(info.banner ? info.banner : "")
@@ -375,42 +390,42 @@ export class Relays extends Module {
         rin.find(".RelayInfoPubkey").text(info.pubkey).click(() => {
             navigator.clipboard.writeText(info.pubkey ? info.pubkey : "")
         })
-        fillText(".RelayInfoContact", info.contact)
-        fillText(".RelayInfoNIPs", info.supported_nips)
-        fillText(".RelayInfoSoftware", info.software)
-        fillText(".RelayInfoVersion", info.version)
-        fillUrl(".RelayInfoPrivacy", info.privacy_policy)
-        fillUrl(".RelayInfoService", info.terms_of_service)
+        fill(".RelayInfoContact", info.contact)
+        fill(".RelayInfoNIPs", info.supported_nips)
+        fill(".RelayInfoSoftware", info.software)
+        fill(".RelayInfoVersion", info.version)
+        fill(".RelayInfoPrivacy", info.privacy_policy)
+        fill(".RelayInfoService", info.terms_of_service)
 
         const limits = info.limitation
         const rln = rin.find("table.RelayLimitations")
         if (limits) {
-            fillText(".MaxMessageLength", FormattedBytes(limits.max_message_length), rln)
-            fillText(".MaxSubscriptions", limits.max_subscriptions, rln)
-            fillText(".MaxSubidLength", FormattedBytes(limits.max_subid_length), rln)
-            fillText(".MaxLimit", limits.max_limit, rln)
-            fillText(".MaxEventTags", limits.max_event_tags, rln)
-            fillText(".MaxContentLength", FormattedBytes(limits.max_content_length), rln)
-            fillText(".MinPOWDifficulty", limits.min_pow_difficulty, rln)
-            fillText(".AuthRequired", limits.auth_required, rln)
-            fillText(".PaymentRequired", limits.payment_required, rln)
-            fillText(".RestrictedWrites", limits.restricted_writes, rln)
-            fillText(".CreatedLowerLimit", FormattedTime(limits.created_at_lower_limit), rln)
-            fillText(".CreatedUpperLimit", FormattedTime(limits.created_at_upper_limit), rln)
-            fillText(".DefaultLimit", limits.default_limit, rln)
+            fill(".MaxMessageLength", FormattedBytes(limits.max_message_length), rln)
+            fill(".MaxSubscriptions", limits.max_subscriptions, rln)
+            fill(".MaxSubidLength", FormattedBytes(limits.max_subid_length), rln)
+            fill(".MaxLimit", limits.max_limit, rln)
+            fill(".MaxEventTags", limits.max_event_tags, rln)
+            fill(".MaxContentLength", FormattedBytes(limits.max_content_length), rln)
+            fill(".MinPOWDifficulty", limits.min_pow_difficulty, rln)
+            fill(".AuthRequired", limits.auth_required, rln)
+            fill(".PaymentRequired", limits.payment_required, rln)
+            fill(".RestrictedWrites", limits.restricted_writes, rln)
+            fill(".CreatedLowerLimit", FormattedTime(limits.created_at_lower_limit), rln)
+            fill(".CreatedUpperLimit", FormattedTime(limits.created_at_upper_limit), rln)
+            fill(".DefaultLimit", limits.default_limit, rln)
         } else rln.remove()
 
         /*const reten = info.retention
         const rrn = rin.find("table.RelayRetention")
         if (reten) {
-            fillText(".Kinds", reten.)
+            fill(".Kinds", reten.)
         } else rrn.remove()*/
 
-        fillText(".RelayCountries", info.relay_countries)
-        fillText(".LanguageTags", info.language_tags)
-        fillText(".Tags", info.tags)
-        fillText(".PostingPolicy", info.posting_policy)
-        fillUrl(".PaymentsUrl", info.payments_url)
+        fill(".RelayCountries", info.relay_countries)
+        fill(".LanguageTags", info.language_tags)
+        fill(".Tags", info.tags)
+        fill(".PostingPolicy", info.posting_policy)
+        fill(".PaymentsUrl", info.payments_url)
 
         return rin
     }
