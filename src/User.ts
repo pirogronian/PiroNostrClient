@@ -214,9 +214,11 @@ export class User extends Module {
     }
 
     async show(user: NDKUser|null|undefined = undefined) {
+        const content = this.context
         let me = false
         if (!user) {
             user = await this.get()
+            if (!this.sameContext(content))  return
             if (user)  me = true
         }
         const LoginForm = $("#Login")
@@ -301,10 +303,13 @@ export class User extends Module {
     }
 
     async handle(id: string|undefined = undefined) {
+        this.newContext()
+        const context = this.context
         this.mainView().html(UserHTML)
         let user = undefined
         if (id) {
             user = await this.get(id)
+            if (!this.sameContext(context))  return
             this.foreign = true
         } else this.foreign = false
             
