@@ -226,6 +226,7 @@ export class User extends Module {
         })
 
         if (user) {
+            if (!user.profile)  this.warning("Loading user profile failed.")
             const upkn = $("#UserPubkey")
             const unpn = $("#UserNPub")
             const unprn = $("#UserNProfile")
