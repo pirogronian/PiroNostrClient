@@ -3,7 +3,7 @@ import $ from "jquery"
 import type { JQuery } from "jquery"
 import NDK, { NDKRelay, NDKRelayStatus, NDKPool, NDKRelayAuthPolicies } from "@nostr-dev-kit/ndk";
 import type { NDKRelayInformation } from "@nostr-dev-kit/ndk"
-import { safeAsync, InstallRelayDebugHandlers } from "@/various.js"
+import { safeAsync, InstallRelayDebugHandlers, MakeLabelActive } from "@/various.js"
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
@@ -536,6 +536,7 @@ export class Relays extends Module {
             this.autoUse = aac.prop("checked")
             this.saveSettings()
         })
+        MakeLabelActive(aac.parent())
         const acc = Head.find("input[name='AutoConnectRelay']")
         if (this.autoConnect)
             acc.prop("checked", true)
@@ -543,6 +544,7 @@ export class Relays extends Module {
             this.autoConnect = acc.prop("checked")
             this.saveSettings()
         })
+        MakeLabelActive(acc.parent())
         Head.find("#AddDefaultsRelays").click(() => {
             this.poolEvent = false
             DEFAULT_RELAYS.forEach((relay) => {

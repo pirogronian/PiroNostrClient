@@ -18,6 +18,15 @@ a:not(:where(#ArticleView a)):hover, label.active:not(:where(#ArticleView label)
     background-color: lightgray;
 }
 
+label.Active {
+    border: white solid 0.5mm
+}
+
+label.Active:hover {
+    background: lightgray;
+    border: grey solid 0.5mm
+}
+
 .hidden { display: none }
 
 /*div:not(#ArticleView div) { display: flow-root; }*/

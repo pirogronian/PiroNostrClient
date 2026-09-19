@@ -1,3 +1,5 @@
+import type { JQuery } from "jquery"
+
 import { NDKEvent, NDKRelay } from "@nostr-dev-kit/ndk";
 
 export async function safeAsync<T>(promise: Promise<T>): Promise<[Error | null, T | null]> {
@@ -50,6 +52,12 @@ export function MakeLinkInner(node, url: string, text: string|null = null) {
         node.text(text)
     return node
     //console.log("Prepared inner link:", node.html())
+}
+
+export function MakeLabelActive(node: JQuery<HTMLElement>) {
+    node.addClass("Active")
+    const input = node.find("input")
+    node.click(() => { input.prop("checked", !input.prop("checked")) })
 }
 
 export function FormattedTime(seconds: number|undefined|null = null) {
