@@ -3,7 +3,7 @@ import $ from "jquery"
 import type { JQuery } from "jquery"
 import NDK, { NDKRelay, NDKRelayStatus, NDKPool, NDKRelayAuthPolicies } from "@nostr-dev-kit/ndk";
 import type { NDKRelayInformation } from "@nostr-dev-kit/ndk"
-import { safeAsync, InstallRelayDebugHandlers, MakeLabelActive } from "@/various.js"
+import { safeAsync, InstallRelayDebugHandlers, MakeLabelActive, FormattedBytes, FormattedTime } from "@/various.js"
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
@@ -327,23 +327,66 @@ export class Relays extends Module {
 
     guiCreateInfo(info: NDKRelayInformation) {
         const rin = $(RelayInfoHTML)
-        rin.find(".RelayInfoName").text(info?.name)
-        rin.find(".RelayInfoDescription").text(info?.description)
-        rin.find(".RelayInfoBanner img").prop("src", info?.banner).click(() => {
-            navigator.clipboard.writeText(info?.banner ? info.banner : "")
+
+        function fillText(selector: string, value: any, parent: JQuery<HTMLElement> = rin): JQuery<HTMLElement> {
+            const node = parent.find(selector)
+
+            if (value)  node.text(value)
+            else node.parent().hide()
+
+            return node
+        }
+
+        function fillImg(selector: string, value: string|undefined, parent: JQuery<HTMLElement> = rin): JQuery<HTMLElement> {
+            const node = parent.find(selector)
+            const img = node.find("img")
+            if (value) {
+                img.prop("src", value)
+            }
+            else node.parent().hide()
+
+            return img
+        }
+
+        //rin.find(".RelayInfoName").text(info.name)
+        fillText(".RelayInfoName", info.name)
+        //rin.find(".RelayInfoDescription").text(info.description)
+        fillText(".RelayInfoDescription", info.description)
+        //rin.find(".RelayInfoBanner img").prop("src", info.banner).click(() => {
+        fillImg(".RelayInfoBanner", info.banner).click(() => {
+            navigator.clipboard.writeText(info.banner ? info.banner : "")
         })
-        rin.find(".RelayInfoIcon img").prop("src", info?.icon).click(() => {
-            navigator.clipboard.writeText(info?.icon ? info.icon : "")
+        fillImg(".RelayInfoIcon", info.icon).click(() => {
+            navigator.clipboard.writeText(info.icon ? info.icon : "")
         })
-        rin.find(".RelayInfoPubkey").text(info?.pubkey).click(() => {
-            navigator.clipboard.writeText(info?.pubkey ? info.pubkey : "")
+        rin.find(".RelayInfoPubkey").text(info.pubkey).click(() => {
+            navigator.clipboard.writeText(info.pubkey ? info.pubkey : "")
         })
-        rin.find(".RelayInfoContact").text(info?.contact)
-        rin.find(".RelayInfoNIPs").text(info?.supported_nips)
-        rin.find(".RelayInfoSoftware").text(info?.software)
-        rin.find(".RelayInfoVersion").text(info?.version)
-        rin.find(".RelayInfoPrivacy").text(info?.privacy_policy)
-        rin.find(".RelayInfoService").text(info?.terms_of_service)
+        fillText(".RelayInfoContact", info.contact)
+        fillText(".RelayInfoNIPs", info.supported_nips)
+        fillText(".RelayInfoSoftware", info.software)
+        fillText(".RelayInfoVersion", info.version)
+        fillText(".RelayInfoPrivacy", info.privacy_policy)
+        fillText(".RelayInfoService", info.terms_of_service)
+
+        const limits = info.limitation
+        const rln = rin.find("table.RelayLimitations")
+        if (limits) {
+            const rln = rin.find("table.RelayLimitations")
+            fillText(".MaxMessageLength", FormattedBytes(limits.max_message_length), rln)
+            fillText(".MaxSubscriptions", limits.max_subscriptions, rln)
+            fillText(".MaxSubidLength", FormattedBytes(limits.max_subid_length), rln)
+            fillText(".MaxLimit", limits.max_limit, rln)
+            fillText(".MaxEventTags", limits.max_event_tags, rln)
+            fillText(".MaxContentLength", FormattedBytes(limits.max_content_length), rln)
+            fillText(".MinPOWDifficulty", limits.min_pow_difficulty, rln)
+            fillText(".AuthRequired", limits.auth_required, rln)
+            fillText(".PaymentRequired", limits.payment_required, rln)
+            fillText(".RestrictedWrites", limits.restricted_writes, rln)
+            fillText(".CreatedLowerLimit", FormattedTime(limits.created_at_lower_limit), rln)
+            fillText(".CreatedUpperLimit", FormattedTime(limits.created_at_upper_limit), rln)
+            fillText(".DefaultLimit", limits.default_limit, rln)
+        } else rln.hide()
 
         return rin
     }

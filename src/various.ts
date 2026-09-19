@@ -70,7 +70,8 @@ export function FormattedTime(seconds: number|undefined|null = null) {
     return t.toLocaleString()
 }
 
-export function FormattedBytes(bytes: number, decimals: number = 2): string {
+export function FormattedBytes(bytes: number|undefined, decimals: number = 2): string {
+    if (bytes == undefined)  return ""
     if (bytes === 0) return "0 B";
 
     const k = 1024; // Użyj 1000 dla jednostek dziesiętnych (KB, MB...) zamiast dwójkowych (KiB, MiB...)
