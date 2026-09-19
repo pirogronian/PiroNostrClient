@@ -478,8 +478,8 @@ export class Relays extends Module {
 
     guiRefreshItem(relay: NDKRelay|string|undefined) {
         if (relay == undefined)  return
-        //console.log("Refreshing", relay.url)
         const url = typeof relay == "string" ? relay : relay.url
+        console.log("Refreshing", url)
         if (typeof relay == "string")
             relay = this.relays[url]
         if (!relay)  relay = url

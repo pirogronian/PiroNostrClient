@@ -309,16 +309,20 @@ export class User extends Module {
             const rrn = $("#UserReadRelays")
             if (typeof rl?.readRelayUrls == "object") {
                 for (const url of rl?.readRelayUrls) {
-                    if (url)
+                    if (url) {
                         rrn.append(App.get().relays.guiCreateItem(url))
+                        App.get().relays.guiRefreshItem(url)
+                    }
                 }
             }
                 
             const wrn = $("#UserWriteRelays")
             if (typeof rl?.writeRelayUrls == "object")
                 for (const url of rl?.writeRelayUrls) {
-                    if (url)
+                    if (url) {
                         wrn.append(App.get().relays.guiCreateItem(url))
+                        App.get().relays.guiRefreshItem(url)
+                    }
             }
         } else {
             upn.hide()
