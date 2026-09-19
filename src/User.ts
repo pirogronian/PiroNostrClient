@@ -1,6 +1,6 @@
 
 import QRCode from "qrcode";
-import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer, NDKPrivateKeySigner, NDKRelay } from "@nostr-dev-kit/ndk";
+import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer, NDKPrivateKeySigner, NDKRelay, NDKRelayList } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 import type JQuery from "jquery"
 
@@ -22,6 +22,7 @@ const CONFIGKEY_NIP46_SECKEY = "nip46.seckey"
 const CONFIGKEY_NIP46_RELAYS = "nip46.relays"
 
 export class User extends Module {
+    user?: NDKUser|null|undefined
     foreign: boolean = false
     tmpSigner?: NDKPrivateKeySigner
     waitingSigner?: NDKNip46Signer
@@ -214,18 +215,17 @@ export class User extends Module {
     }
 
     async show(user: NDKUser|null|undefined = undefined) {
-        const content = this.context
-        let me = false
-        if (!user) {
-            user = await this.get()
-            if (!this.sameContext(content))  return
-            if (user)  me = true
-        }
+        const context = this.context
         const LoginForm = $("#Login")
         const upn = $("#UserProfile")
         $("#UserLoginNIP46Cancel").click(() => {
             this.cancelNip46Login()
         })
+
+        if (!user)  user = this.user
+        let me = false
+        if (user == await this.get())  me = true
+        if (!this.sameContext(context))  return
 
         if (user) {
             if (!user.profile)  this.warning("Loading user profile failed.")
@@ -290,6 +290,8 @@ export class User extends Module {
                     this.loginReload()
                 })
             }
+
+            const rl = NDKRelayList.from
         } else {
             upn.hide()
             LoginForm.show()
@@ -306,14 +308,17 @@ export class User extends Module {
         this.newContext()
         const context = this.context
         this.mainView().html(UserHTML)
-        let user = undefined
         if (id) {
-            user = await this.get(id)
+            this.user = await this.get(id)
             if (!this.sameContext(context))  return
             this.foreign = true
-        } else this.foreign = false
+        } else {
+            this.foreign = false
+            this.user = await this.get()
+            if (!this.sameContext(context))  return
+        }
             
-        this.show(user)
+        this.show()
     }
 
     setup() {
