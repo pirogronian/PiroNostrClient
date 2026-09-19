@@ -620,10 +620,9 @@ export class Relays extends Module {
     guiPopulateOther() {
         const context = this.context
         const list = this.guiOtherContainer()
-        const urls = Array.from(this.getPooledUrls())
         //console.debug("Existing relay objects:", this.relays, "End of relays.")
         for(const [url, info] of Object.entries(this.known)) {
-            if (!urls.includes(url)) {
+            if (!this.inPool(url)) {
                 let relay: NDKRelay|string|undefined = this.relays[url]
                 if (!relay)  relay = url
                 //console.log("Creating item for unused", url)
