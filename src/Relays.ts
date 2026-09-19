@@ -387,11 +387,17 @@ export class Relays extends Module {
             fillText(".DefaultLimit", limits.default_limit, rln)
         } else rln.remove()
 
-        const reten = info.retention
+        /*const reten = info.retention
         const rrn = rin.find("table.RelayRetention")
         if (reten) {
+            fillText(".Kinds", reten.)
+        } else rrn.remove()*/
 
-        } else rrn.remove()
+        fillText(".RelayCountries", info.relay_countries)
+        fillText(".LanguageTags", info.language_tags)
+        fillText(".Tags", info.tags)
+        fillText(".PostingPolicy", info.posting_policy)
+        fillText(".PaymentsUrl", info.payments_url)
 
         return rin
     }
