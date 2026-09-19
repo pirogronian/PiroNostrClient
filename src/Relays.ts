@@ -440,38 +440,33 @@ export class Relays extends Module {
             if (!this.known[url]) {
                 rn.find(".New").show()
             }
-
-            rn.find(".ConnectRelayButton").click(() => {
-                relay.connect()
-            })
-            rn.find(".DisconnectRelayButton").click(() => {
-                relay.disconnect()
-            })
-
-            rn.find("button.RemoveRelayButton").click(() => {
-                console.log("Removing:", url)
-                this.remove(url)
-                this.markUsed(url, false)
-                this.saveKnown()
-                //this.handle()
-            })
         }
 
-        if (typeof relay == "string" || !this.inPool(url)) {
-            rn.find(".RemoveRelayButton").hide()
-            rn.find("button.AddRelayButton").click(() => {
-                this.add(url, this.autoConnect)
-                //this.handle()
-            })
-            rn.find("button.ForgetRelayButton").click(() => {
-                delete this.known[url]
-                this.saveKnown()
-                this.guiReloadItems()
-            })
-        } else {
-            rn.find("button.AddRelayButton").hide()
-            rn.find("button.ForgetRelayButton").hide()
-        }
+        rn.find(".ConnectRelayButton").click(() => {
+            const relay = this.get(url)
+            if (relay)  relay.connect()
+        })
+        rn.find(".DisconnectRelayButton").click(() => {
+            const relay = this.get(url)
+            if (relay)  relay.disconnect()
+        })
+
+        rn.find("button.AddRelayButton").click(() => {
+            this.add(url, this.autoConnect)
+        })
+        rn.find("button.RemoveRelayButton").click(() => {
+            console.log("Removing:", url)
+            this.remove(url)
+            this.markUsed(url, false)
+            this.saveKnown()
+            //this.handle()
+        })
+
+        rn.find("button.ForgetRelayButton").click(() => {
+            delete this.known[url]
+            this.saveKnown()
+            this.guiReloadItems()
+        })
 
         return rn
     }
@@ -524,6 +519,19 @@ export class Relays extends Module {
         else {
             urb.show()
             durb.hide()
+        }
+
+        const arb = ri.find(".AddRelayButton")
+        const rrb = ri.find(".RemoveRelayButton")
+        const frb = ri.find(".ForgetRelayButton")
+        if (this.inPool(url)) {
+            rrb.show()
+            arb.hide()
+            frb.hide()
+        } else {
+            rrb.hide()
+            arb.show()
+            frb.show()
         }
     }
 
