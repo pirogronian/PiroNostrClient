@@ -433,7 +433,7 @@ export class Relays extends Module {
         rn.find(".DontUseRelayButton").click(() => {
             this.markUsed(url, false)
             this.saveKnown()
-            this.guiRefreshItem(relay)
+            this.guiRefreshItem(url)
         })
 
         if (typeof relay == "string") {
@@ -449,7 +449,7 @@ export class Relays extends Module {
             const s = rn.find(".RelayStatus")
             s.text(c)
             s.addClass(c)
-            if (!this.known[relay.url]) {
+            if (!this.known[url]) {
                 rn.find(".New").show()
             }
 
@@ -461,15 +461,15 @@ export class Relays extends Module {
             })
 
             rn.find("button.RemoveRelayButton").click(() => {
-                console.log("Removing:", relay.url)
-                this.remove(relay.url)
-                this.markUsed(relay.url, false)
+                console.log("Removing:", url)
+                this.remove(url)
+                this.markUsed(url, false)
                 this.saveKnown()
                 //this.handle()
             })
         }
 
-        if (typeof relay == "string" || !this.inPool(relay.url)) {
+        if (typeof relay == "string" || !this.inPool(url)) {
             rn.find(".RemoveRelayButton").hide()
             rn.find("button.AddRelayButton").click(() => {
                 this.add(url, this.autoConnect)
@@ -488,9 +488,13 @@ export class Relays extends Module {
         return rn
     }
 
-    guiRefreshItem(relay: NDKRelay|string) {
+    guiRefreshItem(relay: NDKRelay|string|undefined) {
+        if (relay == undefined)  return
         //console.log("Refreshing", relay.url)
         const url = typeof relay == "string" ? relay : relay.url
+        if (typeof relay == "string")
+            relay = this.relays[url]
+        if (! relay)  relay = url
         const ri = $(`div[relay='${url}']`)
 
         const crb = ri.find(".ConnectRelayButton")
@@ -633,7 +637,7 @@ export class Relays extends Module {
                 const item = this.guiCreateItem(relay, url)
                 if (!this.sameContext(context))  return
                 list.append(item)
-                this.guiRefreshItem(relay)
+                this.guiRefreshItem(url)
             }
         }
     }
