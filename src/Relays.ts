@@ -413,24 +413,6 @@ export class Relays extends Module {
             this.guiRefreshItem(url)
         })
 
-        if (typeof relay == "string") {
-            const s = rn.find(".RelayStatus")
-                s.text("unused")
-                s.addClass("unused")
-
-                rn.find(".ConnectRelayButton").hide()
-                rn.find(".DisconnectRelayButton").hide()
-        } else {
-            let c: string = NDKRelayStatus[relay.status]
-            c = c.toLocaleLowerCase()
-            const s = rn.find(".RelayStatus")
-            s.text(c)
-            s.addClass(c)
-            if (!this.known[url]) {
-                rn.find(".New").show()
-            }
-        }
-
         rn.find(".ConnectRelayButton").click(() => {
             const relay = this.get(url)
             if (relay)  relay.connect()
