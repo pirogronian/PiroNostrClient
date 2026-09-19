@@ -348,7 +348,7 @@ export class Relays extends Module {
     }
 
     guiCreateItem(relay: NDKRelay|string, url: string|undefined = undefined) {
-        const context = this.context
+        //const context = this.context
         url = url? url : typeof relay == "string" ? relay : relay.url
 
         const rn = $(RelayHeadHTML)
@@ -368,7 +368,7 @@ export class Relays extends Module {
 
         const p = this.relayInfo(relay)
         p.then((info) => {
-            if (!this.sameContext(context))  return
+            //if (!this.sameContext(context))  return
             if (!info) {
                 console.debug("No info for", url)
                 return
@@ -482,7 +482,7 @@ export class Relays extends Module {
         const url = typeof relay == "string" ? relay : relay.url
         if (typeof relay == "string")
             relay = this.relays[url]
-        if (! relay)  relay = url
+        if (!relay)  relay = url
         const ri = $(`div[relay='${url}']`)
 
         const crb = ri.find(".ConnectRelayButton")
