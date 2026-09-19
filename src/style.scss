@@ -19,12 +19,17 @@ a:not(:where(#ArticleView a)):hover, label.active:not(:where(#ArticleView label)
 }
 
 label.Active {
+    padding: 2mm;
     border: white solid 0.5mm
 }
 
 label.Active:hover {
     background: lightgray;
     border: grey solid 0.5mm
+}
+
+label.Active input {
+    padding: 0
 }
 
 .hidden { display: none }
