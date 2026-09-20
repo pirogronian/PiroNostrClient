@@ -597,13 +597,11 @@ export class Relays extends Module {
         const rrn = ri.find("label.RelayRead")
         const wrn = ri.find("label.RelayWrite")
         if (User.loggedRelays) {
-            //console.debug(url, ": user's relays present.")
             rrn.show()
             wrn.show()
             rrn.find("input").prop("checked", User.isReadRelay(url))
             wrn.find("input").prop("checked", User.isWriteRelay(url))
         } else {
-            //console.debug(url, ": no user's relays.")
             rrn.hide()
             wrn.hide()
         }

@@ -254,7 +254,7 @@ export class User extends Module {
     isReadRelay(relay: NDKRelay|string): boolean {
         const url = typeof relay == "string"? relay : relay.url
         if (this.loggedRelays) {
-            return url in this.loggedRelays.readRelayUrls
+            return this.loggedRelays.readRelayUrls.includes(url)
         }
         return false
     }
@@ -262,7 +262,7 @@ export class User extends Module {
     isWriteRelay(relay: NDKRelay|string): boolean {
         const url = typeof relay == "string"? relay : relay.url
         if (this.loggedRelays) {
-            return url in this.loggedRelays.writeRelayUrls
+            return this.loggedRelays.writeRelayUrls.includes(url)
         }
         return false
     }
