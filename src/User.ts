@@ -156,12 +156,20 @@ export class User extends Module {
         const tmpUser = await this.tmpSigner.user()
         this.waitingSigner = new NDKNip46Signer(this.ndk, undefined, this.tmpSigner, relays, { name: App.get().settingsName })
         //this.installNip46DebugHandlers()
-        //this.waitingSigner = NDKNip46Signer.nostrconnect(this.ndk, relays[0], this.tmpSigner)
-        //this.waitingSigner.relayUrls = relays
+        const bunkerLabel = $("label[for='UserLoginNIP46BunkerUrl']")
+        const bunkerInput = bunkerLabel.find("input")
+        const bunkerButton = bunkerLabel.find("button")
+        bunkerButton.click(() => {
+            const signer = new NDKNip46Signer(this.ndk, bunkerInput.val(), this.tmpSigner, relays, { name: App.get().settingsName })
+            const p = signer.blockUntilReady()
+            p.then((user) => {
+                this.waitingSigner = signer
+                this.onNip46Login(user)
+            })
+        })
 
         const relayParams = relays.map(r => `relay=${encodeURIComponent(r)}`).join("&")
         const connectionURI = `${this.waitingSigner.nostrConnectUri}&${relayParams}`
-        //const canvas = $("#UserLoginNIP46NostrconnectURI").get(0)
         const canvas = $("#UserLoginNIP46QrCode").get(0)
         await QRCode.toCanvas(canvas, connectionURI)
         $("#UserLoginNIP46NostrconnectURI").text(connectionURI)
@@ -170,10 +178,14 @@ export class User extends Module {
         console.debug("Waiting for remote signer to accept.")
         const p = this.waitingSigner.blockUntilReady()
         p.then((user) => {
-            console.debug("Remote signer accepted login as", user.pubkey)
-            this.nostrConnectFinalize()
-            this.loginReload()
+            this.onNip46Login(user)    
         })
+    }
+
+    onNip46Login(user: NDKUser) {
+        console.debug("Remote signer accepted login as", user.pubkey)
+        this.nostrConnectFinalize()
+        this.loginReload()
     }
 
     saveNip46() {
@@ -241,6 +253,7 @@ export class User extends Module {
         this.ndk.signer = undefined
         this.onLogout()
         this.settings(SIGNER_KEY, null)
+        this.forgetNip46Login()
     }
 
     async relays(user: NDKUser|string|null|undefined = undefined) {
