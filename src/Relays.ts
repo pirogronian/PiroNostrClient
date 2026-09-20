@@ -457,9 +457,10 @@ export class Relays extends Module {
             else  User.removeReadRelay(url)
         })
         const wrn = rn.find("input.RelayWrite")
-        rrn.change(() => {
+        wrn.change(() => {
+            //console.debug("Clicked write checkbox.")
             const User = App.get().user
-            const add = rrn.prop("checked")
+            const add = wrn.prop("checked")
             if (add)  User.addWriteRelay(url)
             else  User.removeWriteRelay(url)
         })

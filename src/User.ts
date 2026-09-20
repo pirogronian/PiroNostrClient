@@ -269,9 +269,16 @@ export class User extends Module {
 
     addReadRelay(relay: NDKRelay|string): boolean {
         const url = typeof relay == "string"? relay : relay.url
-        if (this.isReadRelay(url))  return false
+        if (this.isReadRelay(url)) {
+            console.warn("Relay", url, "already in reads.")
+            return false
+        }
         if (this.loggedRelays) {
-            this.loggedRelays.readRelayUrls.push(url)
+            //console.debug("Adding", url, "to read relays.")
+            let list = this.loggedRelays.readRelayUrls
+            list.push(url)
+            this.loggedRelays.readRelayUrls = list
+            if (!this.isReadRelay(url))  console.error("Relay wasn't added properly!")
             this.loggedRelaysChanged = true
             return true
         }
@@ -280,9 +287,17 @@ export class User extends Module {
 
     addWriteRelay(relay: NDKRelay|string): boolean {
         const url = typeof relay == "string"? relay : relay.url
-        if (this.isWriteRelay(url))  return false
+        //console.debug("Adding read relay", url)
+        if (this.isWriteRelay(url)) {
+            console.warn("Relay", url, "already in writes.")
+            return false
+        }
         if (this.loggedRelays) {
-            this.loggedRelays.writeRelayUrls.push(url)
+            //console.debug("Adding", url, "to write relays.")
+            let list = this.loggedRelays.writeRelayUrls
+            list.push(url)
+            this.loggedRelays.writeRelayUrls = list
+            if (!this.isWriteRelay(url))  console.error("Relay wasn't added properly!")
             this.loggedRelaysChanged = true
             return true
         }
@@ -291,10 +306,19 @@ export class User extends Module {
 
     removeReadRelay(relay: NDKRelay|string): boolean {
         const url = typeof relay == "string"? relay : relay.url
+        //console.debug("Removing read relay", url)
         if (this.loggedRelays) {
-            const index = this.loggedRelays.readRelayUrls.indexOf(url)
+            let list = this.loggedRelays.readRelayUrls
+            const index = list.indexOf(url)
             if (index < 0)  return false
-            delete this.loggedRelays.readRelayUrls[index]
+            //console.debug("Removing", url, "from read relays.")
+            delete list[index]
+            const list2 = this.loggedRelays.writeRelayUrls
+            this.loggedRelays.removeTag("r")
+            this.loggedRelays.removeTag("relay")
+            this.loggedRelays.readRelayUrls = list
+            this.loggedRelays.writeRelayUrls = list2
+            if (this.isReadRelay(url))  console.error("Relay wasn't removed properly!")
             this.loggedRelaysChanged = true
             return true
         }
@@ -303,10 +327,19 @@ export class User extends Module {
 
     removeWriteRelay(relay: NDKRelay|string): boolean {
         const url = typeof relay == "string"? relay : relay.url
+        //console.debug("Removing write relay", url)
         if (this.loggedRelays) {
-            const index = this.loggedRelays.writeRelayUrls.indexOf(url)
+            let list = this.loggedRelays.writeRelayUrls
+            const index = list.indexOf(url)
             if (index < 0)  return false
-            delete this.loggedRelays.writeRelayUrls[index]
+            //console.debug("Removing", url, "from write relays.")
+            delete list[index]
+            const list2 = this.loggedRelays.readRelayUrls
+            this.loggedRelays.removeTag("r")
+            this.loggedRelays.removeTag("relay")
+            this.loggedRelays.writeRelayUrls = list
+            this.loggedRelays.readRelayUrls = list2
+            if (this.isWriteRelay(url))  console.error("Relay wasn't removed properly!")
             this.loggedRelaysChanged = true
             return true
         }
