@@ -1,11 +1,12 @@
 
+import { EventEmitter } from "tseep"
 import $ from "jquery"
 import Navigo from "navigo"
 import NDK, { NDKEvent, NDKSubscriptionCacheUsage } from "@nostr-dev-kit/ndk"
 import { Router } from "@/Router.js"
 import { InnerUrl, InnerLink, MakeLinkInner } from "./various.js"
 
-export class Module {
+export class Module extends EventEmitter {
     settingsName!: string
     routingName!: string
     parent: Module|undefined

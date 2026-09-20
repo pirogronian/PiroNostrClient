@@ -98,7 +98,7 @@ export class Relays extends Module {
         relay.trusted = settings.trusted
         relay.authPolicy = AuthPolicies[settings.auth]
         this.relays[url] = relay
-        //InstallRelayDebugHandlers(relay)
+        InstallRelayDebugHandlers(relay)
         return relay
     }
 
@@ -669,6 +669,8 @@ export class Relays extends Module {
             this.reload()
             this.guiReloadItems()
         })
+
+        App.get().user.guiPublishRelaysButtonSetup()
 
         return [Head, arl, orl]
     }

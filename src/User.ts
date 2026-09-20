@@ -12,6 +12,11 @@ import "@/User.scss"
 import UserHTML from "@/User.html?raw"
 import { InstallRelayDebugHandlers } from "./various.js";
 
+const ADD_READ_RELAY_EVENT = "addReadRelay"
+const ADD_WRITE_RELAY_EVENT = "addWriteRelay"
+const REMOVE_READ_RELAY_EVENT = "removeReadRelay"
+const REMOVE_WRITE_RELAY_EVENT = "removeWriteRelay"
+
 const SIGNER_KEY = "signer"
 const NIP07 = "nip07"
 const NIP46 = "nip46"
@@ -269,6 +274,10 @@ export class User extends Module {
 
     addReadRelay(relay: NDKRelay|string): boolean {
         const url = typeof relay == "string"? relay : relay.url
+        if (!url) {
+            console.warn("Trying add a null url!", url)
+            return false
+        }
         if (this.isReadRelay(url)) {
             console.warn("Relay", url, "already in reads.")
             return false
@@ -279,6 +288,7 @@ export class User extends Module {
             list.push(url)
             this.loggedRelays.readRelayUrls = list
             if (!this.isReadRelay(url))  console.error("Relay wasn't added properly!")
+            else this.emit(ADD_READ_RELAY_EVENT, url)
             this.loggedRelaysChanged = true
             return true
         }
@@ -287,6 +297,10 @@ export class User extends Module {
 
     addWriteRelay(relay: NDKRelay|string): boolean {
         const url = typeof relay == "string"? relay : relay.url
+        if (!url) {
+            console.warn("Trying add a null url!", url)
+            return false
+        }
         //console.debug("Adding read relay", url)
         if (this.isWriteRelay(url)) {
             console.warn("Relay", url, "already in writes.")
@@ -298,6 +312,7 @@ export class User extends Module {
             list.push(url)
             this.loggedRelays.writeRelayUrls = list
             if (!this.isWriteRelay(url))  console.error("Relay wasn't added properly!")
+            else this.emit(ADD_WRITE_RELAY_EVENT, url)
             this.loggedRelaysChanged = true
             return true
         }
@@ -312,13 +327,15 @@ export class User extends Module {
             const index = list.indexOf(url)
             if (index < 0)  return false
             //console.debug("Removing", url, "from read relays.")
-            delete list[index]
+            //delete list[index]
+            list.splice(index, 1)
             const list2 = this.loggedRelays.writeRelayUrls
             this.loggedRelays.removeTag("r")
             this.loggedRelays.removeTag("relay")
             this.loggedRelays.readRelayUrls = list
             this.loggedRelays.writeRelayUrls = list2
             if (this.isReadRelay(url))  console.error("Relay wasn't removed properly!")
+            else this.emit(REMOVE_READ_RELAY_EVENT, url)
             this.loggedRelaysChanged = true
             return true
         }
@@ -333,17 +350,52 @@ export class User extends Module {
             const index = list.indexOf(url)
             if (index < 0)  return false
             //console.debug("Removing", url, "from write relays.")
-            delete list[index]
+            //delete list[index]
+            list.splice(index, 1)
             const list2 = this.loggedRelays.readRelayUrls
             this.loggedRelays.removeTag("r")
             this.loggedRelays.removeTag("relay")
             this.loggedRelays.writeRelayUrls = list
             this.loggedRelays.readRelayUrls = list2
             if (this.isWriteRelay(url))  console.error("Relay wasn't removed properly!")
+            else this.emit(REMOVE_WRITE_RELAY_EVENT, url)
             this.loggedRelaysChanged = true
             return true
         }
         return false
+    }
+
+    guiPublishRelaysButton() {
+        return $("#PublishRelaysButton")
+    }
+
+    guiPublishRelaysButtonSetup() {
+        this.guiPublishRelaysButton().click(() => { this.publishRelays() })
+    }
+
+    onUserRelaysChange() {
+        console.debug("User's relays changed.")
+        this.guiPublishRelaysButton().show()
+    }
+
+    publishRelays() {
+        if (!this.loggedRelays) {
+            console.warn("No relays to publish!")
+            return
+        }
+        const id = this.loggedRelays.getEventHash()
+        console.debug("Publishing user's relays with hash", id)
+        const p = this.loggedRelays.publishReplaceable()
+        p.then(() => {
+            console.debug("User's relays published.")
+            this.loggedRelaysChanged = false
+            this.guiPublishRelaysButton().text("Publish user's relays").hide()
+            this.hideMessages()
+        }).catch((error) => {
+            this.guiPublishRelaysButton().text("Unable to publish relays! (push to retry)")
+            this.error(error.msg)
+            console.error(error)
+        })
     }
 
     async show(user: NDKUser|null|undefined = undefined) {
@@ -453,6 +505,7 @@ export class User extends Module {
             if (this.nip46autologin && !this.foreign)
                 this.guiNip46Autologin()
         }
+        this.guiPublishRelaysButtonSetup()
     }
 
     async handle(id: string|undefined = undefined) {
@@ -484,5 +537,10 @@ export class User extends Module {
             this.handle(match.data.id)
         })
         this.makeLinkActive($("#UserLink"), "")
+
+        this.on(ADD_READ_RELAY_EVENT, () => { this.onUserRelaysChange() })
+        this.on(ADD_WRITE_RELAY_EVENT, () => { this.onUserRelaysChange() })
+        this.on(REMOVE_READ_RELAY_EVENT, () => { this.onUserRelaysChange() })
+        this.on(REMOVE_WRITE_RELAY_EVENT, () => { this.onUserRelaysChange() })
     }
 }

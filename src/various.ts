@@ -82,20 +82,22 @@ export function FormattedBytes(bytes: number|undefined, decimals: number = 2): s
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
-export function InstallRelayDebugHandlers(relay: NDKRelay) {
-    relay.on("published", (event) => {
-        console.debug(relay.url, ": published event:", event.rawEvent())
-    })
+export function InstallRelayDebugHandlers(relay: NDKRelay, all: boolean = false) {
+    if (all) {
+        relay.on("published", (event) => {
+            console.debug(relay.url, ": published event:", event.rawEvent())
+        })
+        relay.on("connect", () => {
+            console.debug(relay.url, "connect")
+        })
+        relay.on("ready", () => {
+            console.debug(relay.url, "ready")
+        })
+    }
     relay.on("publish:failed", (event, error) => {
         console.error(relay.url, ": failed to publish", event.rawEvent(), "with error:", error)
     })
     relay.on("auth:failed", (error) => {
         console.error(relay.url, ": failed to auth with error:", error)
-    })
-    relay.on("connect", () => {
-        console.debug(relay.url, "connect")
-    })
-    relay.on("ready", () => {
-        console.debug(relay.url, "ready")
     })
 }
