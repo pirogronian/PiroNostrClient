@@ -26,6 +26,7 @@ export class User extends Module {
     foreign: boolean = false
     loggedUser?: NDKUser|null|undefined
     loggedRelays?: NDKRelayList|null|undefined
+    loggedRelaysChanged: boolean = false
     tmpSigner?: NDKPrivateKeySigner
     waitingSigner?: NDKNip46Signer
     nip46autologin: boolean = false
@@ -60,6 +61,7 @@ export class User extends Module {
     async onLogin() {
         this.loggedUser = await this.get()
         this.loggedRelays = await this.relays(this.loggedUser)
+        this.loggedRelaysChanged = false
     }
 
     onLogout() {
@@ -241,6 +243,68 @@ export class User extends Module {
         })
         if (event)
             return NDKRelayList.from(event)
+    }
+
+    isReadRelay(relay: NDKRelay|string): boolean {
+        const url = typeof relay == "string"? relay : relay.url
+        if (this.loggedRelays) {
+            return url in this.loggedRelays.readRelayUrls
+        }
+        return false
+    }
+
+    isWriteRelay(relay: NDKRelay|string): boolean {
+        const url = typeof relay == "string"? relay : relay.url
+        if (this.loggedRelays) {
+            return url in this.loggedRelays.writeRelayUrls
+        }
+        return false
+    }
+
+    addReadRelay(relay: NDKRelay|string): boolean {
+        const url = typeof relay == "string"? relay : relay.url
+        if (this.isReadRelay(url))  return false
+        if (this.loggedRelays) {
+            this.loggedRelays.readRelayUrls.push(url)
+            this.loggedRelaysChanged = true
+            return true
+        }
+        return false
+    }
+
+    addWriteRelay(relay: NDKRelay|string): boolean {
+        const url = typeof relay == "string"? relay : relay.url
+        if (this.isWriteRelay(url))  return false
+        if (this.loggedRelays) {
+            this.loggedRelays.writeRelayUrls.push(url)
+            this.loggedRelaysChanged = true
+            return true
+        }
+        return false
+    }
+
+    removeReadRelay(relay: NDKRelay|string): boolean {
+        const url = typeof relay == "string"? relay : relay.url
+        if (this.loggedRelays) {
+            const index = this.loggedRelays.readRelayUrls.indexOf(url)
+            if (index < 0)  return false
+            delete this.loggedRelays.readRelayUrls[index]
+            this.loggedRelaysChanged = true
+            return true
+        }
+        return false
+    }
+
+    removeWriteRelay(relay: NDKRelay|string): boolean {
+        const url = typeof relay == "string"? relay : relay.url
+        if (this.loggedRelays) {
+            const index = this.loggedRelays.writeRelayUrls.indexOf(url)
+            if (index < 0)  return false
+            delete this.loggedRelays.writeRelayUrls[index]
+            this.loggedRelaysChanged = true
+            return true
+        }
+        return false
     }
 
     async show(user: NDKUser|null|undefined = undefined) {
