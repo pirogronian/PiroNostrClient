@@ -52,7 +52,13 @@
 }
 
 .RelayInfo {
+    display: flex;
     background: white;
+}
+
+.RelayInfo table.Info {
+    border: grey solid 0.5mm;
+    margin: auto
 }
 
 .RelayInfo * {
