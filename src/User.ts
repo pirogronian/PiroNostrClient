@@ -24,6 +24,8 @@ const CONFIGKEY_NIP46_RELAYS = "nip46.relays"
 export class User extends Module {
     user?: NDKUser|null|undefined
     foreign: boolean = false
+    loggedUser?: NDKUser|null|undefined
+    loggedRelays?: NDKRelayList|null|undefined
     tmpSigner?: NDKPrivateKeySigner
     waitingSigner?: NDKNip46Signer
     nip46autologin: boolean = false
@@ -53,6 +55,16 @@ export class User extends Module {
             }
         }
         return user
+    }
+
+    async onLogin() {
+        this.loggedUser = await this.get()
+        this.loggedRelays = await this.relays(this.loggedUser)
+    }
+
+    onLogout() {
+        this.loggedUser = undefined
+        this.loggedRelays = undefined
     }
 
     login(method: string|void|null = null) {
@@ -90,6 +102,7 @@ export class User extends Module {
         const signer = new NDKNip07Signer()
         this.ndk.signer = signer
         this.settings(SIGNER_KEY, NIP07)
+        this.onLogin()
         this.loginReload()
     }
 
@@ -183,6 +196,7 @@ export class User extends Module {
             console.log("Auto-login by NIP-46 accepted as", user.pubkey)
             this.ndk.signer = this.waitingSigner
             this.nip46autologin = false
+            this.onLogin()
             this.loginReload()
         })
         return true
@@ -197,6 +211,7 @@ export class User extends Module {
 
     nostrConnectFinalize() {
         this.ndk.signer = this.waitingSigner
+        this.onLogin()
         this.settings(SIGNER_KEY, NIP46)
         this.saveNip46()
     }
@@ -211,13 +226,14 @@ export class User extends Module {
 
     logout() {
         this.ndk.signer = undefined
+        this.onLogout()
         this.settings(SIGNER_KEY, null)
     }
 
-    async relays(user: NDKUser|string|undefined = undefined) {
+    async relays(user: NDKUser|string|null|undefined = undefined) {
         let pubkey:string|undefined = ""
         if (!user)  pubkey = this.user?.pubkey
-        if (typeof user == "object")  pubkey = user.pubkey
+        if (user && typeof user == "object")  pubkey = user.pubkey
         if (!pubkey)  return
         const event = await this.ndk.fetchEvent({
             kinds: [10002],
