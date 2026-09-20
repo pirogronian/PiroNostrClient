@@ -685,8 +685,11 @@ export class Relays extends Module {
 
     guiUpdateStats() {
         const inPool = this.ndk.pool.relays.size
-        const statStr = `Connected: ${this.connectedNum}/${inPool}`
-        $("#RelaysStats").text(statStr)
+        const statStr = `Active relays: ${this.connectedNum} connected / ${inPool}`
+        $("#ActiveRelaysStats").text(statStr)
+        const outsidePool = Object.entries(this.known).length - inPool
+        const otherStr = `Other relays: ${outsidePool}`
+        $("#OtherRelaysStats").text(otherStr)
     }
 
     guiPopulateActive() {
