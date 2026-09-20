@@ -449,6 +449,21 @@ export class Relays extends Module {
             this.guiRefreshItem(url)
         })
 
+        const rrn = rn.find("input.RelayRead")
+        rrn.change(() => {
+            const User = App.get().user
+            const add = rrn.prop("checked")
+            if (add)  User.addReadRelay(url)
+            else  User.removeReadRelay(url)
+        })
+        const wrn = rn.find("input.RelayWrite")
+        rrn.change(() => {
+            const User = App.get().user
+            const add = rrn.prop("checked")
+            if (add)  User.addWriteRelay(url)
+            else  User.removeWriteRelay(url)
+        })
+
         const tn = rn.find("input.RelayTrusted")
         tn.prop("checked", this.relaySettings(relay)?.trusted)
         tn.change(() => {
