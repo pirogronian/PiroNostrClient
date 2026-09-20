@@ -160,13 +160,18 @@ export class User extends Module {
         const bunkerInput = bunkerLabel.find("input")
         const bunkerButton = bunkerLabel.find("button")
         bunkerButton.click(() => {
+            this.hideMessages()
             const signer = new NDKNip46Signer(this.ndk, bunkerInput.val(), this.tmpSigner, relays, { name: App.get().settingsName })
             const p = signer.blockUntilReady()
             p.then((user) => {
                 this.waitingSigner = signer
                 this.onNip46Login(user)
+            }).catch((error) => {
+                this.error(error)
+                console.error(error)
             })
         })
+        //bunkerInput.on("input", (e) => { console.log("Input submitted:", e) })
 
         const relayParams = relays.map(r => `relay=${encodeURIComponent(r)}`).join("&")
         const connectionURI = `${this.waitingSigner.nostrConnectUri}&${relayParams}`
@@ -178,7 +183,11 @@ export class User extends Module {
         console.debug("Waiting for remote signer to accept.")
         const p = this.waitingSigner.blockUntilReady()
         p.then((user) => {
+            this.hideMessages()
             this.onNip46Login(user)    
+        }).catch((error) => {
+            this.error(error)
+            console.error(error)
         })
     }
 
