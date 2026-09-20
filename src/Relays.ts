@@ -439,6 +439,9 @@ export class Relays extends Module {
                 i.toggle()
             })
         })
+        MakeLabelActive(rn.find("label.RelayRead"))
+        MakeLabelActive(rn.find("label.RelayWrite"))
+
         const bn = rn.find("input.RelayBootstrap")
         bn.change(() => {
             this.markUsed(url, bn.prop("checked"))
@@ -585,6 +588,17 @@ export class Relays extends Module {
             rrb.hide()
             arb.show()
             frb.show()
+        }
+
+        const User = App.get().user
+        const rrn = ri.find("label.RelayRead")
+        const wrn = ri.find("label.RelayWrite")
+        if (User.loggedRelays) {
+            rrn.find("input").prop("checked", User.isReadRelay(url))
+            wrn.find("input").prop("checked", User.isWriteRelay(url))
+        } else {
+            rrn.hide()
+            wrn.hide()
         }
 
         const bn = ri.find("input.RelayBootstrap")
