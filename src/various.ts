@@ -1,3 +1,4 @@
+import $ from "jquery"
 import type { JQuery } from "jquery"
 
 import { NDKEvent, NDKRelay } from "@nostr-dev-kit/ndk";
@@ -56,8 +57,6 @@ export function MakeLinkInner(node, url: string, text: string|null = null) {
 
 export function MakeLabelActive(node: JQuery<HTMLElement>) {
     node.addClass("Active")
-    const input = node.find("input")
-    node.click(() => { input.prop("checked", !input.prop("checked")) })
 }
 
 export function FormattedTime(seconds: number|undefined|null = null) {
