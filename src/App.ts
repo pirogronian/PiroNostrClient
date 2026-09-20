@@ -1,4 +1,6 @@
 
+
+import $ from "jquery"
 import NDK, { NDKEvent, NDKUser, NDKRelay } from "@nostr-dev-kit/ndk";
 import NDKCacheAdapterDexie from '@nostr-dev-kit/ndk-cache-dexie';
 import { Relays } from '@/Relays.js';
@@ -62,16 +64,13 @@ export class App extends Module {
             },
         })
         
-        this.router.onRoute('/', () => {
-            this.about.navigate()
-        });
-        this.router.onRoute("", (match) => {
+        this.router.onRoute("/", (match) => {
             console.log("Route: default")
             if (match && match.params) {
-                console.log("Index with params.")
-            } else {
-                this.about.navigate()
+                console.log("Index with params:", match.params)
             }
+            this.clearUI()
+            this.guiIndex()
         })
 
         this.router.resolve();
@@ -98,5 +97,21 @@ export class App extends Module {
 
     logout() {
         this.user.logout()
+    }
+
+    guiIndex() {
+        const invite = $("<p>Welcome to PiroNostrClient.</p>")
+        this.mainView().append(invite)
+        if (App.offline) {
+            const offlineWarning = $("<p>")
+            offlineWarning.append("You are offline. Got to the ")
+            offlineWarning.append(this.relays.activeLink("", "Relays Section"))
+            offlineWarning.append(" and add some accessable relays to be connected.")
+            this.mainView().append(offlineWarning)
+        }
+    }
+
+    setup() {
+        this.makeLinkActive($("#HomeLink"), "")
     }
 }
