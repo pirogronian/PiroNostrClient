@@ -296,7 +296,7 @@ export class Relays extends Module {
     }
 
     markUsed(url: string, use: boolean = true) {
-        console.debug("Set bootstrap", use, "for", url)
+        //console.debug("Set bootstrap", use, "for", url)
         if (!this.known[url])
             this.known[url] = new RelaySettings()
         this.known[url].use = use
@@ -338,7 +338,7 @@ export class Relays extends Module {
                         url = new URL(value)
                         if (url.protocol == "git+https:") {
                             const newUrl = url.href.replace(/^git\+http/, "http")
-                            console.log("New url:", newUrl)
+                            //console.log("New url:", newUrl)
                             url = new URL(newUrl)
                         }
                     } catch {}
@@ -475,17 +475,6 @@ export class Relays extends Module {
         rsb.click(() => { sn.toggle() })
         sn.hide()
 
-        /*rn.find(".UseRelayButton").click(() => {
-            this.markUsed(url)
-            this.saveKnown()
-            this.guiRefreshItem(url)
-        })
-        rn.find(".DontUseRelayButton").click(() => {
-            this.markUsed(url, false)
-            this.saveKnown()
-            this.guiRefreshItem(url)
-        })*/
-
         rn.find(".ConnectRelayButton").click(() => {
             const relay = this.get(url)
             if (relay)  relay.connect()
@@ -503,7 +492,6 @@ export class Relays extends Module {
             this.remove(url)
             this.markUsed(url, false)
             this.saveKnown()
-            //this.handle()
         })
 
         rn.find("button.ForgetRelayButton").click(() => {
@@ -594,9 +582,13 @@ export class Relays extends Module {
         const rrn = ri.find("label.RelayRead")
         const wrn = ri.find("label.RelayWrite")
         if (User.loggedRelays) {
+            //console.debug(url, ": user's relays present.")
+            rrn.show()
+            wrn.show()
             rrn.find("input").prop("checked", User.isReadRelay(url))
             wrn.find("input").prop("checked", User.isWriteRelay(url))
         } else {
+            //console.debug(url, ": no user's relays.")
             rrn.hide()
             wrn.hide()
         }
@@ -653,7 +645,7 @@ export class Relays extends Module {
             this.handle()
         })*/
 
-        Head.find("RefreshRelayItems").click(() => {
+        Head.find("#RefreshRelaysItems").click(() => {
             this.guiRefreshItems()
         })
         Head.find("#ReloadRelaysItems").click(() => {
@@ -711,6 +703,7 @@ export class Relays extends Module {
     }
 
     guiRefreshItems() {
+        console.debug("Refreshing all items...")
         for (const [url, setting] of Object.entries(this.known)) {
             this.guiRefreshItem(url)
         }

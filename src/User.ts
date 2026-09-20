@@ -61,12 +61,18 @@ export class User extends Module {
     async onLogin() {
         this.loggedUser = await this.get()
         this.loggedRelays = await this.relays(this.loggedUser)
+        if (this.loggedRelays) {
+            console.debug("User's relays loaded.")
+            App.get().relays.guiRefreshItems()
+        }
+        else console.warn("User's relays not loaded!")
         this.loggedRelaysChanged = false
     }
 
     onLogout() {
         this.loggedUser = undefined
         this.loggedRelays = undefined
+        App.get().relays.guiRefreshItems()
     }
 
     login(method: string|void|null = null) {
@@ -191,7 +197,7 @@ export class User extends Module {
         this.waitingSigner = new NDKNip46Signer(this.ndk, token, this.tmpSigner, relays)
         this.waitingSigner.on("authUrl", (url) => { window.open(url, "auth") })
         //this.waitingSigner = NDKNip46Signer.bunker(this.ndk, token, this.tmpSigner)
-        this.installNip46DebugHandlers()
+        //this.installNip46DebugHandlers()
         const p = this.waitingSigner.user()
         console.log("Waiting for remote signer to accept restored session.")
         p.then((user) => {
