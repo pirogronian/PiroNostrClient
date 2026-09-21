@@ -317,10 +317,19 @@ export class Relays extends Module {
 
     onUpdate() {
         const stats = this.ndk.pool.stats()
-        if (stats.connected > 0)
-            Module.offline = false
+        if (stats.connected > 0) {
+            if (Module.offline) {
+                Module.offline = false
+                this.emit("online")
+            }
+        }
         else
-            Module.offline = true
+        {
+            if (!Module.offline) {
+                Module.offline = true
+                this.emit("offline")
+            }
+        }
         this.connectedNum = stats.connected
         this.guiUpdateStats()
     }

@@ -14,6 +14,8 @@ import { Articles } from '@/Articles.js';
 import { Article } from "@/Article.js";
 import type { CallExpression } from 'typescript/unstable/ast';
 
+//import { LangTools } from "@/LangTools.js"
+
 import "@/style.scss"
 
 export class App extends Module {
@@ -100,6 +102,8 @@ export class App extends Module {
     }
 
     guiIndex() {
+        if (!this.isCurrent())  return
+        this.clearUI()
         const invite = $("<p>Welcome to PiroNostrClient.</p>")
         this.mainView().append(invite)
         if (App.offline) {
@@ -109,9 +113,17 @@ export class App extends Module {
             offlineWarning.append(" and add some accessable relays to be connected.")
             this.mainView().append(offlineWarning)
         }
+
     }
 
     setup() {
+        this.relays.setup()
+        this.user.setup()
+        this.article.setup()
+        this.articles.setup()
+
         this.makeLinkActive($("#HomeLink"), "")
+        this.relays.on("offline", () => { console.debug("Offline!"); this.guiIndex() })
+        this.relays.on("online", () => { console.debug("Online!"); this.guiIndex() })
     }
 }

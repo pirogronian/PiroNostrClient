@@ -39,8 +39,6 @@ export class Module extends EventEmitter {
         } else {
             this.settingsPath = this.settingsName
         }
-
-        this.setup()
     }
 
     settings(name: string, value: string|undefined|null = undefined): string|null|void {
