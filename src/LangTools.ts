@@ -10,9 +10,9 @@ import { TempFile } from "@/TempFile.js"
 
 export namespace LangTools {
     export const Standards = {
-        ISO639_1: "ISO-639-1",
-        ISO639_3: "ISO-639-3",
-        BCP47: "BCP47",
+        ISO639_1: "iso639-1",
+        ISO639_3: "iso639-3",
+        BCP47: "bcp47",
         Auto: null
     } as const;
 
