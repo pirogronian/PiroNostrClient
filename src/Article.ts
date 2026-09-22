@@ -1,7 +1,7 @@
 
 import $ from "jquery"
 
-import NDK, { NDKEvent } from "@nostr-dev-kit/ndk";
+import NDK, { NDKWiki, NDKEvent } from "@nostr-dev-kit/ndk";
 
 import { createJSONEditor, createKeySelection } from "vanilla-jsoneditor";
 
@@ -19,6 +19,7 @@ const USE_LAST_ARTICLE_FORMAT_KEY = "use_last_format"
 
 export class Article extends Module {
     event: NDKEvent|null = null
+    wiki?: NDKWiki
     lastFormat: string = ""
     useLastFormat: string = "1"
 
@@ -40,6 +41,7 @@ export class Article extends Module {
 
     setEvent(event: NDKEvent) {
         this.event = event
+        this.wiki = NDKWiki.from(event)
     }
 
     showRawEvent(target) : void {
@@ -156,7 +158,7 @@ export class Article extends Module {
     }
 
     async show() {
-        if (!this.event) {
+        if (!this.event || !this.wiki) {
             console.log("No event!")
             return
         }
@@ -164,9 +166,9 @@ export class Article extends Module {
         this.restoreSettings()
 
         const o = $(ArticleViewHTML)
-        App.get().articles.makeLinkActive(o.find("h1 a"), `?id=${this.event.tagValue("d")}`, this.event.tagValue("title"))
+        App.get().articles.makeLinkActive(o.find("h1 a"), `?id=${this.wiki.dTag}`, this.wiki.title)
         //o.find("h1 a").text(this.event.tagValue("title")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
-        o.find("#RawArticleContent").text(this.event.content)
+        o.find("#RawArticleContent").text(this.wiki.content)
     
         const user = await App.get().user.get(this.event.pubkey)
         if (!this.isCurrent())  return
@@ -182,7 +184,7 @@ export class Article extends Module {
         o.find("#CreationTime").text(FormattedTime(this.event.created_at))
         App.get().articles.makeLinkActive(o.find("a#ArticleId"), `?id=${this.event.tagValue("d")}`, this.event.tagValue("d"))
         //o.find("a#ArticleId").text(this.event.tagValue("d")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
-        const summary = this.event.tagValue("summary")
+        const summary = this.wiki.summary
         if (summary)
             o.find("#ArticleSummary").text(summary)
         else
