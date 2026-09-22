@@ -105,7 +105,88 @@ export class Article extends Module {
 
     plaintext(content : string) : string {  return content}
 
+    createWikiLinksFromTextNodes(container: HTMLElement): void {
+        const wikiLinkRegex = /\[\[([^\]|]+)(?:|([^\]]+))?\]\]/g;
+
+        // 1. Tworzymy TreeWalker, który szuka wyłącznie węzłów tekstowych
+        const walker = document.createTreeWalker(
+            container,
+            NodeFilter.SHOW_TEXT,
+            {
+                acceptNode(node) {
+                    // Ignorujemy bloki kodu, skrypty i już istniejące linki
+                    const parentTag = node.parentElement?.tagName.toUpperCase();
+                    if (
+                    parentTag === 'CODE' || 
+                    parentTag === 'PRE' || 
+                    parentTag === 'SCRIPT' || 
+                    parentTag === 'STYLE' || 
+                    parentTag === 'A'
+                    ) {
+                    return NodeFilter.FILTER_REJECT;
+                    }
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            }
+        );
+
+        const nodesToProcess: Text[] = [];
+        let currentNode = walker.nextNode();
+
+        // Zbieramy węzły do osobnej tablicy, aby nie modyfikować DOM w trakcie walkingu
+        while (currentNode) {
+            wikiLinkRegex.lastIndex = 0; // Resetujemy stan wyrażenia regularnego
+            if (wikiLinkRegex.test(currentNode.nodeValue || '')) {
+                nodesToProcess.push(currentNode as Text);
+            }
+            currentNode = walker.nextNode();
+        }
+
+        // 2. Podmieniamy zawartość tekstową na elementy <a>
+        for (const textNode of nodesToProcess) {
+            const text = textNode.nodeValue || '';
+            wikiLinkRegex.lastIndex = 0; // Resetujemy stan wyrażenia regularnego
+
+            const fragment = document.createDocumentFragment();
+            let lastIndex = 0;
+            let match: RegExpExecArray | null;
+
+            while ((match = wikiLinkRegex.exec(text)) !== null) {
+                const matchIndex = match.index;
+                let target
+                if (match[1])  target = match[1].trim();
+                else continue;
+                const alias = match[2] ? match[2].trim() : target;
+
+                // Dodajemy tekst przed linkiem
+                if (matchIndex > lastIndex) {
+                    fragment.appendChild(document.createTextNode(text.slice(lastIndex, matchIndex)));
+                }
+
+                // Tworzymy klikalny link <a> dla Wikilink
+                const a = document.createElement('a');
+                App.get().articles.makeLinkActive($(a), `?id=${encodeURIComponent(formatNip54TagD(target))}`, alias)
+                a.dataset.target = target; // Przydatne dla Nostr Wiki (np. szukanie eventu po tagu d)
+
+                fragment.appendChild(a);
+                lastIndex = wikiLinkRegex.lastIndex;
+            }
+
+            // Dodajemy pozostały tekst po ostatnim matchu
+            if (lastIndex < text.length) {
+                fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+            }
+
+            // Zastępujemy stary węzeł tekstowy nowym fragmentem DOM
+            textNode.parentNode?.replaceChild(fragment, textNode);
+        }
+    }
+
     async createNode(format: string|null = null, content: string|null = null) {
+        let testDOM = $("<p>[[The Adventures of Philibert, Captain Virgin]]</p>")
+        this.createWikiLinksFromTextNodes(testDOM.get(0))
+        console.debug("Test wikilinks:", testDOM.html())
+
         if (!content) {
             if (this.event)
                 content = this.event.content
@@ -119,16 +200,19 @@ export class Article extends Module {
                 cnt = await this.asciidoc(content)
                 ret = $(cnt)
                 this.asciidocCreateWikilinks(ret)
+                this.createWikiLinksFromTextNodes($("<div>").append(ret).get(0))
                 break
             case "djot":
                 cnt = this.djot(content)
                 ret = $(cnt)
                 this.djotCreateWikilinksAfter(ret)
+                this.createWikiLinksFromTextNodes($("<div>").append(ret).get(0))
                 break
             default:
                 cnt = this.plaintext(content)
                 ret = $("<div>").text(cnt)
         }
+
         return ret
     }
     
