@@ -183,10 +183,6 @@ export class Article extends Module {
     }
 
     async createNode(format: string|null = null, content: string|null = null) {
-        let testDOM = $("<p>[[The Adventures of Philibert, Captain Virgin]]</p>")
-        this.createWikiLinksFromTextNodes(testDOM.get(0))
-        console.debug("Test wikilinks:", testDOM.html())
-
         if (!content) {
             if (this.event)
                 content = this.event.content
