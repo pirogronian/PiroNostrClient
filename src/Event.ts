@@ -30,18 +30,35 @@ export namespace Event {
         return tags[0][1];
     }
 
-    export function removeTag(this: NDKEvent, tagName: string | string[], marker?: string, options: TagFilterOptions = new TagFilterOptions()): void {
+    export function removeTag(this: NDKEvent, tagName: string | string[], markerOrFlag?: string|boolean, options: TagFilterOptions = new TagFilterOptions()): void {
         const tagNames = Array.isArray(tagName) ? tagName : [tagName];
-        this.tags = this.tags.filter((tag) => {
-            const include = tagNames.includes(tag[0]);
-            let hasMarker
-            if (options.useCase)
-                hasMarker = marker ? tag[options.markerIndex] === marker : true;
-            else
-                hasMarker = marker ? tag[options.markerIndex]?.toLocaleLowerCase() === marker.toLocaleLowerCase() : true;
+        if (typeof markerOrFlag != "boolean") {
+            this.tags = this.tags.filter((tag) => {
+                const include = tagNames.includes(tag[0]);
+                let hasMarker
+                if (options.useCase)
+                    hasMarker = markerOrFlag ? tag[options.markerIndex] === markerOrFlag : true;
+                else
+                    hasMarker = markerOrFlag ? tag[options.markerIndex]?.toLocaleLowerCase() === markerOrFlag.toLocaleLowerCase() : true;
 
-            return !(include && hasMarker);
-        });
+                return !(include && hasMarker);
+            });
+            return
+        } else {
+            this.tags = this.tags.filter((tag) => {
+                const minIndex = tag.length < tagNames.length? tag.length : tagName.length
+                if (markerOrFlag && tag.length != tagNames.length)  return true
+                tag.forEach((value, index) => {
+                    if (options.useCase) {
+                        if (value != tagNames[index])  return true
+                    } else {
+                        if (value.toLocaleLowerCase() != tagNames[index]?.toLocaleLowerCase())  return true
+                    }
+                    if (!markerOrFlag && index == minIndex)  return false
+                })
+                return false
+            })
+        }
     }
 
     export function setup() {
