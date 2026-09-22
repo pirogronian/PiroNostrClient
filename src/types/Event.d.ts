@@ -10,6 +10,6 @@ declare module '@nostr-dev-kit/ndk' {
 
     tagValue(tagName: string, marker?: string, options: TagFilterOptions = new TagFilterOptions()): string | undefined;
 
-    removeTag(tagName: string | string[], marker?: string, options: TagFilterOptions = new TagFilterOptions()): void;
+    removeTag(tagName: string | string[], markerOrFlag?: string|boolean, options: TagFilterOptions = new TagFilterOptions()): void;
   }
 }
