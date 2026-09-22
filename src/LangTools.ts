@@ -33,9 +33,10 @@ export namespace LangTools {
     }
 
     export function detectStandard(code: string) {
+        if (isValid(code, Standards.BCP47))  return Standards.BCP47
         if (isValid(code, Standards.ISO639_1))  return Standards.ISO639_1
         if (isValid(code, Standards.ISO639_3))  return Standards.ISO639_3
-        if (isValid(code, Standards.BCP47))  return Standards.BCP47
+        
         return null
     }
 
