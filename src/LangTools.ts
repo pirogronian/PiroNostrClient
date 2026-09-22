@@ -9,7 +9,7 @@ import ParentLocalesData from "cldr-core/supplemental/parentLocales.json?raw";
 import { TempFile } from "@/TempFile.js"
 
 export namespace LangTools {
-    const Standards = {
+    export const Standards = {
         ISO639_1: "ISO-639-1",
         ISO639_3: "ISO-639-3",
         BCP47: "BCP47",
