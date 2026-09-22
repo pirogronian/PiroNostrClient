@@ -1,6 +1,6 @@
 
 import $ from "jquery"
-import NDK, { NDKEvent, NDKRelay } from "@nostr-dev-kit/ndk";
+import NDK, { NDKEvent, NDKWiki, NDKRelay } from "@nostr-dev-kit/ndk";
 import type { NDKFilter, NDKSubscription } from "@nostr-dev-kit/ndk"
 //import NDKCacheAdapterDexie, { db } from '@nostr-dev-kit/ndk-cache-dexie';
 
@@ -17,7 +17,7 @@ export class Articles extends Module {
     enabled: boolean = false
     resultSize: number = 0
 
-    async articleHead(event: NDKEvent, relay?: NDKRelay) : Promise<void> {
+    async articleHead(event: NDKWiki, relay?: NDKRelay) : Promise<void> {
         if (!event) { console.warn("Articles: no event!"); return}
         //console.debug("Search tags test:", event.getMatchingTags("l", "bcp47", { markerIndex: 2, useCase: false }))
 
@@ -26,8 +26,8 @@ export class Articles extends Module {
         //console.log("Articles enabled")
         const Head = $(ArtHeadHTML)
         const title = Head.find(".ArticleTitle")
-        let TT = event.tagValue("title")
-        if (!TT) { TT = event.tagValue("d") }
+        let TT = event.title
+        if (!TT) { TT = event.dTag }
         //console.log(`Received article "${TT}"`)
         title.text(TT)
         App.get().article.makeLinkActive(title, `/${event.encode()}`)
@@ -46,7 +46,7 @@ export class Articles extends Module {
         Head.find("div.CreationTime").text(FormattedTime(event.created_at))
         Head.find("div.Relay").text(event?.relay?.url)
 
-        Head.find("div.Summary").text(event.tagValue("summary"))
+        Head.find("div.Summary").text(event.summary)
         const topics = EventTagValues(event, "t")
         const HeadTopics = Head.find(".Topics")
         topics.forEach((topic) => {
@@ -190,7 +190,7 @@ export class Articles extends Module {
         //this.loadFinder(params.author, params.id)
         const err = this.load(params,
             (event: NDKEvent, relay?: NDKRelay) => {
-                this.articleHead(event, relay)
+                this.articleHead(NDKWiki.from(event), relay)
             })
         if (err) {
             this.error(err.message)
