@@ -18,6 +18,9 @@ export class Articles extends Module {
     resultSize: number = 0
 
     async articleHead(event: NDKEvent, relay?: NDKRelay) : Promise<void> {
+        if (!event) { console.warn("Articles: no event!"); return}
+        //console.debug("Search tags test:", event.getMatchingTags("l", "bcp47", { markerIndex: 2, useCase: false }))
+
         //console.log("Article event:", event)
         if (!this.isCurrent()) return
         //console.log("Articles enabled")
@@ -25,7 +28,7 @@ export class Articles extends Module {
         const title = Head.find(".ArticleTitle")
         let TT = event.tagValue("title")
         if (!TT) { TT = event.tagValue("d") }
-        console.log(`Received article "${TT}"`)
+        //console.log(`Received article "${TT}"`)
         title.text(TT)
         App.get().article.makeLinkActive(title, `/${event.encode()}`)
 

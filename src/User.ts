@@ -42,7 +42,7 @@ export class User extends Module {
         if (!npub && this.ndk.signer) {
             user = await this.ndk.signer.user()
             if (user && profile) {
-                console.log("Fetching profile...")
+                //console.log("Fetching profile...")
                 await user.fetchProfile({
                     closeOnEose: true,
                     groupable: false
@@ -52,12 +52,12 @@ export class User extends Module {
         if (npub) {
             user = await this.ndk.fetchUser(npub)
             if (user && profile) {
-                console.debug("Fetch user profile for", user.pubkey)
+                //console.debug("Fetch user profile for", user.pubkey)
                 await user.fetchProfile()
-                if (user.profile)
+                /*if (user.profile)
                     console.debug("Profile loaded.")
                 else
-                    console.warn("Profile not loaded!")
+                    console.warn("Profile not loaded!")*/
             }
         }
         return user
@@ -67,7 +67,7 @@ export class User extends Module {
         this.loggedUser = await this.get()
         this.loggedRelays = await this.relays(this.loggedUser)
         if (this.loggedRelays) {
-            console.debug("User's relays loaded.")
+            //console.debug("User's relays loaded.")
             App.get().relays.guiRefreshItems()
         }
         else console.warn("User's relays not loaded!")
