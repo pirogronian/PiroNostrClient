@@ -4,7 +4,7 @@ import NDK, { NDKEvent, NDKWiki, NDKRelay } from "@nostr-dev-kit/ndk";
 import type { NDKFilter, NDKSubscription } from "@nostr-dev-kit/ndk"
 //import NDKCacheAdapterDexie, { db } from '@nostr-dev-kit/ndk-cache-dexie';
 
-import { safeAsync, EventTagValues, FormattedTime, FormattedBytes } from "@/various.js";
+import { safeAsync, EventTagValues, FormattedTime, FormattedBytes, formatNip54TagD } from "@/various.js";
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
@@ -135,7 +135,7 @@ export class Articles extends Module {
             }
             if (params.id) {
                 console.log("Subscribing with id:", params.id)
-                filter['#d'] = [ params.id ]
+                filter['#d'] = [ decodeURIComponent(formatNip54TagD(params.id)) ]
             }
             for (const [key, value] of Object.entries(params)) {
                 if (key.length == 1) {
