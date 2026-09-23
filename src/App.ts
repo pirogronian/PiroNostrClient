@@ -117,6 +117,7 @@ export class App extends Module {
     }
 
     setup() {
+        this.about.setup()
         this.relays.setup()
         this.user.setup()
         this.article.setup()
