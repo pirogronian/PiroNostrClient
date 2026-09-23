@@ -35,7 +35,12 @@
 
 #ArticleInfo > dl > div {
     display: grid;
-    padding: 0 2mm 0 2mm
+    padding: 0 2mm 0 2mm;
+    border: lightgrey 0.5mm solid
+}
+
+#ArticleInfo > dl > div:hover {
+    border: grey 0.5mm solid
 }
 
 #ArticleInfo dl div dd {
@@ -44,4 +49,8 @@
 
 #ArticleInfo dl div dt {
     grid-column: 2
+}
+
+#ArticleInfo dl div dt > * {
+    padding-left: 2mm
 }
