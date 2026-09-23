@@ -13,6 +13,9 @@ import { App } from "@/App.js"
 import { safeAsync, formatNip54TagD, EventTagValues, FormattedTime, FormattedBytes } from "@/various.js";
 
 import ArticleViewHTML from '@/Article.html?raw';
+import ArticleInfoHTML from "@/ArticleInfo.html?raw"
+
+import "@/Article.scss"
 
 const LAST_ARTICLE_FORMAT_KEY = "last_format"
 const USE_LAST_ARTICLE_FORMAT_KEY = "use_last_format"
@@ -302,7 +305,50 @@ export class Article extends Module {
         })
         o.find("#EventSize").text(`Size: ${FormattedBytes(this.eventSize(this.event), 2)}`)
 
+        const info = $(ArticleInfoHTML)
+        const titleDOM = info.find("#Title")
+        if (this.wiki.title)  titleDOM.text(this.wiki.title)
+        else titleDOM.parent().parent().remove()
+
+        const idDOM = info.find("#ArticleId")
+        const id = this.wiki.dTag
+        App.get().articles.makeLinkActive(idDOM, `?id=${id}`, id)
+
+        const authPictDOM = info.find("#AuthorPicture")
+        const picture = user?.profile?.picture
+        if (picture)  authPictDOM.prop("src", picture)
+        
+        const nickDOM = info.find("#AuthorNick")
+        const nick2 = user?.profile?.name ? user.profile.name : "[author]"
+        App.get().articles.makeLinkActive(nickDOM, `?author=${this.wiki.pubkey}`, nick2)
+
+        info.find("#ArticlePublishedAt").text(FormattedTime(this.wiki.published_at))
+        info.find("#EventCreatedAt").text(FormattedTime(this.wiki.created_at))
+
+        const relaysDOM = info.find("#ArticleRelays")
+        relaysDOM.append($("<div>").text(this.event?.relay?.url))
+        this.event.onRelays.forEach((relay) => {
+            if (relay.url != this.event?.relay?.url)
+                relaysDOM.append($("<div>").text(relay.url))
+        })
+
+        const topicsDOM = info.find("#ArticleTopics")
+        topics.forEach((topic) => {
+            const a = $(App.get().articles.activeLink(`?t=${topic}"`, topic))
+            topicsDOM.append(a)
+        })
+        if (!topics.length)
+            topicsDOM.parent().hide()
+
+        const clientDOM = info.find("#ArticleClient")
+        if (client)  clientDOM.text(client)
+        else clientDOM.parent().hide()
+
+        info.find("#EventSize").text(FormattedBytes(this.eventSize(this.event), 2))
+
         this.mainView(o)
+
+        this.mainView().find("#ArticleInfo").append(info)
 
         const ulf = $("input[name='uselastformat']")
         if (this.useLastFormat)  ulf.prop("checked", "checked")

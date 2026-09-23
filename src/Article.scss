@@ -1,0 +1,39 @@
+
+@use "style";
+
+#ArticleInfo {
+    @extend .Frame;
+    @extend .MultirowFlexContainer;
+    padding: 0;
+}
+
+#ArticleInfo * {
+    padding: 0;
+    margin: 0
+}
+
+#ArticleInfo img {
+    max-height: 2cm;
+}
+
+#ArticleInfo dd {
+    margin: 0
+}
+
+#ArticleInfo dt {
+    @extend .MultirowFlexContainer;
+    padding-left: 5mm
+}
+
+#ArticleInfo dl div {
+    display: grid;
+    padding: 0 2mm 0 2mm
+}
+
+#ArticleInfo dl div dd {
+    grid-column: 1
+}
+
+#ArticleInfo dl div dt {
+    grid-column: 2
+}
