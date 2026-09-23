@@ -1,7 +1,7 @@
 
 @use "style";
 
-#ArticleInfo {
+#ArticleInfo dl {
     @extend .Frame;
     @extend .MultirowFlexContainer;
     padding: 0;
@@ -16,16 +16,24 @@
     max-height: 2cm;
 }
 
+#ArticleInfo h1 {
+    font-size: 5mm
+}
+
 #ArticleInfo dd {
     margin: 0
 }
 
 #ArticleInfo dt {
     @extend .MultirowFlexContainer;
-    padding-left: 5mm
+    padding-left: 2mm;
 }
 
-#ArticleInfo dl div {
+#ArticleInfo dt * {
+    margin: 0
+}
+
+#ArticleInfo > dl > div {
     display: grid;
     padding: 0 2mm 0 2mm
 }

@@ -325,6 +325,14 @@ export class Article extends Module {
         info.find("#ArticlePublishedAt").text(FormattedTime(this.wiki.published_at))
         info.find("#EventCreatedAt").text(FormattedTime(this.wiki.created_at))
 
+        const sumDOM = info.find("#ArticleSummary")
+        if (summary)  sumDOM.text(summary)
+        else sumDOM.parent().hide()
+
+        const originDOM = info.find("#OriginLink")
+        if (origin)  this.makeLinkActive(originDOM, `/${origin}`)
+        else originDOM.parent().hide()
+
         const relaysDOM = info.find("#ArticleRelays")
         relaysDOM.append($("<div>").text(this.event?.relay?.url))
         this.event.onRelays.forEach((relay) => {
