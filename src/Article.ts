@@ -274,6 +274,14 @@ export class Article extends Module {
         const id = this.wiki.dTag
         App.get().articles.makeLinkActive(idDOM, `?id=${id}`, id)
 
+        const imgDOM = info.find("#ArticlePicture")
+        if (this.wiki.image)  imgDOM.prop("src", this.wiki.image)
+        else imgDOM.parent().parent().hide()
+
+        const urlDOM = info.find("#ArticleUrl")
+        if (this.wiki.url)  imgDOM.prop("href", this.wiki.url)
+        else imgDOM.parent().parent().hide()
+
         const authPictDOM = info.find("#AuthorPicture")
         const picture = user?.profile?.picture
         if (picture)  authPictDOM.prop("src", picture)

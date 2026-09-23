@@ -43,12 +43,17 @@
     border: grey 0.5mm solid
 }
 
-#ArticleInfo dl div dd {
-    grid-column: 1
+#ArticleInfo > dl > div > dt {
+    grid-column: 1;
 }
 
-#ArticleInfo dl div dt {
-    grid-column: 2
+#ArticleInfo > dl > div > dd {
+    grid-column: 2;
+    padding-left: 2mm
+}
+
+#ArticleInfo > dl > div > dd > * {
+    padding-left: 2mm
 }
 
 #ArticleInfo dl div dt > * {
