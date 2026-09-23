@@ -249,61 +249,21 @@ export class Article extends Module {
         this.restoreSettings()
 
         const o = $(ArticleViewHTML)
-        App.get().articles.makeLinkActive(o.find("h1 a"), `?id=${this.wiki.dTag}`, this.wiki.title)
-        //o.find("h1 a").text(this.event.tagValue("title")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
-        o.find("#RawArticleContent").text(this.wiki.content)
     
         const user = await App.get().user.get(this.event.pubkey)
         if (!this.isCurrent())  return
-        const img = o.find("img#AuthorPicture")
-        if (user && user.profile && user.profile.picture)
-            img.attr("src", user.profile.picture)
-        else
-            img.hide()
+        
         let nick = user?.profile?.name
         if (!nick) nick = "author"
-        App.get().user.makeLinkActive(o.find("a#AuthorNick"), `/${this.event.pubkey}`, nick)
-            //o.find("a#AuthorNick").text(user.profile.name).attr("href", LocalUrl(`#/articles?author=${user.pubkey}`))
-        o.find("#CreationTime").text(FormattedTime(this.event.created_at))
-        App.get().articles.makeLinkActive(o.find("a#ArticleId"), `?id=${this.event.tagValue("d")}`, this.event.tagValue("d"))
-        //o.find("a#ArticleId").text(this.event.tagValue("d")).attr("href", LocalUrl(`#/articles?id=${this.event.tagValue("d")}`))
         const summary = this.wiki.summary
-        if (summary)
-            o.find("#ArticleSummary").text(summary)
-        else
-            o.find("#ArticleSummary").hide()
 
         let origin = this.event.tagValue("e")
         if (!origin) origin = this.event.tagValue("a")
         const oa = o.find("#OriginLink")
-        if (origin) {
-            this.makeLinkActive(oa, `/${origin}`)
-        } else oa.hide()
 
         const topics = EventTagValues(this.event, "t")
-        const HeadTopics = o.find("#ArticleTopics")
-        topics.forEach(function(topic) {
-            const a = $(App.get().articles.activeLink(`?t=${topic}"`, topic))
-            HeadTopics.append(a)
-        })
-        if (!topics.length)
-            HeadTopics.hide()
 
-        const co = o.find("#ArticleClient")
         const client = this.event.tagValue("client")
-        if (client) co.text(`Created with: ${client}`)
-        else co.hide()
-
-        const rc = o.find("#ArticleRelays")
-        let rn = $("<div>").text(this.event?.relay?.url)
-        rc.append(rn)
-        this.event.onRelays.forEach((relay) => {
-            if (relay.url == this.event?.relay?.url)
-                return
-            let rn = $("<div>").text(relay.url)
-            rc.append(rn)
-        })
-        o.find("#EventSize").text(`Size: ${FormattedBytes(this.eventSize(this.event), 2)}`)
 
         const info = $(ArticleInfoHTML)
         const titleDOM = info.find("#Title")
