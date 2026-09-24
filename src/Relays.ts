@@ -507,7 +507,7 @@ export class Relays extends Module {
             if (!i.length) {
                 console.warn("Found info but widget is absent for", url)
             }
-            console.debug(i)
+            //console.debug(i)
             rn.append(i)
             i.hide()
             rn.find(".RelayInfoButton").prop("disabled", false).click(() => {
