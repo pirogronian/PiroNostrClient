@@ -396,7 +396,7 @@ export class Relays extends Module {
         fill(".RelayInfoService", info.terms_of_service)
 
         const limits = info.limitation
-        const rln = rin.find("table.RelayLimitations")
+        const rln = rin.find("dl.RelayLimitations")
         if (limits) {
             fill(".MaxMessageLength", FormattedBytes(limits.max_message_length), rln)
             fill(".MaxSubscriptions", limits.max_subscriptions, rln)
