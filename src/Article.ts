@@ -10,7 +10,7 @@ import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
-import { safeAsync, formatNip54TagD, EventTagValues, FormattedTime, FormattedBytes } from "@/various.js";
+import { safeAsync, formatNip54TagD, EventTagValues, FormattedTime, FormattedBytes, MakeLabelActive } from "@/various.js";
 
 import { LangTools } from "./LangTools.js";
 import { CreateLangEvent } from "./LangEvent.js";
@@ -408,6 +408,17 @@ export class Article extends Module {
         $("input[name='ViewType']").change(SwitchView)
 
         this.showRawEvent($('#RawEventView').get(0))
+
+        const facheck = $("label[for='FollowAuthor']")
+        MakeLabelActive(facheck)
+        const facheckinp = facheck.find("input")
+        const arts = App.get().articles
+        facheckinp.prop("checked", arts.followAuthor)
+        facheckinp.change(() => {
+            //console.debug("Switch follow author to", facheckinp.prop("checked"))
+            arts.followAuthor = facheckinp.prop("checked")
+            arts.saveSettings()
+        })
     }
 
 

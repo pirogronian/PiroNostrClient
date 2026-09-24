@@ -1,6 +1,6 @@
 
 import $ from "jquery"
-import NDK, { NDKEvent, NDKWiki, NDKRelay } from "@nostr-dev-kit/ndk";
+import NDK, { NDKEvent, NDKWiki, NDKRelay, nip19 } from "@nostr-dev-kit/ndk";
 import type { NDKFilter, NDKSubscription } from "@nostr-dev-kit/ndk"
 //import NDKCacheAdapterDexie, { db } from '@nostr-dev-kit/ndk-cache-dexie';
 
@@ -12,10 +12,21 @@ import FinderHTML from "@/Finder.html?raw"
 import FinderTagInputs from "@/FinderTagInputs.html?raw"
 import ArtHeadHTML from "@/ArticleHeader.html?raw"
 
+const FOLLOW_AUTHOR_SETTING_KEY = "FollowAuthor"
+
 export class Articles extends Module {
     sub: NDKSubscription | null = null
     enabled: boolean = false
     resultSize: number = 0
+    followAuthor: boolean = false
+
+    loadSettings() {
+        this.followAuthor = this.settings(FOLLOW_AUTHOR_SETTING_KEY) == "1"? true : false
+    }
+
+    saveSettings() {
+        this.settings(FOLLOW_AUTHOR_SETTING_KEY, this.followAuthor? "1" : null)
+    }
 
     async articleHead(event: NDKWiki, relay?: NDKRelay) : Promise<void> {
         if (!event) { console.warn("Articles: no event!"); return}
@@ -129,6 +140,7 @@ export class Articles extends Module {
             //'#d': [pageSlug]
         };
         if (params) {
+            if (params.followAuthor && this.followAuthor)  params.author = params.followAuthor
             if (params.author) {
                 console.log("Subscribing with author:", params.author)
                 filter.authors = [ params.author ]
@@ -187,10 +199,19 @@ export class Articles extends Module {
     }
 
     handle(params: object) {
+        this.newContext()
+        const context = this.context
+        this.loadSettings()
         //this.loadFinder(params.author, params.id)
         const err = this.load(params,
             (event: NDKEvent, relay?: NDKRelay) => {
-                this.articleHead(NDKWiki.from(event), relay)
+                if (!this.sameContext(context))  return
+                //console.debug(this.followAuthor, params.followAuthor)
+                if (this.followAuthor && params.followAuthor) {
+                    console.debug("Following the author...")
+                    const addr = nip19.naddrEncode(event)
+                    App.get().article.navigate(`/${addr}`)
+                } else this.articleHead(NDKWiki.from(event), relay)
             })
         if (err) {
             this.error(err.message)
@@ -215,5 +236,6 @@ export class Articles extends Module {
                 this.handle(match?.params)
         })
         this.makeLinkActive($("#SearchLink"), "")
+        this.loadSettings()
     }
 }
