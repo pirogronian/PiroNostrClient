@@ -279,6 +279,7 @@ export class Article extends Module {
         const oa = o.find("#OriginLink")
 
         const topics = EventTagValues(this.event, "t")
+        const cats = EventTagValues(this.event, "c")
 
         const client = this.event.tagValue("client")
 
@@ -329,6 +330,14 @@ export class Article extends Module {
         const originDOM = info.find("#OriginLink")
         if (origin)  this.makeLinkActive(originDOM, `/${origin}`)
         else originDOM.parent().hide()
+
+        const catsDOM = info.find("#ArticleCategories")
+        cats.forEach((cat) => {
+            const a = $(App.get().articles.activeLink(`?c=${cat}"`, cat))
+            catsDOM.append(a)
+        })
+        if (!cats.length)
+            catsDOM.parent().hide()
 
         const topicsDOM = info.find("#ArticleTopics")
         topics.forEach((topic) => {
