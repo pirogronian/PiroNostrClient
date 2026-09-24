@@ -19,6 +19,7 @@ export class Articles extends Module {
     enabled: boolean = false
     resultSize: number = 0
     followAuthor: boolean = false
+    author: string|undefined
 
     loadSettings() {
         this.followAuthor = this.settings(FOLLOW_AUTHOR_SETTING_KEY) == "1"? true : false
@@ -140,7 +141,6 @@ export class Articles extends Module {
             //'#d': [pageSlug]
         };
         if (params) {
-            if (params.followAuthor && this.followAuthor)  params.author = params.followAuthor
             if (params.author) {
                 console.log("Subscribing with author:", params.author)
                 filter.authors = [ params.author ]
@@ -203,11 +203,12 @@ export class Articles extends Module {
         const context = this.context
         this.loadSettings()
         //this.loadFinder(params.author, params.id)
+        this.author = params.followAuthor
         const err = this.load(params,
             (event: NDKEvent, relay?: NDKRelay) => {
                 if (!this.sameContext(context))  return
                 //console.debug(this.followAuthor, params.followAuthor)
-                if (this.followAuthor && params.followAuthor) {
+                if (this.followAuthor && event.pubkey == this.author) {
                     console.debug("Following the author...")
                     const addr = nip19.naddrEncode(event)
                     App.get().article.navigate(`/${addr}`)
