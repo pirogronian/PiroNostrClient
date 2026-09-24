@@ -93,6 +93,7 @@ export class App extends Module {
             href = root.concat(hstr).concat(qstr)
             console.log("Fixing url to:", href)
         }
+        if (!window.location.hash)  href = href.concat("#/")
         window.history.replaceState(null, href, href)
     }
 
