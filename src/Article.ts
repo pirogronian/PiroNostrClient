@@ -283,9 +283,11 @@ export class Article extends Module {
         const client = this.event.tagValue("client")
 
         const info = $(ArticleInfoHTML)
-        const titleDOM = info.find("#Title")
+        const titlekDOM = info.find("dt#Title")
+        const titleDOM = info.find("dd#Title")
         if (this.wiki.title)  titleDOM.text(this.wiki.title)
-        else titleDOM.parent().parent().remove()
+        else titleDOM.remove()
+        titlekDOM.remove()
 
         const idDOM = info.find("#ArticleId")
         const id = this.wiki.dTag
