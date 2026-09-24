@@ -419,6 +419,62 @@ export class Relays extends Module {
         fill(".PostingPolicy", info.posting_policy)
         fill(".PaymentsUrl", info.payments_url)
 
+        const rfn = rin.find(".RelayFees")
+        const fees = info.fees
+        let keep = false
+        if (fees) {
+            const adms = fees.admission
+            if (adms && adms.length > 0) {
+                keep = true
+                rfn.append($("<h2>").text("Admission:"))
+                
+                adms?.forEach((adm) => {
+                    const div = $("<div>")
+                    div.append($("<dt>").text("Amount:"))
+                    div.append($("<dd>").text(adm.amount))
+                    div.append($("<dt>").text("Unit:"))
+                    div.append($("<dd>").text(adm.unit))
+                    rfn.append(div)
+                })
+            }
+            
+            const subs = fees.subscription
+            if (subs && subs.length > 0) {
+                keep = true
+                rfn.append($("<h2>").text("Subscription:"))
+                
+                subs.forEach((sub) => {
+                    const div = $("<div>")
+                    div.append($("<dt>").text("Amount:"))
+                    div.append($("<dd>").text(sub.amount))
+                    div.append($("<dt>").text("Unit:"))
+                    div.append($("<dd>").text(sub.unit))
+                    div.append($("<dt>").text("Period:"))
+                    div.append($("<dd>").text(sub.period))
+                    rfn.append(div)
+                })
+            }
+
+            const pubs = fees.publication
+            if (pubs && pubs.length > 0) {
+                keep = true
+                rfn.append($("<h2>").text("Publication:"))
+                
+                pubs.forEach((pub) => {
+                    const div = $("<div>")
+                    div.append($("<dt>").text("Kinds:"))
+                    div.append($("<dd>").text(pub.kinds))
+                    div.append($("<dt>").text("Amount:"))
+                    div.append($("<dd>").text(pub.amount))
+                    div.append($("<dt>").text("Unit:"))
+                    div.append($("<dd>").text(pub.unit))
+                    rfn.append(div)
+                })
+            }
+
+            if (!keep)  rfn.parent().parent().remove()
+        } else rfn.parent().parent().remove()
+
         return rin
     }
 

@@ -12,6 +12,9 @@ import { Module } from "@/Module.js"
 import { App } from "@/App.js"
 import { safeAsync, formatNip54TagD, EventTagValues, FormattedTime, FormattedBytes } from "@/various.js";
 
+import { LangTools } from "./LangTools.js";
+import { CreateLangEvent } from "./LangEvent.js";
+
 import ArticleViewHTML from '@/Article.html?raw';
 import ArticleInfoHTML from "@/ArticleInfo.html?raw"
 
@@ -303,6 +306,16 @@ export class Article extends Module {
         const nickDOM = info.find("#AuthorNick")
         const nick2 = user?.profile?.name ? user.profile.name : "[author]"
         App.get().articles.makeLinkActive(nickDOM, `?author=${this.wiki.pubkey}`, nick2)
+
+        const lDOM = info.find("#ArticleLangs")
+        const le = CreateLangEvent(this.event)
+        const langs = le.getLanguages()
+        if (langs.length > 0) {
+            langs.forEach((lang) => {
+                if (!lang.code) return
+                lDOM.append($("<div>").text(LangTools.humanFormat(lang.code, lang.standard)))
+            })
+        } else lDOM.parent().hide()
 
         info.find("#ArticlePublishedAt").text(FormattedTime(this.wiki.published_at))
         info.find("#EventCreatedAt").text(FormattedTime(this.wiki.created_at))

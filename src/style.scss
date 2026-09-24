@@ -46,6 +46,35 @@ table.Info tbody tr:nth-child(odd) {
     background: lightgrey
 }
 
+dl.Info > div {
+    display: grid;
+    grid-template-columns: max-content;
+}
+
+dl.Info > div > dt {
+    grid-column: 1;
+    padding: 1mm;
+    margin: 0.5mm
+}
+
+dl.Info > div > dt:nth-child(4n+3) {
+    background: lightgray;
+}
+
+dl.Info > div > dd {
+    grid-column: 2;
+    padding: 1mm;
+    margin: 0.5mm
+}
+
+dl.Info > div > dd:nth-child(4n+4) {
+    background: lightgray;
+}
+
+/*dl.Info > div:nth-child(odd) {
+    background: lightgray;
+}*/
+
 table.Info td {
     padding: 1mm
 }

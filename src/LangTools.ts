@@ -7,16 +7,36 @@ import LikelySubtagsData from 'cldr-core/supplemental/likelySubtags.json?raw';
 import ParentLocalesData from "cldr-core/supplemental/parentLocales.json?raw";
 
 import { TempFile } from "@/TempFile.js"
+import type { UUID } from "crypto";
 
 export namespace LangTools {
     export const Standards = {
         ISO639_1: "iso639-1",
         ISO639_3: "iso639-3",
         BCP47: "bcp47",
-        Auto: null
+        Auto: undefined
     } as const;
 
     export type StandardType = (typeof Standards)[keyof typeof Standards];
+
+    export function isStandardName(name: string|undefined): name is StandardType {
+        return Object.values(Standards).includes(name as StandardType)
+    }
+
+    export class Language {
+        code: string|undefined
+        standard: string|undefined
+        constructor(code: string, standard: string|undefined = undefined) {
+            this.code = code
+            this.standard = standard
+        }
+
+        valid(): boolean {
+            if (!this.code)  return false
+            if (!isStandardName(this.standard))  return false
+            return isValid(this.code, this.standard)
+        }
+    }
 
     export function isValid(code: string, standard: StandardType): boolean {
         switch(standard) {
@@ -28,7 +48,7 @@ export namespace LangTools {
                 const schema = bcp47parse(code.trim())
                 return !!schema.language
             default:
-                return false
+                return !!detectStandard(code)
         }
     }
 
