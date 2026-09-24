@@ -307,7 +307,7 @@ export class Article extends Module {
         
         const nickDOM = info.find("#AuthorNick")
         const nick2 = user?.profile?.name ? user.profile.name : "[author]"
-        App.get().articles.makeLinkActive(nickDOM, `?author=${this.wiki.pubkey}`, nick2)
+        App.get().user.makeLinkActive(nickDOM, `/${this.wiki.pubkey}`, nick2)
 
         const lDOM = info.find("#ArticleLangs")
         const le = CreateLangEvent(this.event)
