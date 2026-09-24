@@ -70,12 +70,13 @@ export class Article extends Module {
     }
 
     asciidocCreateWikilinks(element) {
-        element.find("a").each(function() {
+        element.find("a").each(() => {
             const node = $(this)
             //console.log("Checking node:", $(this).prop("nodeName"))
             //console.log("Checking node:", node)
             if (!node.text() && !node.attr("href")) {
-                App.get().articles.makeLinkActive(node, `?id=${formatNip54TagD(node.attr("id"))}`, node.attr("id"))
+                App.get().articles.makeLinkActive(node, 
+                    `?id=${formatNip54TagD(node.attr("id"))}&followAuthor=${this.event?.pubkey}`, node.attr("id"))
                 /*node.text(node.attr("id"))
                 node.attr("href", InnerUrl(`/articles?id=${formatNip54TagD(node.attr("id"))}`))*/
             }
@@ -96,12 +97,12 @@ export class Article extends Module {
     }
 
     djotCreateWikilinksAfter(element) {
-        element.find("a").each(function() {
-            const node = $(this)
+        element.find("a").each((node) => {
             //console.log("Checking node:", $(this).prop("nodeName"))
             //console.log("Checking node:", node)
             if (!node.attr("href")) {
-                App.get().articles.makeLinkActive(node, `?id=${formatNip54TagD(node.text())}`)
+                App.get().articles.makeLinkActive(node,
+                    `?id=${formatNip54TagD(node.text())}&followAuthor=${this.event?.pubkey}`)
                 //node.attr("href", LocalUrl(`#/articles?id=${formatNip54TagD(node.text())}`))
             }
         })
@@ -175,7 +176,8 @@ export class Article extends Module {
 
                 // Tworzymy klikalny link <a> dla Wikilink
                 const a = document.createElement('a');
-                App.get().articles.makeLinkActive($(a), `?id=${encodeURIComponent(formatNip54TagD(target))}`, alias)
+                App.get().articles.makeLinkActive($(a),
+                    `?id=${encodeURIComponent(formatNip54TagD(target))}&followAuthor=${this.event?.pubkey}`, alias)
                 a.dataset.target = target; // Przydatne dla Nostr Wiki (np. szukanie eventu po tagu d)
 
                 fragment.appendChild(a);
