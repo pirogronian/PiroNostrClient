@@ -338,7 +338,8 @@ export class Relays extends Module {
         const rin = $(RelayInfoHTML)
 
         function fill(selector: string, value: any, parent: JQuery<HTMLElement> = rin): JQuery<HTMLElement> {
-            const node = parent.find(selector)
+            const knode = parent.find("dt".concat(selector))
+            const vnode = parent.find("dd".concat(selector))
 
             if (value) {
                 let url
@@ -356,23 +357,30 @@ export class Relays extends Module {
                     const link = $("<a>")
                     link.text(value)
                     link.prop("href", url.href)
-                    node.append(link)        
+                    vnode.append(link)        
                 } else
-                    node.text(value)
+                    vnode.text(value)
                 
             }
-            else node.parent().remove()
+            else {
+                knode.remove()
+                vnode.remove()
+            }
 
-            return node
+            return vnode
         }
 
         function fillImg(selector: string, value: string|undefined, parent: JQuery<HTMLElement> = rin): JQuery<HTMLElement> {
-            const node = parent.find(selector)
-            const img = node.find("img")
+            const knode = parent.find("dt".concat(selector))
+            const vnode = parent.find("dd".concat(selector))
+            const img = vnode.find("img")
             if (value) {
                 img.prop("src", value)
             }
-            else node.parent().remove()
+            else {
+                knode.remove()
+                vnode.remove()
+            }
 
             return img
         }
@@ -385,7 +393,7 @@ export class Relays extends Module {
         fillImg(".RelayInfoIcon", info.icon).click(() => {
             navigator.clipboard.writeText(info.icon ? info.icon : "")
         })
-        rin.find(".RelayInfoPubkey").text(info.pubkey).click(() => {
+        rin.find("dd.RelayInfoPubkey").text(info.pubkey).click(() => {
             navigator.clipboard.writeText(info.pubkey ? info.pubkey : "")
         })
         fill(".RelayInfoContact", info.contact)
@@ -396,21 +404,22 @@ export class Relays extends Module {
         fill(".RelayInfoService", info.terms_of_service)
 
         const limits = info.limitation
-        const rln = rin.find("dl.RelayLimitations")
+        const rln = rin.find(".RelayLimitations")
+        const rldln = rln.find("dl.Info")
         if (limits) {
-            fill(".MaxMessageLength", FormattedBytes(limits.max_message_length), rln)
-            fill(".MaxSubscriptions", limits.max_subscriptions, rln)
-            fill(".MaxSubidLength", FormattedBytes(limits.max_subid_length), rln)
-            fill(".MaxLimit", limits.max_limit, rln)
-            fill(".MaxEventTags", limits.max_event_tags, rln)
-            fill(".MaxContentLength", FormattedBytes(limits.max_content_length), rln)
-            fill(".MinPOWDifficulty", limits.min_pow_difficulty, rln)
-            fill(".AuthRequired", limits.auth_required, rln)
-            fill(".PaymentRequired", limits.payment_required, rln)
-            fill(".RestrictedWrites", limits.restricted_writes, rln)
-            fill(".CreatedLowerLimit", FormattedTime(limits.created_at_lower_limit), rln)
-            fill(".CreatedUpperLimit", FormattedTime(limits.created_at_upper_limit), rln)
-            fill(".DefaultLimit", limits.default_limit, rln)
+            fill(".MaxMessageLength", FormattedBytes(limits.max_message_length), rldln)
+            fill(".MaxSubscriptions", limits.max_subscriptions, rldln)
+            fill(".MaxSubidLength", FormattedBytes(limits.max_subid_length), rldln)
+            fill(".MaxLimit", limits.max_limit, rldln)
+            fill(".MaxEventTags", limits.max_event_tags, rldln)
+            fill(".MaxContentLength", FormattedBytes(limits.max_content_length), rldln)
+            fill(".MinPOWDifficulty", limits.min_pow_difficulty, rldln)
+            fill(".AuthRequired", limits.auth_required, rldln)
+            fill(".PaymentRequired", limits.payment_required, rldln)
+            fill(".RestrictedWrites", limits.restricted_writes, rldln)
+            fill(".CreatedLowerLimit", FormattedTime(limits.created_at_lower_limit), rldln)
+            fill(".CreatedUpperLimit", FormattedTime(limits.created_at_upper_limit), rldln)
+            fill(".DefaultLimit", limits.default_limit, rldln)
         } else rln.remove()
 
         fill(".RelayCountries", info.relay_countries)
@@ -430,6 +439,7 @@ export class Relays extends Module {
                 
                 adms?.forEach((adm) => {
                     const div = $("<div>")
+                    div.addClass("Info")
                     div.append($("<dt>").text("Amount:"))
                     div.append($("<dd>").text(adm.amount))
                     div.append($("<dt>").text("Unit:"))
@@ -445,6 +455,7 @@ export class Relays extends Module {
                 
                 subs.forEach((sub) => {
                     const div = $("<div>")
+                    div.addClass("Info")
                     div.append($("<dt>").text("Amount:"))
                     div.append($("<dd>").text(sub.amount))
                     div.append($("<dt>").text("Unit:"))
@@ -462,6 +473,7 @@ export class Relays extends Module {
                 
                 pubs.forEach((pub) => {
                     const div = $("<div>")
+                    div.addClass("Info")
                     div.append($("<dt>").text("Kinds:"))
                     div.append($("<dd>").text(pub.kinds))
                     div.append($("<dt>").text("Amount:"))
@@ -473,7 +485,7 @@ export class Relays extends Module {
             }
 
             if (!keep)  rfn.parent().parent().remove()
-        } else rfn.parent().parent().remove()
+        } else rin.find(".RelayPayments").remove()
 
         return rin
     }
@@ -495,7 +507,7 @@ export class Relays extends Module {
             if (!i.length) {
                 console.warn("Found info but widget is absent for", url)
             }
-            //console.debug(i)
+            console.debug(i)
             rn.append(i)
             i.hide()
             rn.find(".RelayInfoButton").prop("disabled", false).click(() => {

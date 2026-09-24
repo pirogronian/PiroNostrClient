@@ -42,42 +42,35 @@ label.Active input {
     margin: 0.2cm
 }
 
-table.Info tbody tr:nth-child(odd) {
-    background: lightgrey
-}
-
-dl.Info {
+.Info {
+    display: grid;
+    grid-template-columns: max-content;
     background: white;
 }
 
-dl.Info, dl.Info > div {
-    display: grid;
-    grid-template-columns: max-content;
+.Info .Section {
+    grid-column: span 2;
 }
 
-dl.Info dt {
+.Info dt {
     grid-column: 1;
     padding: 1mm;
     margin: 0.5mm
 }
 
-dl.Info dt:nth-child(4n+3) {
+.Info dt:nth-of-type(odd) {
     background: lightgray;
 }
 
-dl.Info dd {
+.Info dd {
     grid-column: 2;
     padding: 1mm;
     margin: 0.5mm
 }
 
-dl.Info dd:nth-child(4n+4) {
+.Info dd:nth-of-type(odd) {
     background: lightgray;
 }
-
-/*dl.Info > div:nth-child(odd) {
-    background: lightgray;
-}*/
 
 table.Info td {
     padding: 1mm
