@@ -47,6 +47,7 @@ export class Article extends Module {
         this.wiki = NDKWiki.from(event)
         this.event.on("relay:node", (relay) => {
             console.debug("Event on relay", relay.url)
+            this.guiUpdateRelays()
         })
     }
 
@@ -243,6 +244,15 @@ export class Article extends Module {
         }
     }
 
+    guiUpdateRelays() {
+        const relaysDOM = this.mainView().find("#ArticleRelays")
+        relaysDOM.append($("<div>").text(this.event?.relay?.url))
+        this.event.onRelays.forEach((relay) => {
+            if (relay.url != this.event?.relay?.url)
+                relaysDOM.append($("<div>").text(relay.url))
+        })
+    }
+
     async show() {
         const context = this.context
         if (!this.event || !this.wiki) {
@@ -283,8 +293,8 @@ export class Article extends Module {
         else imgDOM.parent().parent().hide()
 
         const urlDOM = info.find("#ArticleUrl")
-        if (this.wiki.url)  imgDOM.prop("href", this.wiki.url)
-        else imgDOM.parent().parent().hide()
+        if (this.wiki.url)  urlDOM.prop("href", this.wiki.url)
+        else urlDOM.parent().parent().hide()
 
         const authPictDOM = info.find("#AuthorPicture")
         const picture = user?.profile?.picture
@@ -305,13 +315,6 @@ export class Article extends Module {
         if (origin)  this.makeLinkActive(originDOM, `/${origin}`)
         else originDOM.parent().hide()
 
-        const relaysDOM = info.find("#ArticleRelays")
-        relaysDOM.append($("<div>").text(this.event?.relay?.url))
-        this.event.onRelays.forEach((relay) => {
-            if (relay.url != this.event?.relay?.url)
-                relaysDOM.append($("<div>").text(relay.url))
-        })
-
         const topicsDOM = info.find("#ArticleTopics")
         topics.forEach((topic) => {
             const a = $(App.get().articles.activeLink(`?t=${topic}"`, topic))
@@ -329,6 +332,8 @@ export class Article extends Module {
         this.mainView(o)
 
         this.mainView().find("#ArticleInfo").append(info)
+
+        this.guiUpdateRelays()
 
         const ulf = $("input[name='uselastformat']")
         if (this.useLastFormat)  ulf.prop("checked", "checked")
