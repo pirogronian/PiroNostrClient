@@ -136,6 +136,19 @@ code {
     display: none
 }
 
+.Message {
+    font-weight: bold;
+    font-size: 8mm
+}
+
+#Error {
+    color: red
+}
+
+#Warning {
+    color: orange
+}
+
 #FinderForm {
     @extend .MultirowFlexContainer;
     @extend .Frame
