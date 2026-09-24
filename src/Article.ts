@@ -288,9 +288,11 @@ export class Article extends Module {
         const info = $(ArticleInfoHTML)
         const titlekDOM = info.find("dt#Title")
         const titleDOM = info.find("dd#Title")
-        if (this.wiki.title)  titleDOM.text(this.wiki.title)
-        else titleDOM.remove()
-        titlekDOM.remove()
+        if (this.wiki.title) titleDOM.text(this.wiki.title)
+        else {
+            titlekDOM.remove()
+            titleDOM.remove()
+        }
 
         const idDOM = info.find("#ArticleId")
         const id = this.wiki.dTag
