@@ -2,10 +2,37 @@
 import { EventEmitter } from "tseep"
 import $ from "jquery"
 import Navigo from "navigo"
-import NDK, { NDKEvent, NDKRelay, NDKRelaySet,
-     NDKSubscriptionCacheUsage, type NDKFilter, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
+import NDK, { NDKEvent, NDKRelay, NDKRelaySet, NDKPool,
+     NDKSubscriptionCacheUsage, type NDKFilter, 
+     NDKSubscription, type NDKSubscriptionOptions,
+    isNip33AValue, filterFromId, relaysFromBech32 } from "@nostr-dev-kit/ndk"
 import { Router } from "@/Router.js"
 import { InnerUrl, InnerLink, MakeLinkInner } from "./various.js"
+
+export type NDKSubscriptionEventHandlers = Parameters<NDK['subscribe']>[1];
+
+function correctRelaySet(relaySet: NDKRelaySet, pool: NDKPool): NDKRelaySet {
+    const connectedRelays = pool.connectedRelays();
+    const includesConnectedRelay = Array.from(relaySet.relays).some((relay) => {
+        return connectedRelays.map((r) => r.url).includes(relay.url);
+    });
+
+    if (!includesConnectedRelay) {
+        // Add connected relays to the relay set
+        for (const relay of connectedRelays) {
+            relaySet.addRelay(relay);
+        }
+    }
+
+    // if connected relays is empty (such us when we're first starting, add all relays)
+    if (connectedRelays.length === 0) {
+        for (const relay of pool.relays.values()) {
+            relaySet.addRelay(relay);
+        }
+    }
+
+    return relaySet;
+}
 
 export class Module extends EventEmitter {
     settingsName!: string
@@ -90,6 +117,58 @@ export class Module extends EventEmitter {
             opts.cacheUsage = NDKSubscriptionCacheUsage.ONLY_CACHE
         console.log("fetchEvent:", opts)
         return this.ndk.fetchEvent(idOrFilter, opts, relaySetOrRelay)
+    }
+
+    subscribe(
+        idOrFilter: string | NDKFilter | NDKFilter[],
+        opts?: NDKSubscriptionOptions,
+        autoStartOrRelaySet: NDKRelaySet | boolean | NDKSubscriptionEventHandlers = true,
+        _autoStart = true,)
+        : NDKSubscription
+    {
+        let filters: NDKFilter[];
+        let relaySet: NDKRelaySet | undefined;
+
+        if (!opts)  opts = {}
+
+        // if no relayset has been provided, try to get one from the event id
+        if (!(typeof autoStartOrRelaySet == "object" && autoStartOrRelaySet instanceof NDKRelaySet)
+             && typeof idOrFilter === "string") {
+            /* Check if this is a NIP-33 */
+            if (!isNip33AValue(idOrFilter)) {
+                const relays = relaysFromBech32(idOrFilter, this.ndk);
+
+                if (relays.length > 0) {
+                    relaySet = new NDKRelaySet(new Set<NDKRelay>(relays), this.ndk);
+
+                    // Make sure we have connected relays in this set
+                    relaySet = correctRelaySet(relaySet, this.ndk.pool);
+                }
+            }
+        }
+
+        if (typeof idOrFilter === "string") {
+            filters = [filterFromId(idOrFilter)];
+        } else if (Array.isArray(idOrFilter)) {
+            filters = idOrFilter;
+        } else {
+            filters = [idOrFilter];
+        }
+
+        // Run guardrails check on the filter when it's passed as an object (not a string)
+        if (typeof idOrFilter !== "string") {
+            this.ndk.aiGuardrails?.ndk?.fetchingEvents(filters);
+        }
+
+        if (filters.length === 0) {
+            throw new Error(`Invalid filter: ${JSON.stringify(idOrFilter)}`);
+        }
+
+        if (relaySet)  opts.relaySet = relaySet
+
+        //console.debug("Module.subscribe", filters, opts, autoStartOrRelaySet, _autoStart)
+
+        return this.ndk.subscribe(filters, opts, autoStartOrRelaySet, _autoStart)
     }
 
     setup() {}

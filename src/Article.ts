@@ -22,7 +22,7 @@ const USE_LAST_ARTICLE_FORMAT_KEY = "use_last_format"
 
 export class Article extends Module {
     event: NDKEvent|null = null
-    wiki?: NDKWiki
+    wiki: NDKWiki|null = null
     lastFormat: string = ""
     useLastFormat: string = "1"
 
@@ -45,6 +45,9 @@ export class Article extends Module {
     setEvent(event: NDKEvent) {
         this.event = event
         this.wiki = NDKWiki.from(event)
+        this.event.on("relay:node", (relay) => {
+            console.debug("Event on relay", relay.url)
+        })
     }
 
     showRawEvent(target) : void {
@@ -241,6 +244,7 @@ export class Article extends Module {
     }
 
     async show() {
+        const context = this.context
         if (!this.event || !this.wiki) {
             console.log("No event!")
             return
@@ -251,7 +255,7 @@ export class Article extends Module {
         const o = $(ArticleViewHTML)
     
         const user = await App.get().user.get(this.event.pubkey)
-        if (!this.isCurrent())  return
+        if (!this.sameContext(context))  return
         
         let nick = user?.profile?.name
         if (!nick) nick = "author"
@@ -375,6 +379,8 @@ export class Article extends Module {
         this.showRawEvent($('#RawEventView').get(0))
     }
 
+
+
     async load(addr : string) : Promise<NDKEvent|Error|string|null> {
         const [err, wikiEvent] = await safeAsync(this.fetchEvent(addr));
         if (!this.isCurrent())  return null
@@ -392,8 +398,24 @@ export class Article extends Module {
         }
     }
 
+    onEvent(event: NDKEvent) {
+        if (!this.isCurrent())  return
+        if (!this.event ||
+            (this.event && 
+            this.event.created_at &&
+            event.created_at &&
+            this.event.created_at < event.created_at)) {
+            this.newContext()
+            this.setEvent(event)
+            this.clearUI()
+            this.show()
+        }
+    }
+
     async handle(addr: string) {
-        this.clearUI()
+        this.event = null
+        this.wiki = null
+        /*this.clearUI()
         const ret = await this.load(addr)
         if (ret instanceof NDKEvent) {
             this.setEvent(ret)
@@ -405,7 +427,12 @@ export class Article extends Module {
             if (typeof(ret) == "string") {
                 this.error(ret)
             }
-        }
+        }*/
+       this.subscribe(addr, { closeOnEose: true },
+        { onEvent: (event) => {
+            //console.debug("Article: got event:", event)
+            this.onEvent(event)
+        } })
     }
 
     setup() {
