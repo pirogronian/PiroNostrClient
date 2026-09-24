@@ -61,10 +61,19 @@ export namespace Event {
         }
     }
 
+    export function size(this: NDKEvent): number {
+        let ret = this.content.length
+        for (const tag of this.tags)
+            for (const value of tag)
+                ret += value.length
+        return ret
+    }
+
     export function setup() {
         NDKEvent.prototype.getMatchingTags = getMatchingTags
         NDKEvent.prototype.hasTag = hasTag
         NDKEvent.prototype.tagValue = tagValue
         NDKEvent.prototype.removeTag = removeTag
+        NDKEvent.prototype.size = size
     }
 }

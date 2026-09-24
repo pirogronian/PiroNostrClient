@@ -53,7 +53,7 @@ export class Articles extends Module {
             const a = this.activeLink(`?t=${topic}`, topic)
             HeadTopics.append(a)
         })
-        const es = this.eventSize(event)
+        const es = event.size()
         Head.find(".EventSize").text(`${FormattedBytes(es, 2)}`)
         this.resultSize += es
 

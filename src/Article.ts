@@ -320,7 +320,7 @@ export class Article extends Module {
         if (client)  clientDOM.text(client)
         else clientDOM.parent().hide()
 
-        info.find("#EventSize").text(FormattedBytes(this.eventSize(this.event), 2))
+        info.find("#EventSize").text(FormattedBytes(this.event.size(), 2))
 
         this.mainView(o)
 
