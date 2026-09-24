@@ -2,7 +2,8 @@
 import { EventEmitter } from "tseep"
 import $ from "jquery"
 import Navigo from "navigo"
-import NDK, { NDKEvent, NDKSubscriptionCacheUsage } from "@nostr-dev-kit/ndk"
+import NDK, { NDKEvent, NDKRelay, NDKRelaySet,
+     NDKSubscriptionCacheUsage, type NDKFilter, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
 import { Router } from "@/Router.js"
 import { InnerUrl, InnerLink, MakeLinkInner } from "./various.js"
 
@@ -80,12 +81,15 @@ export class Module extends EventEmitter {
         this.router?.navigate(this.url(addr))
     }
 
-    async fetchEvent(addr: string): Promise<NDKEvent|null> {
-        let options = undefined
+    async fetchEvent(idOrFilter: string | NDKFilter | NDKFilter[],
+        opts?: NDKSubscriptionOptions,
+        relaySetOrRelay?: NDKRelaySet | NDKRelay
+    ): Promise<NDKEvent|null> {
+        if (!opts) opts = {}
         if (Module.offline)
-            options = { cacheUsage: NDKSubscriptionCacheUsage.ONLY_CACHE }
-        console.log("fetchEvent:", options)
-        return this.ndk.fetchEvent(addr, options)
+            opts.cacheUsage = NDKSubscriptionCacheUsage.ONLY_CACHE
+        console.log("fetchEvent:", opts)
+        return this.ndk.fetchEvent(idOrFilter, opts, relaySetOrRelay)
     }
 
     setup() {}
