@@ -1,7 +1,7 @@
 
 import $ from "jquery"
 
-import NDK, { NDKWiki, NDKEvent } from "@nostr-dev-kit/ndk";
+import NDK, { NDKWiki, NDKEvent, nip19 } from "@nostr-dev-kit/ndk";
 
 import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core';
 import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
@@ -465,11 +465,13 @@ export class Article extends Module {
         }
         try {
             console.debug("Trying to publish a Wiki event...")
+            this.hideMessages()
             const relays = this.event?.publishReplaceable()
             relays?.then((set) => {
-                this.notice(`Event published on ${set}`)
+                const addr = nip19.naddrEncode(this.event)
+                this.navigate(`/${addr}`)
             }, (set) => {
-                this.notice(`Event rejected on ${set}`)
+                this.notice("Event rejected!")
             })
         } catch (error) {
             this.error(error)
@@ -491,6 +493,7 @@ export class Article extends Module {
         prevButt.click(() => {
             try {
                 //console.debug("Preview clicked.")
+                this.hideMessages()
                 this.event = new NDKEvent(this.ndk, JSON.parse(rawEventEdit.val()))
                 this.preview()
             } catch (error) {
