@@ -28,6 +28,7 @@ export class Article extends Module {
     wiki: NDKWiki|null = null
     lastFormat: string = ""
     useLastFormat: string = "1"
+    editMode: boolean = false
 
     constructor() {
         super()
@@ -52,6 +53,13 @@ export class Article extends Module {
             console.debug("Event on relay", relay.url)
             this.guiUpdateRelays()
         })
+    }
+
+    async isMine(): Promise<boolean|undefined> {
+        if (!this.event)  return false
+        const user = await App.get().user.get()
+        if (!user)  return undefined
+        return this.event.pubkey == user.pubkey
     }
 
     showRawEvent(target) : void {
@@ -258,6 +266,25 @@ export class Article extends Module {
         })
     }
 
+    async guiUpdateEditButtons() {
+        if (this.editMode)  return
+        const context = this.context
+        const forkButton = $("#ForkArticleButton")
+        const editButton = $("#EditArticleButton")
+        const my = await this.isMine()
+        if (!this.sameContext(context))  return
+        if (my !== undefined) {
+            if (my) {
+                forkButton.hide()
+                editButton.show()
+            }
+            else {
+                forkButton.show()
+                editButton.hide()
+            }
+        }
+    }
+
     async show(container = this.mainView()) {
         const context = this.context
         if (!this.event || !this.wiki) {
@@ -421,6 +448,8 @@ export class Article extends Module {
             arts.followAuthor = facheckinp.prop("checked")
             arts.saveSettings()
         })
+
+        this.guiUpdateEditButtons()
     }
 
 
@@ -485,5 +514,7 @@ export class Article extends Module {
             const addr = match.data.id
             this.handle(addr)
         })
+        App.get().user.on("login", () => { this.guiUpdateEditButtons() })
+        App.get().user.on("logout", () => { this.guiUpdateEditButtons() })
     }
 }

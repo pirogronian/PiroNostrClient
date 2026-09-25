@@ -72,12 +72,14 @@ export class User extends Module {
         }
         else console.warn("User's relays not loaded!")
         this.loggedRelaysChanged = false
+        this.emit("login")
     }
 
     onLogout() {
         this.loggedUser = undefined
         this.loggedRelays = undefined
         App.get().relays.guiRefreshItems()
+        this.emit("logout")
     }
 
     login(method: string|void|null = null) {

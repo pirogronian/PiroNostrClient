@@ -11,10 +11,11 @@
   <label for="article" class="active">Article:<input type="radio" name="ViewType" value="article" checked/></label>
   <label for="event" class="active">Event:<input type="radio" name="ViewType" value="event"/></label>
   <label for="FollowAuthor" class="active">Follow the author:<input type="checkbox" name="FollowAuthor"/></label>
+  <button type="button" id="ForkArticleButton" style="display: none;">Fork</button>
+  <button type="button" id="EditArticleButton" style="display: none;">Edit</button>
 </div>
 <div id='ArticleView' class="Frame">
   <article id="ArticleContentView" class="Scrollable"></article>
   <div id="ArticleRelaysView"></div>
 </div>
 <div id='RawEventView' style="display: none"  class="Scrollable"></div>
-<div id="RawArticleContent" style="display: none"></div>
