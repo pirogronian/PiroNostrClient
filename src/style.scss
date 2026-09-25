@@ -132,6 +132,19 @@ code {
     margin: 2mm;
 }
 
+.RemovableItem {
+    background: lightgrey;
+    padding: 1mm;
+    border: lightgrey 1mm solid;
+    margin: 0.5mm
+}
+
+.RemovableItem:hover {
+    background: orange;
+    border: red 1mm solid;
+    cursor: pointer
+}
+
 #Notice, #Warning, #Error {
     display: none
 }

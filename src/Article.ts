@@ -523,6 +523,37 @@ export class Article extends Module {
 
         //console.debug(prevButt)
         //console.debug(pubButt)
+        const topicL = editView.find("label[for='ArticleTopic']")
+        const topicI = topicL.find("input")
+        const topicB = topicL.find("button")
+        const topicC = editView.find("fieldset#Topics")
+        topicB.click(() => {
+            const topic = topicI.val()
+            if (!topic)  return
+            const item = $("<div>")
+            item.addClass("Topic")
+            item.addClass("Item")
+            item.text(topic)
+            item.prop("title", "Click to remove.")
+            item.click(() => { item.remove() })
+            topicC.append(item)
+        })
+
+        const catL = editView.find("label[for='ArticleCategory']")
+        const catI = catL.find("input")
+        const catB = catL.find("button")
+        const catC = editView.find("fieldset#Categories")
+        catB.click(() => {
+            const cat = catI.val()
+            if (!cat)  return
+            const item = $("<div>")
+            item.addClass("Topic")
+            item.addClass("Item")
+            item.text(cat)
+            item.prop("title", "Click to remove.")
+            item.click(() => { item.remove() })
+            catC.append(item)
+        })
 
         prevButt.click(() => {
             try {

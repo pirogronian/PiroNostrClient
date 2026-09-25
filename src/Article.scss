@@ -91,3 +91,7 @@
 #ArticleEditor textarea#ArticleSummary {
     height: 33dvh;
 }
+
+#ArticleEditor .Item {
+    @extend .RemovableItem
+}
