@@ -498,6 +498,18 @@ export class Article extends Module {
         this.editorNode.find("fieldset#Categories").children().remove(".Item")
     }
 
+    guiCreateLangList() {
+        const guiList = this.editorNode.find("#AllLanguagesList")
+        const l = LangTools.getLangsList()
+        l.forEach((lang) => {
+            const label = `${lang}: ${LangTools.humanFormat(lang, lang)}`
+            const option = $("<option>")
+            option.prop("value", lang)
+            option.text(label)
+            guiList.append(option)
+        })
+    }
+
     guiAddTag(tag: string[]) {
         const c = this.editorNode.find("fieldset#Tags")
         const div = $("<div>")
@@ -663,6 +675,8 @@ export class Article extends Module {
             if (!cat)  return
             this.guiAddCategory(cat)
         })
+
+        this.guiCreateLangList()
 
         const tagF = en.find("fieldset#NewTag")
         const newFieldB = en.find("#AddTagFieldButton")
