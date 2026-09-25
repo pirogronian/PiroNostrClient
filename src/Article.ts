@@ -501,7 +501,7 @@ export class Article extends Module {
         prevButt.click(() => {
             try {
                 //console.debug("Preview clicked.")
-                this.event = new NDKEvent(this.ndk, JSON.parse(rawEventEdit.val(), null, 2))
+                this.event = new NDKEvent(this.ndk, JSON.parse(rawEventEdit.val()))
                 this.preview()
             } catch (error) {
                 this.error(error)
@@ -513,7 +513,7 @@ export class Article extends Module {
         })
 
         if (this.event) {
-            rawEventEdit.val(JSON.stringify(this.event.rawEvent()))
+            rawEventEdit.val(JSON.stringify(this.event.rawEvent(), null, 2))
         }
         this.mainView(editView)
     }
