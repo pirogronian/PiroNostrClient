@@ -17,6 +17,7 @@ import { CreateLangEvent } from "./LangEvent.js";
 
 import ArticleViewHTML from '@/Article.html?raw';
 import ArticleInfoHTML from "@/ArticleInfo.html?raw"
+import ArticleEditHTML from "@/ArticleEdit.html?raw"
 
 import "@/Article.scss"
 
@@ -449,10 +450,43 @@ export class Article extends Module {
             arts.saveSettings()
         })
 
+        o.find("#ForkArticleButton").click(() => { this.edit() })
+        o.find("#EditArticleButton").click(() => { this.edit() })
+
         this.guiUpdateEditButtons()
     }
 
+    preview() {
+        if (!this.editMode) {
+            console.warn("Article.preview: not edit mode!")
+            return
+        }
+        const preview = $("#ArticlePreview")
+        preview.empty()
+        this.show(preview)
+    }
 
+    edit() {
+        this.editMode = true
+        const context = this.context
+        this.clearUI()
+        const editView = $(ArticleEditHTML)
+        const prevButt = editView.find("button#ArticlePreviewButton")
+        const rawEventEdit = editView.find("textarea#ArticleEditRawEvent")
+
+        prevButt.click(() => {
+            try {
+                this.event = new NDKEvent(this.ndk, JSON.parse(rawEventEdit.val()))
+            } catch (error) {
+                this.error(error)
+            }
+        })
+
+        if (this.event) {
+            rawEventEdit.val(JSON.stringify(this.event.rawEvent()))
+        }
+        this.mainView(editView)
+    }
 
     async load(addr : string) : Promise<NDKEvent|Error|string|null> {
         const [err, wikiEvent] = await safeAsync(this.fetchEvent(addr));
