@@ -77,6 +77,14 @@
     min-height: fit-content
 }
 
+#ArticleEditor #ArticlePreviewButton {
+    background: lightgreen
+}
+
+#ArticleEditor #ArticlePublishButton {
+    background: orange
+}
+
 #ArticleEditBar {
     @extend .MultirowFlexContainer;
 }
