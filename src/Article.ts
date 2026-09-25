@@ -28,6 +28,7 @@ export class Article extends Module {
     lastFormat: string = ""
     useLastFormat: string = "1"
     editMode: boolean = false
+    editorNode: JQuery<HTMLElement>|undefined
 
     constructor() {
         super()
@@ -465,6 +466,10 @@ export class Article extends Module {
         }
     }
 
+    /*guiAddTopic(topic: string) {
+        const topicC = editView.find("fieldset#Topics")
+    }*/
+
     switchEditor(rawEvent: boolean) {
         console.debug("Switch raw event:", rawEvent)
         const edit = $("#ArticleEdit")
@@ -515,18 +520,19 @@ export class Article extends Module {
         this.editMode = true
         const context = this.context
         this.clearUI()
-        const editView = $(ArticleEditHTML)
-        const prevButt = editView.find("button#ArticlePreviewButton")
-        const pubButt = editView.find("button#ArticlePublishButton")
-        const switchEdit = editView.find("input#RawEventCheckbox")
-        const rawEventEdit = editView.find("textarea#ArticleEditRawEvent")
+        this.editorNode = $(ArticleEditHTML)
+        const en = this.editorNode
+        const prevButt = en.find("button#ArticlePreviewButton")
+        const pubButt = en.find("button#ArticlePublishButton")
+        const switchEdit = en.find("input#RawEventCheckbox")
+        const rawEventEdit = en.find("textarea#ArticleEditRawEvent")
 
         //console.debug(prevButt)
         //console.debug(pubButt)
-        const topicL = editView.find("label[for='ArticleTopic']")
+        const topicL = en.find("label[for='ArticleTopic']")
         const topicI = topicL.find("input")
         const topicB = topicL.find("button")
-        const topicC = editView.find("fieldset#Topics")
+        const topicC = en.find("fieldset#Topics")
         topicB.click(() => {
             const topic = topicI.val()
             if (!topic)  return
@@ -539,10 +545,10 @@ export class Article extends Module {
             topicC.append(item)
         })
 
-        const catL = editView.find("label[for='ArticleCategory']")
+        const catL = en.find("label[for='ArticleCategory']")
         const catI = catL.find("input")
         const catB = catL.find("button")
-        const catC = editView.find("fieldset#Categories")
+        const catC = en.find("fieldset#Categories")
         catB.click(() => {
             const cat = catI.val()
             if (!cat)  return
@@ -577,7 +583,7 @@ export class Article extends Module {
 
         this.guiUpdateRawEventEdit()
 
-        this.mainView(editView)
+        this.mainView(en)
     }
 
     async load(addr : string) : Promise<NDKEvent|Error|string|null> {
