@@ -4,5 +4,19 @@
         <button type="button" id="ArticlePreviewButton">Preview</button>
         <button type="button" id="ArticlePublishButton">Publish</button>
     </div>
+    <div id="ArticleEdit">
+        <label for="ArticleTitle">Title:<input type="text" name="ArticleTitle"/></label>
+        <label for="ArticleId">Id:<input type="text" name="ArticleId"/></label>
+        <label for="ArticleTopic">Topic:<input type="text" name="ArticleTopic"/><button type="button">Add</button></label>
+        <label for="ArticleCategory">Category:<input type="text" name="ArticleCategory"/><button type="button">Add</button></label>
+        <label for="ArticleLanguage">Language:<input type="text" name="ArticleLanguage"/><button type="button">Add</button></label>
+        <fieldset id="Topics"><legend>Topics:</legend></fieldset>
+        <fieldset id="Categories"><legend>Categories:</legend></fieldset>
+        <fieldset id="Languages"><legend>Languages:</legend></fieldset>
+        <h3>Summary:</h3>
+        <textarea id="ArticleSummary"></textarea>
+        <h3>Content:</h3>
+        <textarea id="ArticleContent"></textarea>
+    </div>
     <textarea id="ArticleEditRawEvent"></textarea>
 </div>

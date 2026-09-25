@@ -77,8 +77,17 @@
     @extend .MultirowFlexContainer;
 }
 
+#ArticleEditor fieldset {
+    display: inline-block;
+    max-width: 32dvh
+}
 
 #ArticleEditor textarea {
     @extend .Scrollable;
+    width: 100%;
     height: 100dvh;
+}
+
+#ArticleEditor textarea#ArticleSummary {
+    height: 33dvh;
 }
