@@ -258,7 +258,7 @@ export class Article extends Module {
         })
     }
 
-    async show() {
+    async show(container = this.mainView()) {
         const context = this.context
         if (!this.event || !this.wiki) {
             console.log("No event!")
@@ -357,9 +357,9 @@ export class Article extends Module {
 
         info.find("#EventSize").text(FormattedBytes(this.event.size(), 2))
 
-        this.mainView(o)
+        container.append(o)
 
-        this.mainView().find("#ArticleInfo").append(info)
+        container.find("#ArticleInfo").append(info)
 
         this.guiUpdateRelays()
 
