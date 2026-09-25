@@ -503,13 +503,16 @@ export class Article extends Module {
         const en = this.editorNode
         en.find("input[name='ArticleTitle']").val(this.wiki.title)
         en.find("input[name='ArticleId']").val(this.wiki.dTag)
+        en.find("input[name='ArticleFormat']").val(this.wiki.tagValue("f"))
         en.find("textarea#ArticleSummary").val(this.wiki.summary)
         en.find("textarea#ArticleContent").val(this.wiki.content)
+
         this.guiClearCategories()
         const cats = this.wiki.getMatchingTags("c")
         cats.forEach((tag) => {
             if (tag[1])  this.guiAddCategory(tag[1])
         })
+
         this.guiClearTopics()
         const topics = this.wiki.getMatchingTags("t")
         topics.forEach((tag) => {
@@ -523,6 +526,7 @@ export class Article extends Module {
         const en = this.editorNode
         this.wiki.title = en.find("input[name='ArticleTitle']").val()
         this.wiki.dTag = en.find("input[name='ArticleId']").val()
+        this.wiki.tags.push(["f", en.find("input[name='ArticleFormat']").val()])
         this.wiki.summary = en.find("textarea#ArticleSummary").val()
         this.wiki.content = en.find("textarea#ArticleContent").val()
         if (!this.wiki.tags)  return // To shut up editor warnings.
@@ -597,6 +601,12 @@ export class Article extends Module {
         const switchEdit = en.find("input#RawEventCheckbox")
         const rawEventEdit = en.find("textarea#ArticleEditRawEvent")
 
+        const fmt = en.find("input[name='ArticleFormat']")
+        const fmtSel = en.find("select[name='ArticleFormatSelect']")
+        fmtSel.change(() => {
+            console.debug("Set format to", fmtSel.val())
+            fmt.val(fmtSel.val())
+        })
         //console.debug(prevButt)
         //console.debug(pubButt)
         const topicL = en.find("label[for='ArticleTopic']")
