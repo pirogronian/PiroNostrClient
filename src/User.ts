@@ -502,6 +502,8 @@ export class User extends Module {
             const rl = await this.relays()
             //console.debug("User relays:", rl?.readRelayUrls, rl?.writeRelayUrls)
             const rrn = $("#UserReadRelays")
+            const rrnn = $("#UserReadRelaysNumber")
+            rrnn.text(rl?.readRelayUrls ? rl?.readRelayUrls.length : 0)
             if (typeof rl?.readRelayUrls == "object") {
                 for (const url of rl?.readRelayUrls) {
                     if (url) {
@@ -512,6 +514,8 @@ export class User extends Module {
             }
                 
             const wrn = $("#UserWriteRelays")
+            const wrnn = $("#UserWriteRelaysNumber")
+            wrnn.text(rl?.writeRelayUrls ? rl?.writeRelayUrls.length : 0)
             if (typeof rl?.writeRelayUrls == "object")
                 for (const url of rl?.writeRelayUrls) {
                     if (url) {
