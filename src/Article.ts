@@ -448,10 +448,12 @@ export class Article extends Module {
         this.guiUpdateEditButtons()
     }
 
+//  EDIT STUFF  //
+
     guiUpdateRawEventEdit() {
-        if (!this.event)  return
+        if (!this.wiki)  return
         const rawEventEdit = $("textarea#ArticleEditRawEvent")
-        rawEventEdit.val(JSON.stringify(this.event.rawEvent(), null, 2))
+        rawEventEdit.val(JSON.stringify(this.wiki.rawEvent(), null, 2))
     }
 
     applyRawEventEdit() {
@@ -460,7 +462,7 @@ export class Article extends Module {
         const text = rawEventEdit.val().trim()
         if (!text)  return
         try {
-            this.event = new NDKEvent(this.ndk, JSON.parse(text))
+            this.wiki = new NDKWiki(this.ndk, JSON.parse(text))
         } catch (error) {
             this.error(error)
         }
@@ -515,16 +517,38 @@ export class Article extends Module {
         })
     }
 
+    applyEditor() {
+        this.wiki = new NDKWiki(this.ndk)
+        this.wiki.kind = 30818
+        const en = this.editorNode
+        this.wiki.title = en.find("input[name='ArticleTitle']").val()
+        this.wiki.dTag = en.find("input[name='ArticleId']").val()
+        this.wiki.summary = en.find("textarea#ArticleSummary").val()
+        this.wiki.content = en.find("textarea#ArticleContent").val()
+        if (!this.wiki.tags)  return // To shut up editor warnings.
+        const cats = en.find(".Category")
+        cats.each((index, cat) => {
+            this.wiki.tags.push(["c", $(cat).text()])
+        })
+        const topics = en.find(".Topic")
+        topics.each((index, topic) => {
+            this.wiki.tags.push(["t", $(topic).text()])
+        })
+    }
+
     switchEditor(rawEvent: boolean) {
         console.debug("Switch raw event:", rawEvent)
         const edit = $("#ArticleEdit")
         const rawEdit = $("#ArticleEditRawEvent")
         if (rawEvent) {
+            this.applyEditor()
+            //console.debug(this.event)
             this.guiUpdateRawEventEdit()
             rawEdit.show()
             edit.hide()
         } else {
             this.applyRawEventEdit()
+            //console.debug(this.event)
             this.guiUpdateEditor()
             rawEdit.hide()
             edit.show()
@@ -599,7 +623,9 @@ export class Article extends Module {
             try {
                 //console.debug("Preview clicked.")
                 this.hideMessages()
-                this.event = new NDKEvent(this.ndk, JSON.parse(rawEventEdit.val()))
+                const raw = switchEdit.prop("checked")
+                if (raw)  this.applyRawEventEdit()
+                else this.applyEditor()
                 this.preview()
             } catch (error) {
                 this.error(error)
