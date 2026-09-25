@@ -340,7 +340,7 @@ export class Article extends Module {
         if (langs.length > 0) {
             langs.forEach((lang) => {
                 if (!lang.code) return
-                lDOM.append($("<div>").text(LangTools.humanFormat(lang.code, lang.standard)))
+                lDOM.append($("<div>").text(LangTools.humanFormat(lang.code)))
             })
         } else lDOM.parent().hide()
 
@@ -540,7 +540,7 @@ export class Article extends Module {
 
         this.guiClearTags()
         this.wiki.tags.forEach((tag) => {
-            if (tag[0] && !["d", "f", "c", "t", "title", "summary", "client"].includes(tag[0]))
+            if (tag[0] && !["d", "f", "c", "t", "title", "summary", "client", "published_at"].includes(tag[0]))
                 this.guiAddTag(tag)
         })
     }
@@ -615,7 +615,7 @@ export class Article extends Module {
             this.hideMessages()
             const relays = this.wiki?.publishReplaceable()
             relays?.then((set) => {
-                const addr = nip19.naddrEncode(this.event)
+                const addr = nip19.naddrEncode(this.wiki)
                 this.navigate(`/${addr}`)
             }, (set) => {
                 this.notice("Event rejected!")

@@ -26,8 +26,10 @@ export function CreateLangEvent<T extends NDKEvent>(event: T): T & LangEvent {
                         if (standard)  ret.push(new LangTools.Language(code, standard))
                     }
                 } else {
-                    if (standard in LangTools.Standards)
+                    //console.debug("Found lang standard: ", standard)
+                    if (LangTools.isStandardName(standard)) {
                         ret.push(new LangTools.Language(code, standard))
+                    }
                 }
             }
         })

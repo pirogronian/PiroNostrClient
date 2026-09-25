@@ -60,6 +60,10 @@
     padding-left: 2mm
 }
 
+#ArticleInfo #ArticleLangs > div {
+    text-decoration: underline
+}
+
 #RawEventView {
     @extend .Scrollable;
     @extend .Frame
