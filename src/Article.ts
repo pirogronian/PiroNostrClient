@@ -451,7 +451,7 @@ export class Article extends Module {
     guiUpdateRawEventEdit() {
         if (!this.event)  return
         const rawEventEdit = $("textarea#ArticleEditRawEvent")
-        rawEventEdit.val(JSON.stringify(this.event?.rawEvent(), null, 2))
+        rawEventEdit.val(JSON.stringify(this.event.rawEvent(), null, 2))
     }
 
     applyRawEventEdit() {
@@ -460,15 +460,60 @@ export class Article extends Module {
         const text = rawEventEdit.val().trim()
         if (!text)  return
         try {
-            this.event = JSON.parse(text)
+            this.event = new NDKEvent(this.ndk, JSON.parse(text))
         } catch (error) {
             this.error(error)
         }
     }
 
-    /*guiAddTopic(topic: string) {
-        const topicC = editView.find("fieldset#Topics")
-    }*/
+    guiAddTopic(topic: string) {
+        const topicC = this.editorNode.find("fieldset#Topics")
+        const item = $("<div>")
+        item.addClass("Topic")
+        item.addClass("Item")
+        item.text(topic)
+        item.prop("title", "Click to remove.")
+        item.click(() => { item.remove() })
+        topicC.append(item)
+    }
+
+    guiClearTopics() {
+        this.editorNode.find("fieldset#Topics").children().remove(".Item")
+    }
+
+    guiAddCategory(cat: string) {
+        const catC = this.editorNode.find("fieldset#Categories")
+        const item = $("<div>")
+        item.addClass("Category")
+        item.addClass("Item")
+        item.text(cat)
+        item.prop("title", "Click to remove.")
+        item.click(() => { item.remove() })
+        catC.append(item)
+    }
+
+    guiClearCategories() {
+        this.editorNode.find("fieldset#Categories").children().remove(".Item")
+    }
+
+    guiUpdateEditor() {
+        if (!this.wiki)  return
+        const en = this.editorNode
+        en.find("input[name='ArticleTitle']").val(this.wiki.title)
+        en.find("input[name='ArticleId']").val(this.wiki.dTag)
+        en.find("textarea#ArticleSummary").val(this.wiki.summary)
+        en.find("textarea#ArticleContent").val(this.wiki.content)
+        this.guiClearCategories()
+        const cats = this.wiki.getMatchingTags("c")
+        cats.forEach((tag) => {
+            if (tag[1])  this.guiAddCategory(tag[1])
+        })
+        this.guiClearTopics()
+        const topics = this.wiki.getMatchingTags("t")
+        topics.forEach((tag) => {
+            if (tag[1])  this.guiAddTopic(tag[1])
+        })
+    }
 
     switchEditor(rawEvent: boolean) {
         console.debug("Switch raw event:", rawEvent)
@@ -480,6 +525,7 @@ export class Article extends Module {
             edit.hide()
         } else {
             this.applyRawEventEdit()
+            this.guiUpdateEditor()
             rawEdit.hide()
             edit.show()
         }
@@ -536,13 +582,7 @@ export class Article extends Module {
         topicB.click(() => {
             const topic = topicI.val()
             if (!topic)  return
-            const item = $("<div>")
-            item.addClass("Topic")
-            item.addClass("Item")
-            item.text(topic)
-            item.prop("title", "Click to remove.")
-            item.click(() => { item.remove() })
-            topicC.append(item)
+            this.guiAddTopic(topic)
         })
 
         const catL = en.find("label[for='ArticleCategory']")
@@ -552,13 +592,7 @@ export class Article extends Module {
         catB.click(() => {
             const cat = catI.val()
             if (!cat)  return
-            const item = $("<div>")
-            item.addClass("Topic")
-            item.addClass("Item")
-            item.text(cat)
-            item.prop("title", "Click to remove.")
-            item.click(() => { item.remove() })
-            catC.append(item)
+            this.guiAddCategory(cat)
         })
 
         prevButt.click(() => {
@@ -581,6 +615,7 @@ export class Article extends Module {
             this.switchEditor(switchEdit.prop("checked"))
         })
 
+        this.guiUpdateEditor()
         this.guiUpdateRawEventEdit()
 
         this.mainView(en)
