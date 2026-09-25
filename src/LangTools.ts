@@ -75,7 +75,7 @@ export namespace LangTools {
         } catch(error) {
             console.warn(error)
         }
-        if (ret == code || ret == code.toLocaleLowerCase()) {
+        if (ret == code || ret == code.toLowerCase()) {
             //console.debug("Output:", ret, ", probably not parsed.")
             const parsed = LTags(code)
             const lcode = parsed.language()?.format()
