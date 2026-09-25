@@ -59,3 +59,26 @@
 #ArticleInfo dl div dt > * {
     padding-left: 2mm
 }
+
+#RawEventView {
+    @extend .Scrollable;
+    @extend .Frame
+}
+
+#ArticleEditor {
+    @extend .Frame;
+    display: flex;
+    flex-direction: column;
+    //box-sizing:border-box
+    min-height: fit-content
+}
+
+#ArticleEditBar {
+    @extend .MultirowFlexContainer;
+}
+
+
+#ArticleEditor textarea {
+    @extend .Scrollable;
+    height: 100dvh;
+}
