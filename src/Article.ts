@@ -510,6 +510,16 @@ export class Article extends Module {
         })
     }
 
+    guiAddLang(code:string) {
+        const langs = this.editorNode.find("fieldset#Languages")
+        const div = $("<div>")
+        div.addClass("Item")
+        div.addClass("Lang")
+        div.attr("code", code)
+        div.text(LangTools.humanFormat(code))
+        langs.append(div)
+    }
+
     guiAddTag(tag: string[]) {
         const c = this.editorNode.find("fieldset#Tags")
         const div = $("<div>")
@@ -677,6 +687,12 @@ export class Article extends Module {
         })
 
         this.guiCreateLangList()
+
+        const langI = en.find("input[name='ArticleLanguage']")
+        const addLangB = en.find("label[for='ArticleLanguage'] button")
+        addLangB.click(() => {
+            this.guiAddLang(langI.val())
+        })
 
         const tagF = en.find("fieldset#NewTag")
         const newFieldB = en.find("#AddTagFieldButton")
