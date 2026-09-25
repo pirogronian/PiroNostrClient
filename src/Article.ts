@@ -3,8 +3,6 @@ import $ from "jquery"
 
 import NDK, { NDKWiki, NDKEvent } from "@nostr-dev-kit/ndk";
 
-import { createJSONEditor, createKeySelection } from "vanilla-jsoneditor";
-
 import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core';
 import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
@@ -65,17 +63,9 @@ export class Article extends Module {
 
     showRawEvent(target) : void {
         const rawObject = this.event?.rawEvent();
-  
         const jsonString = JSON.stringify(rawObject, null, 2);
-
-        createJSONEditor({
-            target: target,
-            props: {
-                content: { json: jsonString },
-                readOnly: true, // tryb podglądu
-                mode: 'tree'   // lub 'tree',
-            }
-        })
+        const view = $("#RawEventView")
+        view.html(jsonString)
     }
 
     asciidocCreateWikilinks(element) {

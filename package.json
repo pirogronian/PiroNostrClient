@@ -23,8 +23,7 @@
     "navigo": "^8.11.1",
     "qrcode": "^1.5.4",
     "ts-node": "^10.9.2",
-    "typescript": "^7.0.2",
-    "vanilla-jsoneditor": "^3.13.0"
+    "typescript": "^7.0.2"
   },
   "devDependencies": {
     "@types/language-tags": "^1.0.4",
