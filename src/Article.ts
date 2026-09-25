@@ -498,6 +498,25 @@ export class Article extends Module {
         this.editorNode.find("fieldset#Categories").children().remove(".Item")
     }
 
+    guiAddTag(tag: string[]) {
+        const c = this.editorNode.find("fieldset#Tags")
+        const div = $("<div>")
+        div.addClass("Item")
+        div.addClass("Tag")
+        div.prop("title", "Click to remove.")
+        div.click(() => { div.remove() })
+        tag.forEach((item) => {
+            const span = $("<span>")
+            span.text(item)
+            div.append(span)
+        })
+        c.append(div)
+    }
+
+    guiClearTags() {
+        this.editorNode.find("fieldset#Tags").children().remove(".Item")
+    }
+
     guiUpdateEditor() {
         if (!this.wiki)  return
         const en = this.editorNode
@@ -518,6 +537,12 @@ export class Article extends Module {
         topics.forEach((tag) => {
             if (tag[1])  this.guiAddTopic(tag[1])
         })
+
+        this.guiClearTags()
+        this.wiki.tags.forEach((tag) => {
+            if (tag[0] && !["d", "f", "c", "t", "title", "summary", "client"].includes(tag[0]))
+                this.guiAddTag(tag)
+        })
     }
 
     applyEditor() {
@@ -537,6 +562,15 @@ export class Article extends Module {
         const topics = en.find(".Topic")
         topics.each((index, topic) => {
             this.wiki.tags.push(["t", $(topic).text()])
+        })
+        const tags = en.find(".Tag")
+        tags.each((index, tag) => {
+            const fields = $(tag).children()
+            let ntag: string[] = []
+            fields.each((index, field) => {
+                ntag.push($(field).text())
+            })
+            this.wiki?.tags.push(ntag)
         })
     }
 
@@ -628,6 +662,33 @@ export class Article extends Module {
             const cat = catI.val()
             if (!cat)  return
             this.guiAddCategory(cat)
+        })
+
+        const tagF = en.find("fieldset#NewTag")
+        const newFieldB = en.find("#AddTagFieldButton")
+        const remFieldB = en.find("#RemoveTagFieldButton")
+        const newTagB = en.find("#AddTagButton")
+        const tagFields = tagF.find("span")
+
+        newFieldB.click(() => {
+            const input = $("<input>")
+            input.prop("type", "text")
+            tagFields.append(input)
+        })
+
+        remFieldB.click(() => {
+            //console.debug("Remove last:", tagFields.children().last("input"))
+            tagFields.children().last("input").remove()
+        })
+
+        newTagB.click(() => {
+            const fields = tagFields.children()
+            let tag: string[] = []
+            fields.each((index, field) => {
+                //console.debug(field)
+                tag.push($(field).val())
+            })
+            this.guiAddTag(tag)
         })
 
         prevButt.click(() => {

@@ -21,9 +21,21 @@
         <label for="ArticleTopic">Topic:<input type="text" name="ArticleTopic"/><button type="button">Add</button></label>
         <label for="ArticleCategory">Category:<input type="text" name="ArticleCategory"/><button type="button">Add</button></label>
         <label for="ArticleLanguage">Language:<input type="text" name="ArticleLanguage"/><button type="button">Add</button></label>
+        <fieldset id="NewTag">
+            <legend>New tag:</legend>
+            <span>
+                <input type="text" value="TagName"/>
+                <input type="text" value="TagValue"/>
+                <input type="text" value="TagMarker"/>
+            </span>
+            <button id="AddTagFieldButton">Add field</button>
+            <button id="RemoveTagFieldButton">Remove field</button>
+            <button id="AddTagButton">Add tag</button>
+        </fieldset>
         <fieldset id="Topics"><legend>Topics:</legend></fieldset>
         <fieldset id="Categories"><legend>Categories:</legend></fieldset>
         <fieldset id="Languages"><legend>Languages:</legend></fieldset>
+        <fieldset id="Tags"><legend>Tags:</legend></fieldset>
         <h3>Summary:</h3>
         <textarea id="ArticleSummary"></textarea>
         <h3>Content:</h3>

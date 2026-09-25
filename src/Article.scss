@@ -77,9 +77,16 @@
     @extend .MultirowFlexContainer;
 }
 
-#ArticleEditor fieldset {
+.List {
     display: inline-block;
     max-width: 32dvh
+}
+
+#ArticleEditor #Topics,
+#ArticleEditor #Categories,
+#ArticleEditor #Languages,
+#ArticleEditor #Tags {
+    @extend .List;
 }
 
 #ArticleEditor textarea {
@@ -94,4 +101,13 @@
 
 #ArticleEditor .Item {
     @extend .RemovableItem
+}
+
+#ArticleEditor .Item > span {
+    padding: 1mm;
+    border: 0.5mm grey solid;
+}
+
+#ArticleEditor .Item > span:not(:last-child) {
+    margin-right: 1mm
 }
