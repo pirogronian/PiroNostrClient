@@ -268,6 +268,7 @@ export class Article extends Module {
     }
 
     async guiUpdateEditButtons() {
+        console.debug("Edit buttons update.")
         if (this.editMode)  return
         const context = this.context
         const forkButton = $("#ForkArticleButton")
@@ -450,8 +451,8 @@ export class Article extends Module {
             arts.saveSettings()
         })
 
-        o.find("#ForkArticleButton").click(() => { this.edit() })
-        o.find("#EditArticleButton").click(() => { this.edit() })
+        o.find("#ForkArticleButton").click(() => { this.navigate("/edit/") })
+        o.find("#EditArticleButton").click(() => { this.navigate("/edit/") })
 
         this.guiUpdateEditButtons()
     }
@@ -500,7 +501,7 @@ export class Article extends Module {
         prevButt.click(() => {
             try {
                 //console.debug("Preview clicked.")
-                this.event = new NDKEvent(this.ndk, JSON.parse(rawEventEdit.val()))
+                this.event = new NDKEvent(this.ndk, JSON.parse(rawEventEdit.val(), null, 2))
                 this.preview()
             } catch (error) {
                 this.error(error)
@@ -551,27 +552,21 @@ export class Article extends Module {
     async handle(addr: string) {
         this.event = null
         this.wiki = null
-        /*this.clearUI()
-        const ret = await this.load(addr)
-        if (ret instanceof NDKEvent) {
-            this.setEvent(ret)
-            await this.show()
-        } else {
-            if (ret instanceof Error) {
-                this.error(ret.message)
+        this.editMode = false
+        
+        this.subscribe(addr, { closeOnEose: true },
+            { onEvent: (event) => {
+                //console.debug("Article: got event:", event)
+                this.onEvent(event)
             }
-            if (typeof(ret) == "string") {
-                this.error(ret)
-            }
-        }*/
-       this.subscribe(addr, { closeOnEose: true },
-        { onEvent: (event) => {
-            //console.debug("Article: got event:", event)
-            this.onEvent(event)
-        } })
+        })
     }
 
     setup() {
+        this.onRoute("/edit/", () => {
+            this.setCurrent()
+            this.edit()
+        })
         this.onRoute("/:id", (match) => {
             this.setCurrent()
             const addr = match.data.id

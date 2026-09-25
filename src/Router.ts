@@ -5,7 +5,7 @@ export class Router {
     _navigo: Navigo
 
     constructor(base: string = "/") {
-        this._navigo = new Navigo(base, { hash: true, strategy: Navigo.ONE })
+        this._navigo = new Navigo(base, { hash: true, strategy: "ONE" })
     }
 
     onRoute(route: string, f: Function): void {
