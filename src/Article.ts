@@ -283,7 +283,7 @@ export class Article extends Module {
                 forkButton.show()
                 editButton.hide()
             }
-        }
+        } else { console.warn("No user, no edit.") }
     }
 
     async show(container = this.mainView()) {
@@ -461,9 +461,28 @@ export class Article extends Module {
             console.warn("Article.preview: not edit mode!")
             return
         }
+        console.debug("Making preview of a Wiki event...")
         const preview = $("#ArticlePreview")
         preview.empty()
         this.show(preview)
+    }
+
+    publish() {
+        if (!this.editMode) {
+            console.warn("Article.publish: not edit mode!")
+            return
+        }
+        try {
+            console.debug("Trying to publish a Wiki event...")
+            const relays = this.event?.publishReplaceable()
+            relays?.then((set) => {
+                this.notice(`Event published on ${set}`)
+            }, (set) => {
+                this.notice(`Event rejected on ${set}`)
+            })
+        } catch (error) {
+            this.error(error)
+        }
     }
 
     edit() {
@@ -472,14 +491,24 @@ export class Article extends Module {
         this.clearUI()
         const editView = $(ArticleEditHTML)
         const prevButt = editView.find("button#ArticlePreviewButton")
+        const pubButt = editView.find("button#ArticlePublishButton")
         const rawEventEdit = editView.find("textarea#ArticleEditRawEvent")
+
+        //console.debug(prevButt)
+        //console.debug(pubButt)
 
         prevButt.click(() => {
             try {
+                //console.debug("Preview clicked.")
                 this.event = new NDKEvent(this.ndk, JSON.parse(rawEventEdit.val()))
+                this.preview()
             } catch (error) {
                 this.error(error)
             }
+        })
+
+        pubButt.click(() => {
+            this.publish()
         })
 
         if (this.event) {
