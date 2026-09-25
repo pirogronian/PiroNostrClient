@@ -560,6 +560,12 @@ export class Article extends Module {
             if (tag[1])  this.guiAddTopic(tag[1])
         })
 
+        const le = CreateLangEvent(this.wiki)
+        const ll = le.getLanguages()
+        ll.forEach((lang) => {
+            if (lang.code)  this.guiAddLang(lang.code)
+        })
+
         this.guiClearTags()
         this.wiki.tags.forEach((tag) => {
             if (tag[0] && !["d", "f", "c", "t", "title", "summary", "client", "published_at"].includes(tag[0]))
