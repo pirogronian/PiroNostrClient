@@ -564,6 +564,7 @@ export class Article extends Module {
             console.warn("Article.preview: not edit mode!")
             return
         }
+        this.event = new NDKEvent(this.ndk, this.wiki?.rawEvent())
         console.debug("Making preview of a Wiki event...")
         const preview = $("#ArticlePreview")
         preview.empty()
@@ -578,7 +579,7 @@ export class Article extends Module {
         try {
             console.debug("Trying to publish a Wiki event...")
             this.hideMessages()
-            const relays = this.event?.publishReplaceable()
+            const relays = this.wiki?.publishReplaceable()
             relays?.then((set) => {
                 const addr = nip19.naddrEncode(this.event)
                 this.navigate(`/${addr}`)
