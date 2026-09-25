@@ -447,6 +447,39 @@ export class Article extends Module {
         this.guiUpdateEditButtons()
     }
 
+    guiUpdateRawEventEdit() {
+        if (!this.event)  return
+        const rawEventEdit = $("textarea#ArticleEditRawEvent")
+        rawEventEdit.val(JSON.stringify(this.event?.rawEvent(), null, 2))
+    }
+
+    applyRawEventEdit() {
+        this.hideMessages()
+        const rawEventEdit = $("textarea#ArticleEditRawEvent")
+        const text = rawEventEdit.val().trim()
+        if (!text)  return
+        try {
+            this.event = JSON.parse(text)
+        } catch (error) {
+            this.error(error)
+        }
+    }
+
+    switchEditor(rawEvent: boolean) {
+        console.debug("Switch raw event:", rawEvent)
+        const edit = $("#ArticleEdit")
+        const rawEdit = $("#ArticleEditRawEvent")
+        if (rawEvent) {
+            this.guiUpdateRawEventEdit()
+            rawEdit.show()
+            edit.hide()
+        } else {
+            this.applyRawEventEdit()
+            rawEdit.hide()
+            edit.show()
+        }
+    }
+
     preview() {
         if (!this.editMode) {
             console.warn("Article.preview: not edit mode!")
@@ -485,6 +518,7 @@ export class Article extends Module {
         const editView = $(ArticleEditHTML)
         const prevButt = editView.find("button#ArticlePreviewButton")
         const pubButt = editView.find("button#ArticlePublishButton")
+        const switchEdit = editView.find("input#RawEventCheckbox")
         const rawEventEdit = editView.find("textarea#ArticleEditRawEvent")
 
         //console.debug(prevButt)
@@ -505,9 +539,13 @@ export class Article extends Module {
             this.publish()
         })
 
-        if (this.event) {
-            rawEventEdit.val(JSON.stringify(this.event.rawEvent(), null, 2))
-        }
+        MakeLabelActive(switchEdit.parent())
+        switchEdit.change(() => {
+            this.switchEditor(switchEdit.prop("checked"))
+        })
+
+        this.guiUpdateRawEventEdit()
+
         this.mainView(editView)
     }
 
