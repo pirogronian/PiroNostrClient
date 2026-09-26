@@ -805,19 +805,20 @@ export class Article extends Module {
             this.clearUI()
             if (this.editMode) {
                 if (event.kind == NDKDraft.kind) {
-                    console.debug("Got draft!")
+                    //console.debug("Got draft!")
                     const draft = NDKDraft.from(event)
                     const e = await draft.getEvent()
-                    console.debug("Event from draft:", e)
+                    //console.debug("Event from draft:", e)
                     if (!this.sameContext(context)) {
-                        console.warn("Context changed, breaking...")
+                        //console.warn("Context changed, breaking...")
                         return
                     }
                     if (e) {
-                        this.setEvent(e)
+                        if (e.kind == NDKWiki.kind)  this.setEvent(e)
+                        else this.error(`Wrong event kind: ${e.kind}!`)
                     }
                     else {
-                        console.warn("No event in draft!")
+                        this.error("No event in draft!")
                     }
                 }
                 this.setupEditors()
@@ -844,24 +845,27 @@ export class Article extends Module {
     async edit(data:string|object) {
         this.editMode = true
         const context = this.context
+        if (typeof data == "string") {
+            this.event = null
+            this.wiki = null
+            //console.debug("Subscribing for event:", data)
+            this.subscribe(data, { closeOnEose: true },
+            { onEvent: (event) => {
+                //console.debug("Article: got event:", event)
+                this.onEvent(event)
+            }})
+            return
+        }
         const my = await this.isMine()
         if (!this.sameContext(context))  return
         if (my ===  false) {
             this.wiki?.tag(this.event)
         }
         this.clearUI()
-        if (data && typeof data == "object" && data.id)
+        if (data && typeof data == "object" && data.id) {
             this.setupEditors(data.id)
-        else if (typeof data == "string") {
-            this.subscribe(data, { closeOnEose: true },
-            { onEvent: (event) => {
-                //console.debug("Article: got event:", event)
-                this.onEvent(event)
-            }
-        })
-        } else {
-            this.setupEditors()
         }
+        else this.setupEditors()
     }
 
     setup() {
