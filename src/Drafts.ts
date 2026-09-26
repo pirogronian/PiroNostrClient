@@ -3,7 +3,7 @@ import $ from "jquery"
 
 import NDK, { NDKWiki, NDKDraft, NDKEvent, type NDKFilter, nip19 } from "@nostr-dev-kit/ndk";
 
-import { FormattedTime, FormattedBytes } from "./various.js";
+import { FormattedTime, FormattedBytes, MakeLabelActive } from "./various.js";
 
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
@@ -57,7 +57,18 @@ export class Drafts extends Module {
     }
 
     guiCreateMain() {
-        this.mainView($(DraftsMainHTML))
+        const gui = $(DraftsMainHTML)
+        const hideEmpty = gui.find("label[for='HideEmpty']")
+        MakeLabelActive(hideEmpty)
+        const hideEmptyI = hideEmpty.find("input")
+        hideEmptyI.change(() => {
+            const empty = gui.find(".EmptyDraft")
+            if (hideEmptyI.prop("checked"))
+                empty.hide()
+            else empty.show()
+        })
+
+        this.mainView(gui)
     }
 
     remove(draft: NDKDraft) {
