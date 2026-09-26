@@ -56,7 +56,15 @@ export function MakeLinkInner(node, url: string, text: string|null = null) {
 }
 
 export function MakeLabelActive(node: JQuery<HTMLElement>) {
+    const input = node.find("input")
     node.addClass("Active")
+    node.click((e) => {
+        if ($(e.target).is('input[type="checkbox"]')) {
+            return;
+        }
+        input.prop("checked", !input.prop("checked"))
+        input.trigger("change")
+    })
 }
 
 export function CurrentTime() {
