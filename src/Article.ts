@@ -1,7 +1,7 @@
 
 import $ from "jquery"
 
-import NDK, { NDKWiki, NDKDraft, NDKEvent, nip19 } from "@nostr-dev-kit/ndk";
+import NDK, { NDKWiki, NDKDraft, NDKEvent, NDKUser, nip19 } from "@nostr-dev-kit/ndk";
 
 import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core';
 import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
@@ -9,7 +9,8 @@ import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
 import { safeAsync, formatNip54TagD, EventTagValues,
-     FormattedTime, FormattedBytes, MakeLabelActive, TimeToISO, TimeToUnix } from "@/various.js";
+    FormattedTime, FormattedBytes, MakeLabelActive,
+    CurrentTime, TimeToISO, TimeToUnix } from "@/various.js";
 
 import { LangTools } from "./LangTools.js";
 import { CreateLangEvent } from "./LangEvent.js";
@@ -30,6 +31,7 @@ export class Article extends Module {
     useLastFormat: string = "1"
     editMode: boolean = false
     editorNode: JQuery<HTMLElement>|undefined
+    draftId: string|undefined
 
     constructor() {
         super()
@@ -642,6 +644,55 @@ export class Article extends Module {
         }
     }
 
+    isRawEdit(): boolean {
+        const switcher = this.editorNode.find("#RawEventCheckbox")
+        return switcher.prop("checked")
+    }
+
+    applyCurrent() {
+        if (this.isRawEdit())  this.applyRawEventEdit()
+        else this.applyEditor()
+    }
+
+    async draft() {
+        if (!this.editMode) {
+            console.warn("Article.preview: not edit mode!")
+            return
+        }
+        if (!this.wiki) {
+            console.warn("No event to draft!")
+            return
+        }
+        this.applyCurrent()
+        const context = this.context
+        const status = this.editorNode.find("#ArticleDraftStatus")
+        const id = this.editorNode.find("input[name='ArticleId']").val()
+        const time = CurrentTime()
+        const draft = new NDKDraft(this.ndk)
+        draft.event = this.wiki
+        const user = this.ndk.activeUser
+        //console.debug("Active user", user)
+        await draft.encrypt(this.ndk.activeUser)
+        if (!this.sameContext(context))
+        console.debug("After encryption:", draft.identifier)
+
+        if (!this.draftId)  this.draftId = `wiki-${id}-${time}`
+        draft.dTag = this.draftId
+        console.debug("After id set:", draft.identifier)
+        const p = draft.publishReplaceable()
+        console.debug("After publishing:", draft.identifier)
+        status.text("Saving...")
+        p.then(() => {
+            if (!this.sameContext(context))  return
+            console.debug("After published:", draft.identifier)
+            status.text(`Saved on ${FormattedTime(time)}`)
+        }).catch((error) => {
+            if (!this.sameContext(context))  return
+            status.text(`Not saved!`)
+            this.error(error)
+        })
+    }
+
     preview() {
         if (!this.editMode) {
             console.warn("Article.preview: not edit mode!")
@@ -677,13 +728,15 @@ export class Article extends Module {
     async setupEditors(id: string|undefined = undefined) {
         this.editorNode = $(ArticleEditHTML)
         const en = this.editorNode
+        const draftButt = en.find("button#ArticleDraftButton")
+        const draftStatus = en.find("span#ArticleDraftStatus")
         const prevButt = en.find("button#ArticlePreviewButton")
         const pubButt = en.find("button#ArticlePublishButton")
         const switchEdit = en.find("input#RawEventCheckbox")
         const rawEventEdit = en.find("textarea#ArticleEditRawEvent")
 
         if (!this.event && id)
-            en.find("input[name='ArticleId']").val(data.id)
+            en.find("input[name='ArticleId']").val(id)
 
         const fmt = en.find("input[name='ArticleFormat']")
         const fmtSel = en.find("select[name='ArticleFormatSelect']")
@@ -748,6 +801,10 @@ export class Article extends Module {
             this.guiAddTag(tag)
         })
 
+        draftButt.click(() => {
+            this.draft()
+        })
+
         prevButt.click(() => {
             try {
                 //console.debug("Preview clicked.")
@@ -807,6 +864,7 @@ export class Article extends Module {
                 if (event.kind == NDKDraft.kind) {
                     //console.debug("Got draft!")
                     const draft = NDKDraft.from(event)
+                    //console.debug("Applied to NDKDraft.")
                     const e = await draft.getEvent()
                     //console.debug("Event from draft:", e)
                     if (!this.sameContext(context)) {
@@ -814,7 +872,10 @@ export class Article extends Module {
                         return
                     }
                     if (e) {
-                        if (e.kind == NDKWiki.kind)  this.setEvent(e)
+                        if (e.kind == NDKWiki.kind) {
+                            this.draftId = draft.identifier
+                            this.setEvent(e)
+                        }
                         else this.error(`Wrong event kind: ${e.kind}!`)
                     }
                     else {
@@ -844,6 +905,7 @@ export class Article extends Module {
 
     async edit(data:string|object) {
         this.editMode = true
+        this.draftId = undefined
         const context = this.context
         if (typeof data == "string") {
             this.event = null

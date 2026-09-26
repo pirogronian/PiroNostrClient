@@ -59,6 +59,11 @@ export function MakeLabelActive(node: JQuery<HTMLElement>) {
     node.addClass("Active")
 }
 
+export function CurrentTime() {
+    const date = new Date()
+    return date.getTime() / 1000
+}
+
 export function FormattedTime(seconds: number|undefined|null = null) {
     let t: Date|null = null
     if (seconds) {
