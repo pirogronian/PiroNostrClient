@@ -674,9 +674,14 @@ export class Article extends Module {
         }
     }
 
-    edit() {
+    async edit() {
         this.editMode = true
         const context = this.context
+        const my = await this.isMine()
+        if (!this.sameContext(context))  return
+        if (my ===  false) {
+            this.wiki?.tag(this.event)
+        }
         this.clearUI()
         this.editorNode = $(ArticleEditHTML)
         const en = this.editorNode
