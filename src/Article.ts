@@ -654,7 +654,7 @@ export class Article extends Module {
         else this.applyEditor()
     }
 
-    async draft() {
+    async draft(newId: boolean = false) {
         if (!this.editMode) {
             console.warn("Article.preview: not edit mode!")
             return
@@ -676,7 +676,7 @@ export class Article extends Module {
         if (!this.sameContext(context))
         console.debug("After encryption:", draft.identifier)
 
-        if (!this.draftId)  this.draftId = `wiki-${id}-${time}`
+        if (!this.draftId || newId)  this.draftId = `wiki-${id}-${time}`
         draft.dTag = this.draftId
         console.debug("After id set:", draft.identifier)
         const p = draft.publishReplaceable()
@@ -729,6 +729,7 @@ export class Article extends Module {
         this.editorNode = $(ArticleEditHTML)
         const en = this.editorNode
         const draftButt = en.find("button#ArticleDraftButton")
+        const draftNewButt = en.find("button#ArticleDraftNewButton")
         const draftStatus = en.find("span#ArticleDraftStatus")
         const prevButt = en.find("button#ArticlePreviewButton")
         const pubButt = en.find("button#ArticlePublishButton")
@@ -803,6 +804,10 @@ export class Article extends Module {
 
         draftButt.click(() => {
             this.draft()
+        })
+
+        draftNewButt.click(() => {
+            this.draft(true)
         })
 
         prevButt.click(() => {
