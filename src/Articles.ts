@@ -120,6 +120,14 @@ export class Articles extends Module {
             if (e.key === "Enter")
                 console.log("Enter pressed in input field.")
         })*/
+        const cnB = form.find("#CreateNewButton")
+        const idI = form.find("input[name='id']")
+        cnB.click(() => {
+            let param = ""
+            const id = idI.val()
+            if (id)  param = `?id=${id}`
+            App.get().article.navigate(`/edit/${param}`)
+        })
     }
 
     isFinder(): boolean {

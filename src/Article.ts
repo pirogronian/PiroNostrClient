@@ -674,7 +674,7 @@ export class Article extends Module {
         }
     }
 
-    async edit() {
+    async edit(data: object) {
         this.editMode = true
         const context = this.context
         const my = await this.isMine()
@@ -689,6 +689,9 @@ export class Article extends Module {
         const pubButt = en.find("button#ArticlePublishButton")
         const switchEdit = en.find("input#RawEventCheckbox")
         const rawEventEdit = en.find("textarea#ArticleEditRawEvent")
+
+        if (!this.event && data && data.id)
+            en.find("input[name='ArticleId']").val(data.id)
 
         const fmt = en.find("input[name='ArticleFormat']")
         const fmtSel = en.find("select[name='ArticleFormatSelect']")
@@ -826,9 +829,9 @@ export class Article extends Module {
     }
 
     setup() {
-        this.onRoute("/edit/", () => {
+        this.onRoute("/edit/", (match) => {
             this.setCurrent()
-            this.edit()
+            this.edit(match.params)
         })
         this.onRoute("/:id", (match) => {
             this.setCurrent()
