@@ -20,6 +20,7 @@ export class Drafts extends Module {
             console.warn("Got event not being a draft!")
             return
         }
+        const context = this.context
         const draft = NDKDraft.from(event)
         const item = $(DraftItemHTMK)
         const id = item.find("a.DraftId")
@@ -33,9 +34,16 @@ export class Drafts extends Module {
         const size = item.find(".DraftEventSize")
         size.text(FormattedBytes(draft.size()))
         const empty = item.find(".Empty")
+        const del = item.find(".Delete")
         if (!draft.content) empty.hide()
+        else del.hide()
         empty.click(() => {
             this.remove(draft)
+        })
+        del.click(async () => {
+            await draft.delete()
+            if (!this.sameContext(context))  return
+            this.navigate()
         })
 
         const c = $("#DraftsList")
