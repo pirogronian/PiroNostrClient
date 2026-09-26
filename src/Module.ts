@@ -3,7 +3,7 @@ import { EventEmitter } from "tseep"
 import $ from "jquery"
 import Navigo from "navigo"
 import NDK, { NDKEvent, NDKRelay, NDKRelaySet, NDKPool,
-     NDKSubscriptionCacheUsage, type NDKFilter, 
+     NDKSubscriptionCacheUsage, type NDKFilter, nip19,
      NDKSubscription, type NDKSubscriptionOptions,
     isNip33AValue, filterFromId, relaysFromBech32 } from "@nostr-dev-kit/ndk"
 import { Router } from "@/Router.js"
@@ -148,7 +148,34 @@ export class Module extends EventEmitter {
         }
 
         if (typeof idOrFilter === "string") {
-            filters = [filterFromId(idOrFilter)];
+            try {
+                const decoded = nip19.decode(idOrFilter);
+
+                if (decoded.type === 'naddr') {
+                    const data = decoded.data;
+                    const filter: NDKFilter = {
+                        kinds: [data.kind],
+                        authors: [data.pubkey]
+                    };
+
+                    if (!data.identifier)  console.warn("Event id not provided in naddr!")
+                    if (data.identifier !== undefined) {
+                        filter["#d"] = [data.identifier];
+                    }
+
+                    filters = [filter];
+                } else if (decoded.type === 'nevent') {
+                    filters = [{ ids: [decoded.data.id] }];
+                } else if (decoded.type === 'note') {
+                    filters = [{ ids: [decoded.data] }];
+                } else {
+                    // Fallback dla surowego ID w hex lub innych typów
+                    filters = [filterFromId(idOrFilter)];
+                }
+            } catch {
+                // Jeśli to nie jest bech32 (np. surowy hex ID lub tag 'd')
+                filters = [filterFromId(idOrFilter)];
+            }
         } else if (Array.isArray(idOrFilter)) {
             filters = idOrFilter;
         } else {
@@ -166,7 +193,7 @@ export class Module extends EventEmitter {
 
         if (relaySet)  opts.relaySet = relaySet
 
-        //console.debug("Module.subscribe", filters, opts, autoStartOrRelaySet, _autoStart)
+        //console.debug("Module.subscribe:", filters, opts, autoStartOrRelaySet, _autoStart)
 
         return this.ndk.subscribe(filters, opts, autoStartOrRelaySet, _autoStart)
     }
