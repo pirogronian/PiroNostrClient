@@ -69,6 +69,23 @@ export function FormattedTime(seconds: number|undefined|null = null) {
     return t.toLocaleString()
 }
 
+export function TimeToISO(unixSeconds: number): string {
+    const date = new Date(unixSeconds * 1000);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+export function TimeToUnix(formatted: string): number {
+    const date = new Date(formatted)
+    return date.getTime() / 1000
+}
+
 export function FormattedBytes(bytes: number|undefined, decimals: number = 2): string {
     if (bytes == undefined)  return ""
     if (bytes === 0) return "0 B";

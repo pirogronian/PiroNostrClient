@@ -8,7 +8,8 @@ import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
-import { safeAsync, formatNip54TagD, EventTagValues, FormattedTime, FormattedBytes, MakeLabelActive } from "@/various.js";
+import { safeAsync, formatNip54TagD, EventTagValues,
+     FormattedTime, FormattedBytes, MakeLabelActive, TimeToISO, TimeToUnix } from "@/various.js";
 
 import { LangTools } from "./LangTools.js";
 import { CreateLangEvent } from "./LangEvent.js";
@@ -549,6 +550,8 @@ export class Article extends Module {
         en.find("input[name='ArticleTitle']").val(this.wiki.title)
         en.find("input[name='ArticleId']").val(this.wiki.dTag)
         en.find("input[name='ArticleFormat']").val(this.wiki.tagValue("f"))
+        if (this.wiki.published_at)
+            en.find("input[name='ArticlePublishedAt']").val(TimeToISO(this.wiki.published_at))
         en.find("textarea#ArticleSummary").val(this.wiki.summary)
         en.find("textarea#ArticleContent").val(this.wiki.content)
 
@@ -591,6 +594,7 @@ export class Article extends Module {
         this.wiki.title = en.find("input[name='ArticleTitle']").val()
         this.wiki.dTag = en.find("input[name='ArticleId']").val()
         this.wiki.tags.push(["f", en.find("input[name='ArticleFormat']").val()])
+        this.wiki.tags.push(["published_at", `${TimeToUnix(en.find("input[name='ArticlePublishedAt']").val())}`])
         this.wiki.summary = en.find("textarea#ArticleSummary").val()
         this.wiki.content = en.find("textarea#ArticleContent").val()
         if (!this.wiki.tags)  return // To shut up editor warnings.
