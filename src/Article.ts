@@ -568,8 +568,14 @@ export class Article extends Module {
 
         this.guiClearTags()
         this.wiki.tags.forEach((tag) => {
-            if (tag[0] && !["d", "f", "c", "t", "title", "summary", "client", "published_at"].includes(tag[0]))
-                this.guiAddTag(tag)
+            if (tag[0] && !(["d", "f", "c", "t", "title", "summary", "client", "published_at"].includes(tag[0]))) {
+                if (tag[0] == "l" && tag[1]) {
+                    const code = tag[1]
+                    let standard = tag[2]
+                    if (!LangTools.isStandardName(standard) || !LangTools.isValid(code, standard))
+                        this.guiAddTag(tag)
+                }
+            }
         })
     }
 
