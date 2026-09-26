@@ -91,7 +91,7 @@
 
 .List {
     display: inline-block;
-    max-width: 32dvh
+    //max-width: 32dvh
 }
 
 #ArticleEditor #Topics,
@@ -99,6 +99,7 @@
 #ArticleEditor #Languages,
 #ArticleEditor #Tags {
     @extend .List;
+    vertical-align: top
 }
 
 #ArticleEditor textarea {
