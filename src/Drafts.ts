@@ -35,7 +35,10 @@ export class Drafts extends Module {
         size.text(FormattedBytes(draft.size()))
         const empty = item.find(".Empty")
         const del = item.find(".Delete")
-        if (!draft.content) empty.hide()
+        if (!draft.content) {
+            item.addClass("EmptyDraft")
+            empty.hide()
+        }
         else del.hide()
         empty.click(() => {
             this.remove(draft)
