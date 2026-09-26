@@ -713,6 +713,7 @@ export class Article extends Module {
         try {
             console.debug("Trying to publish a Wiki event...")
             this.hideMessages()
+            this.applyCurrent()
             const relays = this.wiki?.publishReplaceable()
             relays?.then((set) => {
                 const addr = nip19.naddrEncode(this.wiki)
