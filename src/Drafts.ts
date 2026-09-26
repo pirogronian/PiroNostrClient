@@ -57,11 +57,11 @@ export class Drafts extends Module {
     }
 
     onLogin() {
-
+        $("#DraftsLink").show()
     }
 
     onLogout() {
-
+        $("#DraftsLink").hide()
     }
 
     setup() {
@@ -72,5 +72,10 @@ export class Drafts extends Module {
             this.guiCreateMain()
             this.load()
         })
+        this.makeLinkActive($("#DraftsLink"), "/")
+        const u = App.get().user
+        u.on("login", () => { this.onLogin() })
+        u.on("logout", () => { this.onLogout() })
+        if (u.loggedUser)  this.onLogin()
     }
 }
