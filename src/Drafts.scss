@@ -1,0 +1,21 @@
+
+@use "style";
+
+.DraftItem {
+    @extend .Frame;
+    @extend .OnerowFlexContainer;
+    padding: 0;
+}
+
+.DraftItem > * {
+    margin: 0
+}
+
+.DraftItem .DraftCreatedAt {
+    text-decoration: underline;
+}
+
+.DraftItem .DraftEventSize {
+    padding: 0;
+    margin: 0 0 0 1mm
+}
