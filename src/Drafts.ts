@@ -14,16 +14,21 @@ import DraftItemHTMK from "@/DraftItem.html?raw"
 export class Drafts extends Module {
     onEvent(event: NDKEvent) {
         if (!this.isCurrent())  return
+        if (event.kind != NDKDraft.kind) {
+            console.warn("Got event not being a draft!")
+            return
+        }
+        const draft = NDKDraft.from(event)
         const item = $(DraftItemHTMK)
         const id = item.find("a.DraftId")
-        const addr = nip19.naddrEncode(event)
-        App.get().article.makeLinkActive(id, `/edit/${addr}`, event.dTag)
+        const addr = nip19.naddrEncode(draft)
+        App.get().article.makeLinkActive(id, `/edit/${addr}`, draft.dTag)
         const crat = item.find("#DraftCreatedAt")
-        crat.text(FormattedTime(event.created_at))
+        crat.text(FormattedTime(draft.created_at))
         const rel = item.find("#Relay")
-        rel.text(event.relay?.url)
+        rel.text(draft.relay?.url)
         const size = item.find("#DraftEventSize")
-        size.text(FormattedBytes(event.size()))
+        size.text(FormattedBytes(draft.size()))
 
         const c = $("#DraftsList")
         c.append(item)
