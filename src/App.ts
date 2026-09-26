@@ -12,6 +12,7 @@ import { Module } from "@/Module.js"
 import { About } from "@/About.js"
 import { Articles } from '@/Articles.js';
 import { Article } from "@/Article.js";
+import { Drafts } from "./Drafts.js";
 import type { CallExpression } from 'typescript/unstable/ast';
 
 //import { LangTools } from "@/LangTools.js"
@@ -26,6 +27,7 @@ export class App extends Module {
     user: User
     articles: Articles
     article: Article
+    drafts: Drafts
 
     static _app: App
 
@@ -50,6 +52,8 @@ export class App extends Module {
         this.articles.register("articles", "articles", this)
         this.article = new Article()
         this.article.register("article", "article", this)
+        this.drafts = new Drafts()
+        this.drafts.register("drafts", "drafts", this)
     }
 
     static get() : App { return App._app }
@@ -126,6 +130,7 @@ export class App extends Module {
         this.user.setup()
         this.article.setup()
         this.articles.setup()
+        this.drafts.setup()
 
         this.makeLinkActive($("#HomeLink"), "")
         this.relays.on("offline", () => { console.debug("Offline!"); this.guiIndex() })

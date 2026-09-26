@@ -795,20 +795,30 @@ export class Article extends Module {
 
     async onEvent(event: NDKEvent) {
         if (!this.isCurrent())  return
-        const context = this.context
         if (!this.event ||
             (this.event && 
             this.event.created_at &&
             event.created_at &&
             this.event.created_at < event.created_at)) {
             this.newContext()
+            const context = this.context
             this.clearUI()
             if (this.editMode) {
                 if (event.kind == NDKDraft.kind) {
+                    console.debug("Got draft!")
                     const draft = NDKDraft.from(event)
                     const e = await draft.getEvent()
-                    if (!this.sameContext(context))  return
-                    if (e)  this.setEvent(e)
+                    console.debug("Event from draft:", e)
+                    if (!this.sameContext(context)) {
+                        console.warn("Context changed, breaking...")
+                        return
+                    }
+                    if (e) {
+                        this.setEvent(e)
+                    }
+                    else {
+                        console.warn("No event in draft!")
+                    }
                 }
                 this.setupEditors()
             } else {
@@ -843,7 +853,7 @@ export class Article extends Module {
         if (data && typeof data == "object" && data.id)
             this.setupEditors(data.id)
         else if (typeof data == "string") {
-            this.subscribe(addr, { closeOnEose: true },
+            this.subscribe(data, { closeOnEose: true },
             { onEvent: (event) => {
                 //console.debug("Article: got event:", event)
                 this.onEvent(event)
