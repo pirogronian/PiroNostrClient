@@ -520,6 +520,10 @@ export class Article extends Module {
         langs.append(div)
     }
 
+    guiClearLangs() {
+        this.editorNode.find("fieldset#Languages").children().remove(".Item")
+    }
+
     guiAddTag(tag: string[]) {
         const c = this.editorNode.find("fieldset#Tags")
         const div = $("<div>")
@@ -560,6 +564,7 @@ export class Article extends Module {
             if (tag[1])  this.guiAddTopic(tag[1])
         })
 
+        this.guiClearLangs()
         const le = CreateLangEvent(this.wiki)
         const ll = le.getLanguages()
         ll.forEach((lang) => {
@@ -572,9 +577,9 @@ export class Article extends Module {
                 if (tag[0] == "l" && tag[1]) {
                     const code = tag[1]
                     let standard = tag[2]
-                    if (!LangTools.isStandardName(standard) || !LangTools.isValid(code, standard))
-                        this.guiAddTag(tag)
+                    if (LangTools.isStandardName(standard) && LangTools.isValid(code, standard))  return
                 }
+                this.guiAddTag(tag)
             }
         })
     }
@@ -596,6 +601,12 @@ export class Article extends Module {
         const topics = en.find(".Topic")
         topics.each((index, topic) => {
             this.wiki.tags.push(["t", $(topic).text()])
+        })
+        const langs = en.find(".Lang")
+        const le = CreateLangEvent(this.wiki)
+        langs.each((index, item) => {
+            const code = $(item).attr("code")
+            le.addLanguage(code, "bcp47")
         })
         const tags = en.find(".Tag")
         tags.each((index, tag) => {
