@@ -1,7 +1,7 @@
 
 import $ from "jquery"
 
-import NDK, { NDKWiki, NDKEvent, nip19 } from "@nostr-dev-kit/ndk";
+import NDK, { NDKWiki, NDKDraft, NDKEvent, nip19 } from "@nostr-dev-kit/ndk";
 
 import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core';
 import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
@@ -674,15 +674,7 @@ export class Article extends Module {
         }
     }
 
-    async edit(data: object) {
-        this.editMode = true
-        const context = this.context
-        const my = await this.isMine()
-        if (!this.sameContext(context))  return
-        if (my ===  false) {
-            this.wiki?.tag(this.event)
-        }
-        this.clearUI()
+    async setupEditors(id: string|undefined = undefined) {
         this.editorNode = $(ArticleEditHTML)
         const en = this.editorNode
         const prevButt = en.find("button#ArticlePreviewButton")
@@ -690,7 +682,7 @@ export class Article extends Module {
         const switchEdit = en.find("input#RawEventCheckbox")
         const rawEventEdit = en.find("textarea#ArticleEditRawEvent")
 
-        if (!this.event && data && data.id)
+        if (!this.event && id)
             en.find("input[name='ArticleId']").val(data.id)
 
         const fmt = en.find("input[name='ArticleFormat']")
@@ -801,21 +793,32 @@ export class Article extends Module {
         }
     }
 
-    onEvent(event: NDKEvent) {
+    async onEvent(event: NDKEvent) {
         if (!this.isCurrent())  return
+        const context = this.context
         if (!this.event ||
             (this.event && 
             this.event.created_at &&
             event.created_at &&
             this.event.created_at < event.created_at)) {
             this.newContext()
-            this.setEvent(event)
             this.clearUI()
-            this.show()
+            if (this.editMode) {
+                if (event.kind == NDKDraft.kind) {
+                    const draft = NDKDraft.from(event)
+                    const e = await draft.getEvent()
+                    if (!this.sameContext(context))  return
+                    if (e)  this.setEvent(e)
+                }
+                this.setupEditors()
+            } else {
+                this.setEvent(event)
+                this.show()
+            }
         }
     }
 
-    async handle(addr: string) {
+    async view(addr: string) {
         this.event = null
         this.wiki = null
         this.editMode = false
@@ -828,15 +831,42 @@ export class Article extends Module {
         })
     }
 
+    async edit(data:string|object) {
+        this.editMode = true
+        const context = this.context
+        const my = await this.isMine()
+        if (!this.sameContext(context))  return
+        if (my ===  false) {
+            this.wiki?.tag(this.event)
+        }
+        this.clearUI()
+        if (data && typeof data == "object" && data.id)
+            this.setupEditors(data.id)
+        else if (typeof data == "string") {
+            this.subscribe(addr, { closeOnEose: true },
+            { onEvent: (event) => {
+                //console.debug("Article: got event:", event)
+                this.onEvent(event)
+            }
+        })
+        } else {
+            this.setupEditors()
+        }
+    }
+
     setup() {
         this.onRoute("/edit/", (match) => {
             this.setCurrent()
             this.edit(match.params)
         })
+        this.onRoute("/edit/:id", (match) => {
+            this.setCurrent()
+            this.edit(match.data.id)
+        })
         this.onRoute("/:id", (match) => {
             this.setCurrent()
             const addr = match.data.id
-            this.handle(addr)
+            this.view(addr)
         })
         App.get().user.on("login", () => { this.guiUpdateEditButtons() })
         App.get().user.on("logout", () => { this.guiUpdateEditButtons() })
