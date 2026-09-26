@@ -11,6 +11,8 @@ import { App } from "@/App.js"
 import DraftsMainHTML from "@/Drafts.html?raw"
 import DraftItemHTMK from "@/DraftItem.html?raw"
 
+import "@/Drafts.scss"
+
 export class Drafts extends Module {
     onEvent(event: NDKEvent) {
         if (!this.isCurrent())  return
@@ -22,13 +24,19 @@ export class Drafts extends Module {
         const item = $(DraftItemHTMK)
         const id = item.find("a.DraftId")
         const addr = nip19.naddrEncode(draft)
-        App.get().article.makeLinkActive(id, `/edit/${addr}`, draft.dTag)
-        const crat = item.find("#DraftCreatedAt")
+        if (draft.content)  App.get().article.makeLinkActive(id, `/edit/${addr}`, draft.identifier)
+        else id.text(draft.identifier)
+        const crat = item.find(".DraftCreatedAt")
         crat.text(FormattedTime(draft.created_at))
-        const rel = item.find("#Relay")
+        const rel = item.find(".Relay")
         rel.text(draft.relay?.url)
-        const size = item.find("#DraftEventSize")
+        const size = item.find(".DraftEventSize")
         size.text(FormattedBytes(draft.size()))
+        const empty = item.find(".Empty")
+        if (!draft.content) empty.hide()
+        empty.click(() => {
+            this.remove(draft)
+        })
 
         const c = $("#DraftsList")
         c.append(item)
@@ -39,6 +47,17 @@ export class Drafts extends Module {
 
     guiCreateMain() {
         this.mainView($(DraftsMainHTML))
+    }
+
+    remove(draft: NDKDraft) {
+        const context = this.context
+        draft.content = ""
+        draft.tags = [["d", draft.identifier]]
+        const p = draft.publishReplaceable()
+        p.then(() => {
+            if (!this.sameContext(context))  return
+            this.navigate()
+        })
     }
 
     async load() {
