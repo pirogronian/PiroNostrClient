@@ -9,6 +9,7 @@ import { User } from "@/User.js"
 import { safeAsync } from "@/various.js"
 import { Router } from "@/Router.js"
 import { Module } from "@/Module.js"
+import { SettingsManager } from "./SettingsManager.js";
 import { About } from "@/About.js"
 import { Articles } from '@/Articles.js';
 import { Article } from "@/Article.js";
@@ -45,6 +46,7 @@ export class App extends Module {
              enableOutboxModel: true,
             aiGuardrails: true });
         this.ndk.clientName = CLIENT_NAME
+        Module.settingsManager = new SettingsManager(this.ndk)
         this.about = new About()
         this.about.register("about", "about", this)
         this.relays = new Relays()

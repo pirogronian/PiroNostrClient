@@ -11,6 +11,11 @@ import { InnerUrl, InnerLink, MakeLinkInner } from "./various.js"
 
 export type NDKSubscriptionEventHandlers = Parameters<NDK['subscribe']>[1];
 
+export interface SettingsManager {
+    settings(key: string, value: string|undefined|null): string|null|void;
+    publish(relaySet?: NDKRelaySet, timeoutMs?: number, requiredRelayCount?: number): Promise<boolean> ;
+}
+
 function correctRelaySet(relaySet: NDKRelaySet, pool: NDKPool): NDKRelaySet {
     const connectedRelays = pool.connectedRelays();
     const includesConnectedRelay = Array.from(relaySet.relays).some((relay) => {
@@ -46,6 +51,7 @@ export class Module extends EventEmitter {
     ndk!: NDK
     static current: string = ""
     static offline: boolean|null = null
+    static settingsManager: SettingsManager|undefined
     context: number = 0
 
     register(name: string, routingNane: string|null = null, parent: Module|undefined = undefined) {
@@ -73,14 +79,7 @@ export class Module extends EventEmitter {
         const ret: string|undefined = undefined
         const key = this.settingsPath.concat(this.settingsSeparator).concat(name)
 
-        if (value) {
-            return localStorage.setItem(key, value)
-        }
-        if (value === null) {
-            console.log("Removing item:", key)
-            return localStorage.removeItem(key)
-        }
-        return localStorage.getItem(key)
+        return Module.settingsManager?.settings(key, value)
     }
 
     isCurrent() {

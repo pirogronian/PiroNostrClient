@@ -440,10 +440,14 @@ export class User extends Module {
         const loading = $("#UserLoading")
         loading.hide()
         const logout = $("#Logout")
+        const pubSet = $("#PublishSettings")
         const LoginForm = $("#Login")
         const upn = $("#UserProfile")
         $("#UserLoginNIP46Cancel").click(() => {
             this.cancelNip46Login()
+        })
+        pubSet.click(() => {
+            Module.settingsManager?.publish()
         })
 
         if (!user)  user = this.user
@@ -506,6 +510,8 @@ export class User extends Module {
             ualn.show()
             if (this.foreign) {
                 $("#Logout").hide()
+            } else {
+                pubSet.show()
             }
 
             const rl = await this.relays()
@@ -560,7 +566,7 @@ export class User extends Module {
             this.foreign = false
             try {
                 this.user = await this.get()
-            } catch {
+            } catch(error) {
                 this.error(error)
             }
 
