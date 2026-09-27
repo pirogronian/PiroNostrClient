@@ -17,8 +17,11 @@ export class SettingsManager extends EventEmitter {
     timeKey: string = "SettingsTime"
     time: number = 0
 
+    modifiedKeys: Set<string>
+
     constructor(ndk: NDK, timeKey?: string) {
         super()
+        this.modifiedKeys = new Set<string>()
         this.ndk = ndk
         if (timeKey)  this.timeKey = timeKey
 
@@ -40,6 +43,7 @@ export class SettingsManager extends EventEmitter {
         if (value) {
             this._settings[key] = value
             localStorage.setItem(key, value)
+            this.modifiedKeys.add(key)
             this.modified = true
             this.updateTime()
             this.emit(this.MODIFIED_EVENT)
@@ -48,6 +52,7 @@ export class SettingsManager extends EventEmitter {
             console.log("Removing item:", key)
             delete this._settings[key]
             localStorage.removeItem(key)
+            this.modifiedKeys.add(key)
             this.modified = true
             this.updateTime()
             this.emit(this.MODIFIED_EVENT)
@@ -91,6 +96,7 @@ export class SettingsManager extends EventEmitter {
         const time = TimeToUnix(settings[this.timeKey])
         if (time <= this.time) {
             console.debug("Remote settings time older than local:", this.time - time)
+            console.debug("Modified keys:", this.modifiedKeys)
             return
         }
         for (const key in settings) {
@@ -99,6 +105,7 @@ export class SettingsManager extends EventEmitter {
         }
         this.time = time
         //localStorage.setItem(this.timeKey, TimeToISO(this.time))
+        this.modifiedKeys.clear()
         this.modified = false
         this.emit(this.SYNCED_EVENT)
     }
@@ -114,6 +121,7 @@ export class SettingsManager extends EventEmitter {
 
         console.debug("Publish settings event:", event)
         await event.publishReplaceable(relaySet, timeoutMs, requiredRelayCount)
+        this.modifiedKeys.clear()
         this.modified = false
         this.emit(this.PUBLISHED_EVENT)
     }
