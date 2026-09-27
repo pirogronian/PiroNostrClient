@@ -439,6 +439,7 @@ export class User extends Module {
 
         const loading = $("#UserLoading")
         loading.hide()
+        const logout = $("#Logout")
         const LoginForm = $("#Login")
         const upn = $("#UserProfile")
         $("#UserLoginNIP46Cancel").click(() => {
@@ -448,7 +449,6 @@ export class User extends Module {
         if (!user)  user = this.user
 
         if (user) {
-            //LoginForm.hide()
             upn.show()
             if (!user.profile)  this.warning("Loading user profile failed.")
             const upkn = $("#UserPubkey")
@@ -534,7 +534,9 @@ export class User extends Module {
             }
         } else {
             //upn.hide()
+            logout.hide()
             LoginForm.show()
+
             if (this.nip46autologin && !this.foreign)
                 this.guiNip46Autologin()
         }
