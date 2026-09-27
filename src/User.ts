@@ -425,6 +425,10 @@ export class User extends Module {
     async show(user: NDKUser|null|undefined = undefined) {
         const context = this.context
         this.mainView().html(UserHTML)
+        const reload = $("#UserReload")
+        reload.click(() => {
+            this.navigate()
+        })
         const LoginForm = $("#Login")
         const upn = $("#UserProfile")
         const selector = this.guiLoginSelector()
