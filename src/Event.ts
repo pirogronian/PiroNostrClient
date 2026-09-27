@@ -1,5 +1,5 @@
 
-import { NDKEvent, type NDKTag } from "@nostr-dev-kit/ndk";
+import { NDKEvent, type NDKRawEvent, type NDKTag, nip19 } from "@nostr-dev-kit/ndk";
 
 export namespace Event {
     export class TagFilterOptions {
@@ -69,11 +69,35 @@ export namespace Event {
         return ret
     }
 
+    export function naddr(e: NDKEvent): string {
+        return nip19.naddrEncode(e.rawEvent())
+    }
+
+    export function nevent(e: NDKEvent): string {
+        return nip19.neventEncode(e.rawEvent())
+    }
+
     export function setup() {
         NDKEvent.prototype.getMatchingTags = getMatchingTags
         NDKEvent.prototype.hasTag = hasTag
         NDKEvent.prototype.tagValue = tagValue
         NDKEvent.prototype.removeTag = removeTag
         NDKEvent.prototype.size = size
+
+        Object.defineProperty(NDKEvent.prototype, 'naddr', {
+            get: function (this: NDKEvent) {
+                return naddr(this); // lub naddr.call(this) / kod z funkcji naddr
+            },
+            enumerable: false,
+            configurable: true,
+        });
+
+        Object.defineProperty(NDKEvent.prototype, 'nevent', {
+            get: function (this: NDKEvent) {
+                return nevent(this);
+            },
+            enumerable: false,
+            configurable: true,
+        });
     }
 }

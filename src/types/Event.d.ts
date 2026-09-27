@@ -13,5 +13,8 @@ declare module '@nostr-dev-kit/ndk' {
     removeTag(tagName: string | string[], markerOrFlag?: string|boolean, options: TagFilterOptions = new TagFilterOptions()): void;
 
     size(): number;
+
+    get naddr(): string
+    get nevent(): string
   }
 }
