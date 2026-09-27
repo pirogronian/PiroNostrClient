@@ -281,6 +281,32 @@ export class Article extends Module {
         } else { console.warn("No user, no edit.") }
     }
 
+    share() {
+        if (!this.wiki) {
+            console.warn("No Wiki to share!")
+            return
+        }
+        if (this.editMode) {
+            console.warn("Sharing not avaliable in edit mode!")
+            return
+        }
+        const dialog = $("#ArticleShareDialog")
+        const naddr = dialog.find("#ArticleNaddr")
+        const nevent = dialog.find("#ArticleNevent")
+        const url = dialog.find("#ArticleUrl")
+        naddr.text(this.wiki.naddr)
+        naddr.click(() => { navigator.clipboard.writeText(naddr.text()) })
+        nevent.text(this.wiki.nevent)
+        nevent.click(() => { navigator.clipboard.writeText(nevent.text()) })
+        url.text(window.location.href)
+        url.click(() => { navigator.clipboard.writeText(url.text()) })
+        const close = dialog.find("#CloseShareArticleDialog")
+        close.click(() => {
+            dialog.prop("open", false)
+        })
+        dialog.prop("open", true)
+    }
+
     async show(container = this.mainView()) {
         const context = this.context
         if (!this.event || !this.wiki) {
@@ -447,6 +473,10 @@ export class Article extends Module {
 
         o.find("#ForkArticleButton").click(() => { this.navigate("/edit/") })
         o.find("#EditArticleButton").click(() => { this.navigate("/edit/") })
+        
+        const share = o.find("#ShareArticleButton")
+        if (this.editMode)  share.hide()
+        else share.click(() => { this.share() })
 
         this.guiUpdateEditButtons()
     }

@@ -69,6 +69,11 @@
     @extend .Frame
 }
 
+#ArticleShareDialog p:hover {
+    text-decoration: underline;
+    cursor: pointer
+}
+
 #ArticleEditor {
     @extend .Frame;
     display: flex;

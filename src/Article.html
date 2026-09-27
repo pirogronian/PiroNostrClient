@@ -13,7 +13,14 @@
   <label for="FollowAuthor" class="active">Follow the author:<input type="checkbox" name="FollowAuthor"/></label>
   <button type="button" id="ForkArticleButton" style="display: none;">Fork</button>
   <button type="button" id="EditArticleButton" style="display: none;">Edit</button>
+  <button type="button" id="ShareArticleButton">Share</button>
 </div>
+<dialog id="ArticleShareDialog">
+  <p id="ArticleNaddr" title="Click to copy"></p>
+  <p id="ArticleNevent" title="Click to copy"></p>
+  <p id="ArticleUrl" title="Click to copy"></p>
+  <button id="CloseShareArticleDialog">Close</button>
+</dialog>
 <div id='ArticleView' class="Frame">
   <article id="ArticleContentView" class="Scrollable"></article>
 </div>
