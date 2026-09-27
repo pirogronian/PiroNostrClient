@@ -19,6 +19,8 @@ import type { CallExpression } from 'typescript/unstable/ast';
 
 import "@/style.scss"
 
+const CLIENT_NAME = "PiroNostrClient"
+
 export class App extends Module {
     router: Router
     ndk: NDK
@@ -33,7 +35,7 @@ export class App extends Module {
 
     constructor() {
         super()
-        this.register("PiroNostrClient", "")
+        this.register(CLIENT_NAME, "")
         App._app = this
         this.router = new Router()
         console.log("Router:", this.router)
@@ -42,6 +44,7 @@ export class App extends Module {
         this.ndk = new NDK({ cacheAdapter,
              enableOutboxModel: true,
             aiGuardrails: true });
+        this.ndk.clientName = CLIENT_NAME
         this.about = new About()
         this.about.register("about", "about", this)
         this.relays = new Relays()
