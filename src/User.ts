@@ -549,12 +549,21 @@ export class User extends Module {
         const context = this.context
         $("#UserLink").addClass("Current")
         if (id) {
-            this.user = await this.get(id)
+            try {
+                this.user = await this.get(id)
+            } catch (error) {
+                this.error(error)
+            }
             if (!this.sameContext(context))  return
             this.foreign = true
         } else {
             this.foreign = false
-            this.user = await this.get()
+            try {
+                this.user = await this.get()
+            } catch {
+                this.error(error)
+            }
+
             if (!this.sameContext(context))  return
         }
         this.show()
