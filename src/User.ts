@@ -424,18 +424,22 @@ export class User extends Module {
 
     async show(user: NDKUser|null|undefined = undefined) {
         const context = this.context
+        this.mainView().html(UserHTML)
         const LoginForm = $("#Login")
         const upn = $("#UserProfile")
+        const selector = this.guiLoginSelector()
+        selector.change(() => {
+            this.login(selector.val())
+        })
         $("#UserLoginNIP46Cancel").click(() => {
             this.cancelNip46Login()
         })
 
         if (!user)  user = this.user
-        let me = false
-        if (user == await this.get())  me = true
-        if (!this.sameContext(context))  return
 
         if (user) {
+            LoginForm.hide()
+            upn.show()
             if (!user.profile)  this.warning("Loading user profile failed.")
             const upkn = $("#UserPubkey")
             const unpn = $("#UserNPub")
@@ -450,8 +454,6 @@ export class User extends Module {
             const ulud06n = $("#UserLud06")
             const ulud16n = $("#UserLud16")
             const uwebn = $("#UserWebsite a")
-            LoginForm.hide()
-            upn.show()
             upkn.text(user.pubkey)
             upkn.click(() => {
                 navigator.clipboard.writeText(user.pubkey)
@@ -492,7 +494,7 @@ export class User extends Module {
             const ualn = $("#UserArticlesLink")
             App.get().articles.makeLinkActive(ualn, `?author=${user.pubkey}`)
             ualn.show()
-            if (me) {
+            if (!this.foreign) {
                 $("#Logout").show().click(() => {
                     this.logout()
                     this.loginReload()
@@ -526,10 +528,6 @@ export class User extends Module {
         } else {
             upn.hide()
             LoginForm.show()
-            const selector = this.guiLoginSelector()
-            selector.change(() => {
-                this.login(selector.val())
-            })
             if (this.nip46autologin && !this.foreign)
                 this.guiNip46Autologin()
         }
@@ -539,7 +537,6 @@ export class User extends Module {
     async handle(id: string|undefined = undefined) {
         this.newContext()
         const context = this.context
-        this.mainView().html(UserHTML)
         if (id) {
             this.user = await this.get(id)
             if (!this.sameContext(context))  return
