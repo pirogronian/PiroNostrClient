@@ -109,6 +109,10 @@ export class App extends Module {
         this.user.logout()
     }
 
+    reload() {
+        this.router.navigate(window.location.hash.replace("#", ""))
+    }
+
     guiIndex() {
         if (!this.isCurrent())  return
         this.clearUI()
@@ -133,6 +137,7 @@ export class App extends Module {
         this.drafts.setup()
 
         this.makeLinkActive($("#HomeLink"), "")
+        $("#Reload").click(() => { this.reload() })
         this.relays.on("offline", () => { console.debug("Offline!"); this.guiIndex() })
         this.relays.on("online", () => { console.debug("Online!"); this.guiIndex() })
     }
