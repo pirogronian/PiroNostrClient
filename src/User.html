@@ -1,8 +1,9 @@
 <div id="UserMainMenu">
-  <button type="button" id="Logout" style="display: none">Logout</button>
+  <button type="button" id="Logout">Logout</button>
   <a id="UserArticlesLink" style="display: none">User's articles</a>
 </div>
-<div id="Login" class="Frame">
+<div id="UserLoading">Waiting for user information. You may logout/login again to break.</div>
+<div id="Login" class="Frame" style="display: none">
   <label for="LoginMethod">Login with:</label>
   <select name="LoginMethod" id="LoginMethodSelect">
     <option value="">None</option>
@@ -24,7 +25,7 @@
     <button id="UserLoginNIP46Forget">Forget</button>
   </div>
 </div>
-<div id="UserProfile">
+<div id="UserProfile" style="display: none">
   <dl class="Info">
       <dt>Public key:</dt><dd id="UserPubkey" title="Click to copy"></dd>
       <dt>NPub:</dt><dd id="UserNPub" title="Click to copy"></dd>

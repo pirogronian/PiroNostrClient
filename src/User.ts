@@ -422,19 +422,25 @@ export class User extends Module {
         })
     }
 
-    async show(user: NDKUser|null|undefined = undefined) {
-        const context = this.context
+    guiSetup() {
         this.mainView().html(UserHTML)
-        const reload = $("#UserReload")
-        reload.click(() => {
-            this.navigate()
+        $("#Logout").click(() => {
+            this.logout()
+            this.loginReload()
         })
-        const LoginForm = $("#Login")
-        const upn = $("#UserProfile")
         const selector = this.guiLoginSelector()
         selector.change(() => {
             this.login(selector.val())
         })
+    }
+
+    async show(user: NDKUser|null|undefined = undefined) {
+        const context = this.context
+
+        const loading = $("#UserLoading")
+        loading.hide()
+        const LoginForm = $("#Login")
+        const upn = $("#UserProfile")
         $("#UserLoginNIP46Cancel").click(() => {
             this.cancelNip46Login()
         })
@@ -442,7 +448,7 @@ export class User extends Module {
         if (!user)  user = this.user
 
         if (user) {
-            LoginForm.hide()
+            //LoginForm.hide()
             upn.show()
             if (!user.profile)  this.warning("Loading user profile failed.")
             const upkn = $("#UserPubkey")
@@ -498,11 +504,8 @@ export class User extends Module {
             const ualn = $("#UserArticlesLink")
             App.get().articles.makeLinkActive(ualn, `?author=${user.pubkey}`)
             ualn.show()
-            if (!this.foreign) {
-                $("#Logout").show().click(() => {
-                    this.logout()
-                    this.loginReload()
-                })
+            if (this.foreign) {
+                $("#Logout").hide()
             }
 
             const rl = await this.relays()
@@ -530,7 +533,7 @@ export class User extends Module {
                     }
             }
         } else {
-            upn.hide()
+            //upn.hide()
             LoginForm.show()
             if (this.nip46autologin && !this.foreign)
                 this.guiNip46Autologin()
@@ -540,6 +543,7 @@ export class User extends Module {
 
     async handle(id: string|undefined = undefined) {
         this.newContext()
+        this.guiSetup()
         const context = this.context
         if (id) {
             this.user = await this.get(id)
