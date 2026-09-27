@@ -1,5 +1,10 @@
 
+@use "style";
 @use "Relays";
+
+#UserMainMenu {
+    @extend .MultirowFlexContainer;
+}
 
 #UserPicture img, #UserBanner img {
     max-height: 8cm
