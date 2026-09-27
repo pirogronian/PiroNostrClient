@@ -4,7 +4,7 @@ import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer, NDKPrivateKeySigner, NDKR
 import $ from "jquery"
 import type JQuery from "jquery"
 
-import { FormattedTime } from "./various.js";
+import { CurrentTime, FormattedTime } from "./various.js";
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
 
@@ -440,11 +440,15 @@ export class User extends Module {
         const loading = $("#UserLoading")
         loading.hide()
         const logout = $("#Logout")
+        const syncSet = $("#SyncSettings")
         const pubSet = $("#PublishSettings")
         const LoginForm = $("#Login")
         const upn = $("#UserProfile")
         $("#UserLoginNIP46Cancel").click(() => {
             this.cancelNip46Login()
+        })
+        syncSet.click(() => {
+            Module.settingsManager?.sync()
         })
         pubSet.click(() => {
             Module.settingsManager?.publish()
@@ -511,6 +515,7 @@ export class User extends Module {
             if (this.foreign) {
                 $("#Logout").hide()
             } else {
+                syncSet.show()
                 pubSet.show()
             }
 
@@ -592,5 +597,18 @@ export class User extends Module {
         this.on(ADD_WRITE_RELAY_EVENT, () => { this.onUserRelaysChange() })
         this.on(REMOVE_READ_RELAY_EVENT, () => { this.onUserRelaysChange() })
         this.on(REMOVE_WRITE_RELAY_EVENT, () => { this.onUserRelaysChange() })
+
+        const sm = Module.settingsManager
+        if (sm) {
+            sm.on("modified", () => {
+                $("#SettingsStatus").text(`Modified at ${FormattedTime(sm.time)}`)
+            })
+            sm.on("synced", () => {
+                $("#SettingsStatus").text(`Synced at ${FormattedTime(CurrentTime())}`)
+            })
+            sm.on("published", () => {
+                $("#SettingsStatus").text(`Published at ${FormattedTime(CurrentTime())}`)
+            })
+        }
     }
 }
