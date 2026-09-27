@@ -547,6 +547,7 @@ export class User extends Module {
         this.newContext()
         this.guiSetup()
         const context = this.context
+        $("#UserLink").addClass("Current")
         if (id) {
             this.user = await this.get(id)
             if (!this.sameContext(context))  return
@@ -556,7 +557,6 @@ export class User extends Module {
             this.user = await this.get()
             if (!this.sameContext(context))  return
         }
-            
         this.show()
     }
 

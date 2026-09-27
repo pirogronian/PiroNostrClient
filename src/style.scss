@@ -18,6 +18,14 @@ a:not(:where(#ArticleView a)):hover, label.active:not(:where(#ArticleView label)
     background-color: lightgray;
 }
 
+#MainNav a {
+    border: white solid 0.5mm
+}
+
+#MainNav a.Current {
+    border: grey solid 0.5mm
+}
+
 label.Active {
     padding: 2mm;
     border: white solid 0.5mm

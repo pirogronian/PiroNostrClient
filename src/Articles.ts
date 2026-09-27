@@ -232,6 +232,7 @@ export class Articles extends Module {
             this.setCurrent()
             console.log("Route: /articles")
             //console.log(match.params)
+            $("#SearchLink").addClass("Current")
             if (this.isFinder()) {
                 console.log("Is finder, clearing results.")
                 this.clearFinderResult()

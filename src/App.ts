@@ -69,20 +69,10 @@ export class App extends Module {
                 console.log("Route.before:", window.location.href)
                 this.articles.stop()
                 this.hideMessages()
+                $("#MainNav a").removeClass("Current")
                 done()
             },
         })
-        
-        this.router.onRoute("/", (match) => {
-            console.log("Route: default")
-            if (match && match.params) {
-                console.log("Index with params:", match.params)
-            }
-            this.clearUI()
-            this.guiIndex()
-        })
-
-        this.router.resolve();
     }
 
     setupLocation() {
@@ -115,6 +105,7 @@ export class App extends Module {
 
     guiIndex() {
         if (!this.isCurrent())  return
+        $("#HomeLink").addClass("Current")
         this.clearUI()
         const invite = $("<p>Welcome to PiroNostrClient.</p>")
         this.mainView().append(invite)
@@ -140,5 +131,16 @@ export class App extends Module {
         $("#Reload").click(() => { this.reload() })
         this.relays.on("offline", () => { console.debug("Offline!"); this.guiIndex() })
         this.relays.on("online", () => { console.debug("Online!"); this.guiIndex() })
+
+        this.router.onRoute("/", (match) => {
+            console.log("Route: default")
+            this.setCurrent()
+            if (match && match.params) {
+                console.log("Index with params:", match.params)
+            }
+            this.guiIndex()
+        })
+
+        this.router.resolve();
     }
 }

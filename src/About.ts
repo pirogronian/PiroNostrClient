@@ -8,6 +8,7 @@ import AboutHTML from "@/About.html?raw"
 export class About extends Module {
 
     handle() {
+        $("#AboutLink").addClass("Current")
         this.mainView().html(AboutHTML)
     }
 

@@ -8,8 +8,8 @@ console.log("Reloading with url:", window.location.href)
 
 const app = new App()
 
-app.setup()
-app.login()
-//app.connect()
 app.setupLocation()
 app.initRouting()
+app.login()
+app.setup()
+//app.connect()

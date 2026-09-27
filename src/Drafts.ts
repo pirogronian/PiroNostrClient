@@ -109,6 +109,7 @@ export class Drafts extends Module {
         this.onRoute("/", () => {
             this.setCurrent()
             this.newContext()
+            $("#DraftsLink").addClass("Current")
             this.clearUI()
             this.guiCreateMain()
             this.load()

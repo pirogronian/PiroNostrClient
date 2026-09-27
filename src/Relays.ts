@@ -823,6 +823,7 @@ export class Relays extends Module {
     handle() {
         //console.log("Relays::handle()")
         if (!this.isCurrent())  return
+        $("#RelaysLink").addClass("Current")
         this.clearUI()
         this.loadSettins()
         this.show()
