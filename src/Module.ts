@@ -13,7 +13,7 @@ export type NDKSubscriptionEventHandlers = Parameters<NDK['subscribe']>[1];
 
 export interface SettingsManager {
     settings(key: string, value: string|undefined|null): string|null|void;
-    publish(relaySet?: NDKRelaySet, timeoutMs?: number, requiredRelayCount?: number): Promise<boolean> ;
+    publish(relaySet?: NDKRelaySet, timeoutMs?: number, requiredRelayCount?: number): Promise<void> ;
 }
 
 function correctRelaySet(relaySet: NDKRelaySet, pool: NDKPool): NDKRelaySet {

@@ -1,21 +1,31 @@
 
 import { EventEmitter } from "tseep"
 
-import NDK, { NDKEvent, NDKRelay, NDKRelaySet } from "@nostr-dev-kit/ndk"
+import NDK, { NDKEvent, NDKRelay, NDKRelaySet, type NDKFilter } from "@nostr-dev-kit/ndk"
+import { TimeToISO, TimeToUnix } from "./various.js"
 
 const EVENT_KIND = 30078
 
 export class SettingsManager extends EventEmitter {
     readonly MODIFIED_EVENT = "modified"
     readonly PUBLISHED_EVENT = "published"
+    readonly SYNCED_EVENT = "synced"
 
     ndk: NDK
     _settings: Record<string, string> = {}
     modified: boolean = false
+    timeKey: string = "SettingsTime"
+    time: number = 0
 
-    constructor(ndk: NDK) {
+    constructor(ndk: NDK, timeKey?: string) {
         super()
         this.ndk = ndk
+        if (timeKey)  this.timeKey = timeKey
+
+        const timeStr = localStorage.getItem(this.timeKey)
+        if (timeStr) {
+            this.time = TimeToUnix(timeStr)
+        }
     }
 
     settings(key: string, value: string|undefined|null = undefined): string|null|void {
@@ -45,7 +55,43 @@ export class SettingsManager extends EventEmitter {
         return ret
     }
 
-    async publish(relaySet?: NDKRelaySet, timeoutMs?: number, requiredRelayCount?: number): boolean {
+    sync() {
+        const pubkey = this.ndk.activeUser?.pubkey
+        const cname = this.ndk.clientName
+        if (!pubkey || !cname)  return
+        const filter: NDKFilter = {
+            kinds: [ EVENT_KIND ],
+            authors: [ pubkey ],
+            "#d": [ cname ]
+        }
+
+        this.ndk.subscribe(
+            filter,
+            { closeOnEose : true },
+            { onEvent: (event) => {
+                this.onSync(event)
+            } })
+    }
+
+    onSync(event: NDKEvent) {
+        if (event.pubkey != this.ndk.activeUser?.pubkey) {
+            console.warn("Got not mine event!")
+            return
+        }
+        const settings = JSON.parse(event.content)
+        const time = TimeToUnix(settings[this.timeKey])
+        if (time <= this.time)  return
+        for (const key in settings) {
+            this._settings[key] = settings[key]
+            localStorage.setItem(key, settings[key])
+        }
+        this.time = time
+        localStorage.setItem(this.timeKey, TimeToISO(this.time))
+        this.modified = false
+        this.emit(this.SYNCED_EVENT)
+    }
+
+    async publish(relaySet?: NDKRelaySet, timeoutMs?: number, requiredRelayCount?: number): Promise<void> {
         const event = new NDKEvent(this.ndk)
 
         event.kind = EVENT_KIND
@@ -53,15 +99,8 @@ export class SettingsManager extends EventEmitter {
         event.content = JSON.stringify(this._settings)
         //console.debug(event.content)
 
-        let relays
-        try {
-            relays = await event.publishReplaceable(relaySet, timeoutMs, requiredRelayCount)
-            this.modified = false
-            this.emit(this.PUBLISHED_EVENT)
-            return true
-        } catch (error) {
-            this.error(error)
-            return false
-        }
+        await event.publishReplaceable(relaySet, timeoutMs, requiredRelayCount)
+        this.modified = false
+        this.emit(this.PUBLISHED_EVENT)
     }
 }

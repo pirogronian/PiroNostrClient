@@ -46,7 +46,7 @@ export class App extends Module {
              enableOutboxModel: true,
             aiGuardrails: true });
         this.ndk.clientName = CLIENT_NAME
-        Module.settingsManager = new SettingsManager(this.ndk)
+        Module.settingsManager = new SettingsManager(this.ndk, CLIENT_NAME + ".SettingsTime")
         this.about = new About()
         this.about.register("about", "about", this)
         this.relays = new Relays()
