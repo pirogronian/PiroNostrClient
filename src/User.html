@@ -5,6 +5,13 @@
   <div id="SettingsStatus"></div>
   <a id="UserArticlesLink" style="display: none">User's articles</a>
 </div>
+<dialog id="SyncDialog">
+  <p>Sync settings are from time of <span id="SyncSettingsTime"></span>, while local are from <span id="LocalSettingsTime"></span>. Accept it anyway?</p>
+  <p>
+    <button id="AcceptSyncSettings">Accept</button>
+    <button id="RefuseSyncSettings">Refuse</button>
+  </p>
+</dialog>
 <div id="UserLoading">Waiting for user information. You may logout/login again to break.</div>
 <div id="Login" class="Frame" style="display: none">
   <label for="LoginMethod">Login with:</label>

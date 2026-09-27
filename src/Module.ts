@@ -15,6 +15,8 @@ export interface SettingsManager extends EventEmitter {
     time: number
     settings(key: string, value: string|undefined|null): string|null|void;
     sync(): void;
+    onSyncEvent(event: NDKEvent): void
+    onSync(settings: Record<string, string>): void
     publish(relaySet?: NDKRelaySet, timeoutMs?: number, requiredRelayCount?: number): Promise<void> ;
 }
 

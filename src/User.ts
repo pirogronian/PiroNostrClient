@@ -606,6 +606,23 @@ export class User extends Module {
             sm.on("synced", () => {
                 $("#SettingsStatus").text(`Synced at ${FormattedTime(CurrentTime())}`)
             })
+            sm.on("syncing", (time, settings) => {
+                const dialog = $("#SyncDialog")
+                const rem = dialog.find("#SyncSettingsTime")
+                const loc = dialog.find("#LocalSettingsTime")
+                const acc = dialog.find("#AcceptSyncSettings")
+                const ref = dialog.find("#RefuseSyncSettings")
+                rem.text(FormattedTime(time))
+                loc.text(FormattedTime(sm.time))
+                acc.click(() => {
+                    sm.onSync(settings)
+                    dialog.prop("open", false)
+                })
+                ref.click(() => {
+                    dialog.prop("open", false)
+                })
+                dialog.prop("open", true)
+            })
             sm.on("published", () => {
                 $("#SettingsStatus").text(`Published at ${FormattedTime(CurrentTime())}`)
             })

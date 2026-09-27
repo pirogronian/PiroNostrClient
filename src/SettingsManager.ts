@@ -9,6 +9,7 @@ const EVENT_KIND = 30078
 export class SettingsManager extends EventEmitter {
     readonly MODIFIED_EVENT = "modified"
     readonly PUBLISHED_EVENT = "published"
+    readonly SYNCING_EVENT = "syncing"
     readonly SYNCED_EVENT = "synced"
 
     ndk: NDK
@@ -16,6 +17,7 @@ export class SettingsManager extends EventEmitter {
     modified: boolean = false
     timeKey: string = "SettingsTime"
     time: number = 0
+    ask: boolean = true
 
     modifiedKeys: Set<string>
 
@@ -41,6 +43,7 @@ export class SettingsManager extends EventEmitter {
         let ret: string|null = null
 
         if (value) {
+            if (value == this._settings[key])  return
             this._settings[key] = value
             localStorage.setItem(key, value)
             this.modifiedKeys.add(key)
@@ -82,11 +85,11 @@ export class SettingsManager extends EventEmitter {
             filter,
             { closeOnEose : true },
             { onEvent: (event) => {
-                this.onSync(event)
+                this.onSyncEvent(event)
             } })
     }
 
-    onSync(event: NDKEvent) {
+    onSyncEvent(event: NDKEvent) {
         console.debug("Got settings event:", event)
         if (event.pubkey != this.ndk.activeUser?.pubkey) {
             console.warn("Got not mine event!")
@@ -96,14 +99,25 @@ export class SettingsManager extends EventEmitter {
         const time = TimeToUnix(settings[this.timeKey])
         if (time <= this.time) {
             console.debug("Remote settings time older than local:", this.time - time)
-            console.debug("Modified keys:", this.modifiedKeys)
+            if (this.ask)  this.emit(this.SYNCING_EVENT, time, settings)
             return
         }
+        this.onSync(settings)
+    }
+
+    onSync(settings: Record<string, string>) {
         for (const key in settings) {
-            this._settings[key] = settings[key]
-            localStorage.setItem(key, settings[key])
+            const value = settings[key]
+            if (value !== undefined) {
+                this._settings[key] = value
+                localStorage.setItem(key, value)
+            }
         }
-        this.time = time
+        const timeStr = settings[this.timeKey]
+        if (timeStr) {
+            const time = TimeToUnix(timeStr)
+            this.time = time
+        }
         //localStorage.setItem(this.timeKey, TimeToISO(this.time))
         this.modifiedKeys.clear()
         this.modified = false
