@@ -12,6 +12,7 @@ import "@/Relays.scss"
 import RelaysHTML from "@/Relays.html?raw"
 import RelayHeadHTML from "@/RelayHead.html?raw"
 import RelayInfoHTML from "@/RelayInfo.html?raw"
+import { SettingsManager } from "./SettingsManager.js";
 
 const STORAGE_KEY = 'known';
 
@@ -921,7 +922,12 @@ export class Relays extends Module {
             this.guiReloadItems()
         })
 
-        //console.debug("Event handler are set.")
+        const sm = Module.settingsManager
+        if (sm) {
+            sm.on("synced", () => {
+                this.reload()
+            })
+        }
 
         this.loadSettins()
         this.load()
