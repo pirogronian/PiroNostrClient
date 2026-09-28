@@ -1,7 +1,8 @@
 
 import QRCode from "qrcode";
 import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer,
-    NDKPrivateKeySigner, NDKRelay, NDKRelayList, nip19 } from "@nostr-dev-kit/ndk";
+    NDKPrivateKeySigner, NDKRelay, NDKRelayList, nip19,
+    nip49} from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 import type JQuery from "jquery"
 
@@ -27,6 +28,9 @@ const PIVATEKEY = "privatekey"
 const CONFIGKEY_NIP46_PUBKEY = "nip46.pubkey"
 const CONFIGKEY_NIP46_SECKEY = "nip46.seckey"
 const CONFIGKEY_NIP46_RELAYS = "nip46.relays"
+
+const NSECS_KEY = "nsec.stored"
+const NSEC_LAST_KEY = "nsec.last"
 
 export class User extends Module {
     user?: NDKUser|null|undefined
@@ -281,7 +285,59 @@ export class User extends Module {
         submit.click(() => {
             this.nsecLogin(nsecI.val())
         })
+
+        const storedStr = this.localSettings(NSECS_KEY)
+        const def = this.localSettings(NSEC_LAST_KEY)
+        const storedL = $("#UserLoginStoredNsec")
+        if (storedStr) {
+            const nsecs = JSON.parse(storedStr)
+            if (typeof nsecs == "object") {
+                const selector = storedL.find("select")
+                for (const key of Object.keys(nsecs)) {
+                    const opt = $("<option>")
+                    opt.val(key)
+                    opt.text(key)
+                    selector.append(opt)
+                }
+                if (def) selector.val(def)
+                const passwI = storedL.find("input")
+                const submit = storedL.find("button")
+                submit.click(() => {
+                    const name = selector.cal()
+                    const passw = passwI.value()
+                    this.nsecUnlock(name, passw)
+                })
+            } else {
+                //console.debug("Hide stored label.")
+                storedL.hide()
+            }
+        } else {
+            //console.debug("Hide stored label.")
+            storedL.hide()
+        }
+
         form.show()
+    }
+
+    nsecUnlock(name: string, passw: string) {
+        const storedStr = this.localSettings(NSECS_KEY)
+        if (!storedStr) {
+            console.warn("Nsec login: no stored secrets!")
+            return
+        }
+        const stored = JSON.parse(storedStr)
+        if (typeof stored != "object") {
+            console.warn("Nsec login: stored secrets have wrong format!")
+            return
+        }
+        const encr = stored[name]
+        if (!encr) {
+            console.warn(`Nsec login: no secret of the name '${name}'!`)
+            return
+        }
+        const raw = nip49.decode(encr, passw)
+        this.nsecLogin(raw)
+        this.localSettings(NSEC_LAST_KEY, name)
     }
 
     nsecLogin(nsec: string) {

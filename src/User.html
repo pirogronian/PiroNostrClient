@@ -1,5 +1,6 @@
 <div id="UserMainMenu">
   <button type="button" id="Logout">Logout</button>
+  <button type="button" id="UserNsecSetPassw" style="display: none">Set password</button>
   <button type="button" id="PublishSettings" style="display: none">Publish settings</button>
   <button type="button" id="SyncSettings" style="display: none">Sync settings</button>
   <div id="SettingsStatus"></div>
@@ -37,6 +38,11 @@
   </div>
   <div id="UserLoginNsec" style="display: none">
     <label for="UserNsecInput">Private key:<input type="password" name="UserNsecInput"/><button>Login</button></label>
+    <label id="UserLoginStoredNsec">or unlock stored one:
+      <select></select>
+      <input type="password" id="StoredNsecPassword"/>
+      <button type="button">Unlock</button>
+    </label>
   </div>
 </div>
 <div id="UserProfile" style="display: none">
