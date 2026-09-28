@@ -80,10 +80,22 @@ export class Module extends EventEmitter {
     }
 
     settings(name: string, value: string|undefined|null = undefined): string|null|void {
-        const ret: string|undefined = undefined
         const key = this.settingsPath.concat(this.settingsSeparator).concat(name)
 
         return Module.settingsManager?.settings(key, value)
+    }
+
+    localSettings(name: string, value: string|undefined|null = undefined): string|null|void {
+        const key = this.settingsPath.concat(this.settingsSeparator).concat(name)
+        
+        if (value) {
+            localStorage.setItem(key, value)
+            return
+        }
+        if (value === null) {
+            localStorage.removeItem(key)
+        }
+        return localStorage.getItem(key)
     }
 
     isCurrent() {
