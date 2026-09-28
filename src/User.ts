@@ -125,7 +125,7 @@ export class User extends Module {
         const signer = new NDKNip07Signer()
         this.ndk.signer = signer
         this.nip07Signer = signer
-        this.settings(SIGNER_KEY, NIP07)
+        this.localSettings(SIGNER_KEY, NIP07)
         this.onLogin()
         this.loginReload()
     }
@@ -259,7 +259,7 @@ export class User extends Module {
         this.ndk.signer = this.waitingSigner
         this.nip46Signer = this.waitingSigner
         this.onLogin()
-        this.settings(SIGNER_KEY, NIP46)
+        this.localSettings(SIGNER_KEY, NIP46)
         this.saveNip46()
     }
 
@@ -296,7 +296,7 @@ export class User extends Module {
             const signer = new NDKPrivateKeySigner(nsec)
             this.ndk.signer = signer
             this.nsecSigner = signer
-            this.settings(SIGNER_KEY, NSEC)
+            this.localSettings(SIGNER_KEY, NSEC)
             this.onLogin()
             this.loginReload()
         } catch(error) {
@@ -310,7 +310,7 @@ export class User extends Module {
         this.nip46Signer = undefined
         this.nsecSigner = undefined
         this.onLogout()
-        this.settings(SIGNER_KEY, null)
+        this.localSettings(SIGNER_KEY, null)
         this.forgetNip46Login()
     }
 
