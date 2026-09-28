@@ -672,6 +672,12 @@ export class User extends Module {
                         dialog.prop("open", true)
                     })
                     setp.show()
+                    const copyNsec = $("#UserNsecCopy")
+                    copyNsec.click(() => {
+                        const pk = this.nsecSigner?.privateKey
+                        if (pk)  navigator.clipboard.writeText(pk)
+                    })
+                    copyNsec.show()
                 }
             }
 
