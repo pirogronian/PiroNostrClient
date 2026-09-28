@@ -120,7 +120,7 @@ export class Articles extends Module {
             if (e.key === "Enter")
                 console.log("Enter pressed in input field.")
         })*/
-        const cnB = form.find("#CreateNewButton")
+        const cnB = $("#CreateNewButton")
         const idI = form.find("input[name='id']")
         cnB.click(() => {
             let param = ""
