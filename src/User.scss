@@ -2,6 +2,21 @@
 @use "style";
 @use "Relays";
 
+
+#NewIdentityAdvice {
+    color: darkred;
+    font-size: 7mm;
+    font-weight: bold;
+}
+
+.Important1 {
+    background: orange
+}
+
+.Important2 {
+    background: lightcoral
+}
+
 #UserMainMenu {
     @extend .MultirowFlexContainer;
 }

@@ -47,6 +47,7 @@ export class User extends Module {
     tmpSigner?: NDKPrivateKeySigner
     waitingSigner?: NDKNip46Signer
     nip46autologin: boolean = false
+    newlyCreated: boolean = false
 
     async get(npub: string|null|undefined = null, profile: boolean = true) : Promise<NDKUser|null|undefined> {
         let user : NDKUser|null|undefined = null
@@ -393,6 +394,16 @@ export class User extends Module {
         this.localSettings(NSECS_KEY, JSON.stringify(stored))
     }
 
+    nsecCreateNew() {
+        const signer = NDKPrivateKeySigner.generate()
+        this.nsecSigner = signer
+        this.ndk.signer = signer
+        this.localSettings(SIGNER_KEY, NSEC)
+        this.emit("login")
+        this.newlyCreated = true
+        this.loginReload()
+    }
+
     logout() {
         this.ndk.signer = undefined
         this.nip07Signer = undefined
@@ -560,6 +571,7 @@ export class User extends Module {
 
     guiSetup() {
         this.mainView().html(UserHTML)
+        if (this.newlyCreated)  $("#NewIdentityAdvice").show()
         $("#Logout").click(() => {
             this.logout()
             this.loginReload()
@@ -568,6 +580,7 @@ export class User extends Module {
         selector.change(() => {
             this.login(selector.val())
         })
+        $("#UserLoginCreateNew").click(() => { this.nsecCreateNew() })
     }
 
     async show(user: NDKUser|null|undefined = undefined) {
@@ -594,7 +607,7 @@ export class User extends Module {
 
         if (user) {
             upn.show()
-            if (!user.profile)  this.warning("Loading user profile failed.")
+            if (!user.profile && !this.newlyCreated)  this.warning("Loading user profile failed.")
             const upkn = $("#UserPubkey")
             const unpn = $("#UserNPub")
             const unprn = $("#UserNProfile")
@@ -656,6 +669,7 @@ export class User extends Module {
                 if (this.nsecSigner) {
                     const last = this.localSettings(NSEC_LAST_KEY)
                     const setp = $("#UserNsecSetPassw")
+                    if (this.newlyCreated) setp.addClass("Important2")
                     setp.click(() => {
                         const dialog = $("#UserNsecSetPasswDialog")
                         const label = dialog.find("input[name='label']")
@@ -675,6 +689,7 @@ export class User extends Module {
                     })
                     setp.show()
                     const copyNsec = $("#UserNsecCopy")
+                    if (this.newlyCreated)  copyNsec.addClass("Important1")
                     copyNsec.click(() => {
                         const pk = this.nsecSigner?.privateKey
                         if (pk)  navigator.clipboard.writeText(pk)
