@@ -10,7 +10,7 @@
     </div>
     <div id="ArticleEdit">
         <label for="ArticleTitle">Title:<input type="text" name="ArticleTitle"/></label>
-        <label for="ArticleId">Id:<input type="text" name="ArticleId"/></label>
+        <label for="ArticleId" id="ArticleId">Id:<input type="text" name="ArticleId"/></label>
         <label for="ArticleFormat">Format:
             <input type="text" name="ArticleFormat"/>
             <select name="ArticleFormatSelect">
@@ -21,9 +21,11 @@
             </select>
         </label>
         <label for="ArticlePublishedAt">Published at:<input type="datetime-local" name="ArticlePublishedAt"/></label>
-        <label for="ArticleTopic">Topic:<input type="text" name="ArticleTopic"/><button type="button">Add</button></label>
-        <label for="ArticleCategory">Category:<input type="text" name="ArticleCategory"/><button type="button">Add</button></label>
-        <label for="ArticleLanguage">Language:<input type="text" name="ArticleLanguage" list="AllLanguagesList"/><button type="button">Add</button></label>
+        <div class="Frame">
+            <label for="ArticleTopic">Topic:<input type="text" name="ArticleTopic"/><button type="button">Add</button></label>
+            <label for="ArticleCategory">Category:<input type="text" name="ArticleCategory"/><button type="button">Add</button></label>
+            <label for="ArticleLanguage">Language:<input type="text" name="ArticleLanguage" list="AllLanguagesList"/><button type="button">Add</button></label>
+        </div>
         <datalist id="AllLanguagesList"></datalist>
         <fieldset id="NewTag">
             <legend>New tag:</legend>

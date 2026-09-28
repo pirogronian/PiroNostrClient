@@ -12,6 +12,8 @@ import FinderHTML from "@/Finder.html?raw"
 import FinderTagInputs from "@/FinderTagInputs.html?raw"
 import ArtHeadHTML from "@/ArticleHeader.html?raw"
 
+import "@/Articles.scss"
+
 const FOLLOW_AUTHOR_SETTING_KEY = "FollowAuthor"
 
 export class Articles extends Module {
