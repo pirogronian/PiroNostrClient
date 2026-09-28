@@ -94,17 +94,19 @@ export class User extends Module {
         this.emit("logout")
     }
 
-    login(method: string|void|null = null) {
+    login(method: string|void|null|boolean = null) {
+        let auto = true
+        if (method === false) auto = false
         if (!method) {
             method = this.settings(SIGNER_KEY)
             console.debug("Choose login method from stored setting:", method)
         }
         switch (method) {
             case NIP07:
-                this.loginNip07()
+                if (auto)   this.loginNip07()
                 break;
             case NIP46:
-                if (this.restoreNip46Login()) {
+                if (auto && this.restoreNip46Login()) {
                     if (this.isCurrent())
                         this.guiNip46Autologin()
                 }
@@ -279,8 +281,7 @@ export class User extends Module {
     }
 
     nsecLoginPrepare() {
-        const nip46 = $("UserLoginNIP46")
-        nip46.hide()
+        $("#UserLoginNIP46").hide()
         const form = $("#UserLoginNsec")
         const nsecL = $("label[for='UserNsecInput']")
         const nsecI = nsecL.find("input")
@@ -701,7 +702,7 @@ export class User extends Module {
 
             if (this.nip46autologin && !this.foreign)
                 this.guiNip46Autologin()
-            else this.login()
+            else this.login(false)
         }
         this.guiPublishRelaysButtonSetup()
     }
