@@ -2,7 +2,7 @@
 import QRCode from "qrcode";
 import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer,
     NDKPrivateKeySigner, NDKRelay, NDKRelayList, nip19,
-    nip49} from "@nostr-dev-kit/ndk";
+    nip49, type NDKUserProfile} from "@nostr-dev-kit/ndk";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils"
 import $ from "jquery"
 import type JQuery from "jquery"
@@ -583,6 +583,75 @@ export class User extends Module {
         $("#UserLoginCreateNew").click(() => { this.nsecCreateNew() })
     }
 
+    guiEditProfile() {
+        const profile = $("#UserProdile dl")
+        function Text(selector: string) {
+            const f = $(selector)
+            const v = f.find("span.Value")
+            const i = f.find(".Input")
+            i.val(v.text())
+            v.hide()
+            i.show()
+        }
+        function Img(selector: string) {
+            const f = $(selector)
+            const i = f.find("input")
+            const img = f.find("img")
+            i.val(img.prop("src"))
+            img.hide()
+            i.show()
+        }
+
+        Text("#UserName")
+        Text("#UserDisplayName")
+        Img("#UserPicture")
+        Img("#UserBanner")
+        Text("#UserBio")
+        Text("#UserNip05")
+        Text("#UserLud06")
+        Text("#UserLud16")
+        Text("#UserAbout")
+
+        const pub = $("#UserProfilePublish")
+        pub.click(() => {
+            this.saveProfile()
+        })
+        pub.show()
+        $("#UserProfileEdit").hide()
+    }
+
+    async saveProfile() {
+        function From(selector: string): string {
+            const f = $(selector)
+            const i = f.find(".Input")
+            return i.val()
+        }
+
+        const user = this.ndk.activeUser
+        if (!user) {
+            console.warn("No active user, nothing to save!")
+            return
+        }
+        if (!user.profile) user.profile = {}
+        user.profile.name = From("#UserName")
+        user.profile.displayName = From("#UserDisplayName")
+        user.profile.picture = From("#UserPicture")
+        user.profile.banner = From("#UserBanner")
+        user.profile.bio = From("#UserBio")
+        user.profile.nip05 = From("#UserNIP05")
+        user.profile.lud06 = From("#UserLud06")
+        user.profile.lud16 = From("#UserLud16")
+        user.profile.about = From("#UserAbout")
+
+        try {
+            await user.publish()
+
+            this.navigate()
+        } catch(error) {
+            this.error(error)
+        }
+    }
+
     async show(user: NDKUser|null|undefined = undefined) {
         const context = this.context
 
@@ -607,19 +676,22 @@ export class User extends Module {
 
         if (user) {
             upn.show()
-            if (!user.profile && !this.newlyCreated)  this.warning("Loading user profile failed.")
+            if (!user.profile && !this.newlyCreated) {
+                this.warning("Loading user profile failed.")
+                user.profile = {}
+            }
             const upkn = $("#UserPubkey")
             const unpn = $("#UserNPub")
             const unprn = $("#UserNProfile")
             const ca = $("#UserCreatedAt")
-            const unn = $("#UserName")
-            const udnn = $("#UserDisplayName")
+            const unn = $("#UserName span.Value")
+            const udnn = $("#UserDisplayName span.Value")
             const upictn = $("#UserPicture")
             const ubannern = $("#UserBanner")
-            const ubion = $("#UserBio")
-            const unip05n: JQuery<HTMLElement> = $("#UserNip05")
-            const ulud06n = $("#UserLud06")
-            const ulud16n = $("#UserLud16")
+            const ubion = $("#UserBio span.Value")
+            const unip05n: JQuery<HTMLElement> = $("#UserNip05 span.Value")
+            const ulud06n = $("#UserLud06 span.Value")
+            const ulud16n = $("#UserLud16 span.Value")
             const uwebn = $("#UserWebsite a")
             upkn.text(user.pubkey)
             upkn.click(() => {
@@ -666,6 +738,7 @@ export class User extends Module {
             } else {
                 syncSet.show()
                 pubSet.show()
+                $("#UserProfileEdit").show().click(() => { this.guiEditProfile() })
                 if (this.nsecSigner) {
                     const last = this.localSettings(NSEC_LAST_KEY)
                     const setp = $("#UserNsecSetPassw")
