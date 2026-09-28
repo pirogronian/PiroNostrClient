@@ -102,7 +102,6 @@ export class User extends Module {
             console.debug("Choose login method from stored setting:", method)
         }
         const selector = $("#LoginMethodSelect")
-        selector.val(method)
         switch (method) {
             case NIP07:
                 if (auto)   this.loginNip07()
@@ -113,11 +112,14 @@ export class User extends Module {
                         this.guiNip46Autologin()
                 }
                 else{
-                    if (this.isCurrent())
+                    if (this.isCurrent()) {
+                        selector.val(method)
                         this.loginNip46Prepare()
+                    }
                 }
                 break;
             case NSEC:
+                selector.val(method)
                 this.nsecLoginPrepare()
                 break
         }
