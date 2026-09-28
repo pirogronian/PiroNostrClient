@@ -20,6 +20,7 @@ const REMOVE_WRITE_RELAY_EVENT = "removeWriteRelay"
 const SIGNER_KEY = "signer"
 const NIP07 = "nip07"
 const NIP46 = "nip46"
+const NSEC = "nsec"
 const PIVATEKEY = "privatekey"
 
 const CONFIGKEY_NIP46_PUBKEY = "nip46.pubkey"
@@ -28,6 +29,9 @@ const CONFIGKEY_NIP46_RELAYS = "nip46.relays"
 
 export class User extends Module {
     user?: NDKUser|null|undefined
+    nip07Signer: NDKNip07Signer|undefined
+    nip46Signer: NDKNip46Signer|undefined
+    nsecSigner: NDKPrivateKeySigner|undefined
     foreign: boolean = false
     loggedUser?: NDKUser|null|undefined
     loggedRelays?: NDKRelayList|null|undefined
@@ -116,6 +120,7 @@ export class User extends Module {
     loginNip07() {
         const signer = new NDKNip07Signer()
         this.ndk.signer = signer
+        this.nip07Signer = signer
         this.settings(SIGNER_KEY, NIP07)
         this.onLogin()
         this.loginReload()
@@ -231,6 +236,7 @@ export class User extends Module {
         p.then((user) => {
             console.log("Auto-login by NIP-46 accepted as", user.pubkey)
             this.ndk.signer = this.waitingSigner
+            this.nip46Signer = this.waitingSigner
             this.nip46autologin = false
             this.onLogin()
             this.loginReload()
@@ -247,6 +253,7 @@ export class User extends Module {
 
     nostrConnectFinalize() {
         this.ndk.signer = this.waitingSigner
+        this.nip46Signer = this.waitingSigner
         this.onLogin()
         this.settings(SIGNER_KEY, NIP46)
         this.saveNip46()
@@ -262,6 +269,9 @@ export class User extends Module {
 
     logout() {
         this.ndk.signer = undefined
+        this.nip07Signer = undefined
+        this.nip46Signer = undefined
+        this.nsecSigner = undefined
         this.onLogout()
         this.settings(SIGNER_KEY, null)
         this.forgetNip46Login()
