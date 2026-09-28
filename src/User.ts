@@ -701,6 +701,7 @@ export class User extends Module {
 
             if (this.nip46autologin && !this.foreign)
                 this.guiNip46Autologin()
+            else this.login()
         }
         this.guiPublishRelaysButtonSetup()
     }
