@@ -101,6 +101,8 @@ export class User extends Module {
             method = this.settings(SIGNER_KEY)
             console.debug("Choose login method from stored setting:", method)
         }
+        const selector = $("#LoginMethodSelect")
+        selector.val(method)
         switch (method) {
             case NIP07:
                 if (auto)   this.loginNip07()
