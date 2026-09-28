@@ -1,6 +1,7 @@
 
 import QRCode from "qrcode";
-import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer, NDKPrivateKeySigner, NDKRelay, NDKRelayList } from "@nostr-dev-kit/ndk";
+import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer,
+    NDKPrivateKeySigner, NDKRelay, NDKRelayList, nip19 } from "@nostr-dev-kit/ndk";
 import $ from "jquery"
 import type JQuery from "jquery"
 
@@ -105,6 +106,9 @@ export class User extends Module {
                         this.loginNip46Prepare()
                 }
                 break;
+            case NSEC:
+                this.nsecLoginPrepare()
+                break
         }
     }
 
@@ -265,6 +269,39 @@ export class User extends Module {
         delete this.tmpSigner
         $("#UserLoginNIP46").hide()
         this.guiLoginSelector().val("")
+    }
+
+    nsecLoginPrepare() {
+        const nip46 = $("UserLoginNIP46")
+        nip46.hide()
+        const form = $("#UserLoginNsec")
+        const nsecL = $("label[for='UserNsecInput']")
+        const nsecI = nsecL.find("input")
+        const submit = nsecL.find("button")
+        submit.click(() => {
+            this.nsecLogin(nsecI.val())
+        })
+        form.show()
+    }
+
+    nsecLogin(nsec: string) {
+        this.hideMessages()
+        try {
+            //console.debug("Checking nsec: ", nsec)
+            if (nip19.NostrTypeGuard.isNSec(nsec)) {
+                console.debug("Detected nsec format, decoding...")
+                nsec = nip19.decode(nsec).data
+            }
+            //console.debug("Create signer with nsec: ", nsec)
+            const signer = new NDKPrivateKeySigner(nsec)
+            this.ndk.signer = signer
+            this.nsecSigner = signer
+            this.settings(SIGNER_KEY, NSEC)
+            this.onLogin()
+            this.loginReload()
+        } catch(error) {
+            this.error(error)
+        }
     }
 
     logout() {
