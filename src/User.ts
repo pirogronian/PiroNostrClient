@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer,
     NDKPrivateKeySigner, NDKRelay, NDKRelayList, nip19,
     nip49} from "@nostr-dev-kit/ndk";
+import { bytesToHex, hexToBytes } from "@noble/hashes/utils"
 import $ from "jquery"
 import type JQuery from "jquery"
 
@@ -13,6 +14,8 @@ import { App } from "@/App.js"
 import "@/User.scss"
 import UserHTML from "@/User.html?raw"
 import { InstallRelayDebugHandlers } from "./various.js";
+
+type NcryptMap = {[key: string]: Uint8Array}
 
 const ADD_READ_RELAY_EVENT = "addReadRelay"
 const ADD_WRITE_RELAY_EVENT = "addWriteRelay"
@@ -303,8 +306,8 @@ export class User extends Module {
                 const passwI = storedL.find("input")
                 const submit = storedL.find("button")
                 submit.click(() => {
-                    const name = selector.cal()
-                    const passw = passwI.value()
+                    const name = selector.val()
+                    const passw = passwI.val()
                     this.nsecUnlock(name, passw)
                 })
             } else {
@@ -325,7 +328,7 @@ export class User extends Module {
             console.warn("Nsec login: no stored secrets!")
             return
         }
-        const stored = JSON.parse(storedStr)
+        const stored = JSON.parse(storedStr) as NcryptMap
         if (typeof stored != "object") {
             console.warn("Nsec login: stored secrets have wrong format!")
             return
@@ -335,12 +338,12 @@ export class User extends Module {
             console.warn(`Nsec login: no secret of the name '${name}'!`)
             return
         }
-        const raw = nip49.decode(encr, passw)
+        const raw = nip49.decrypt(encr, passw)
         this.nsecLogin(raw)
         this.localSettings(NSEC_LAST_KEY, name)
     }
 
-    nsecLogin(nsec: string) {
+    nsecLogin(nsec: string|Uint8Array) {
         this.hideMessages()
         try {
             //console.debug("Checking nsec: ", nsec)
@@ -353,11 +356,36 @@ export class User extends Module {
             this.ndk.signer = signer
             this.nsecSigner = signer
             this.localSettings(SIGNER_KEY, NSEC)
+            const setPassw = $("UserNsecSetPassw")
+            setPassw.show()
             this.onLogin()
             this.loginReload()
         } catch(error) {
             this.error(error)
         }
+    }
+
+    nsecSetCurrentPassword(passw: string) {
+        const name = this.localSettings(NSEC_LAST_KEY)
+        if (!name) {
+            console.warn("No last name to set password for!")
+            return
+        }
+        this.nsecSetPassw(name, passw)
+    }
+
+    nsecSetPassw(name: string, passw: string) {
+        if (!this.nsecSigner) {
+            console.warn("No provate key signer!")
+            return
+        }
+        const sec = hexToBytes(this.nsecSigner.privateKey)
+        const encr = nip49.encrypt(sec, passw)
+        const storedStr = this.localSettings(NSECS_KEY)
+        let stored: NcryptMap = {}
+        if (storedStr) stored = JSON.parse(storedStr) as NcryptMap
+        stored[name] = encr
+        this.localSettings(NSECS_KEY, JSON.stringify(stored))
     }
 
     logout() {
@@ -620,6 +648,26 @@ export class User extends Module {
             } else {
                 syncSet.show()
                 pubSet.show()
+                if (this.nsecSigner) {
+                    const last = this.localSettings(NSECS_KEY)
+                    const setp = $("#UserNsecSetPassw")
+                    setp.click(() => {
+                        const dialog = $("#UserNsecSetPasswDialog")
+                        const label = dialog.find("input[name='label']")
+                        const passw = dialog.find("input[name='password']")
+                        const enter = dialog.find("button")
+                        label.val(last)
+                        enter.click(() => {
+                            const l = label.val()
+                            const p = passw.val()
+                            console.debug("Secure nsec under:", l, p)
+                            this.nsecSetPassw(l, p)
+                            dialog.prop("open", false)
+                        })
+                        dialog.prop("open", true)
+                    })
+                    setp.show()
+                }
             }
 
             const rl = await this.relays()
