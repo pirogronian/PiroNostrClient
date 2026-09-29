@@ -755,11 +755,6 @@ export class User extends Module {
                         App.get().relays.guiRefreshItem(url)
                     }
             }
-
-            if (user.profile)
-                for (const key of Object.keys(user.profile)) {
-                    console.debug("Profile:", key, user.profile[key])
-                }
         } else {
             //upn.hide()
             logout.hide()

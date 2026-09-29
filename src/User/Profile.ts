@@ -1,7 +1,7 @@
 
 import $ from "jquery"
 
-import { NDKUser } from "@nostr-dev-kit/ndk";
+import { NDKUser, type NDKUserProfile } from "@nostr-dev-kit/ndk";
 
 import { MakeCopyable, FormattedTime } from "@/various.js";
 
@@ -11,8 +11,25 @@ import { App } from "@/App.js"
 export class Profile extends Module {
     user: NDKUser|undefined
 
+    readonly StandardMembers = new Set<string>([
+        "created_at",
+        "name",
+        "displayName",
+        "image",
+        "picture",
+        "banner",
+        "bio",
+        "nip05",
+        "lud06",
+        "lud16",
+        "about",
+        "website",
+        "profileEvent"
+    ])
+
     readonly GuiSelectors = {
         Profile: "#UserProfile",
+        Additional: "#UserProfileAdditionalFields",
         Pubkey: "#UserPubkey",
         NPub: "#UserNPub",
         NProf: "#UserNProfile",
@@ -61,6 +78,25 @@ export class Profile extends Module {
             })
         }
         uwebn.text(this.user.profile?.website).prop("href", this.user.profile?.website)
+
+        if (this.user.profile) {
+            const pinfo = $(s.Profile).find("dl.Info")
+            for (const [field, value] of Object.entries(this.user.profile)) {
+                if (!this.StandardMembers.has(field)) {
+                    //console.debug("Profile.additional:", field, value)
+                    $(s.Additional).show()
+                    const keyNode = $("<dt>")
+                    keyNode.text(field)
+                    const valNode = $("<dd>")
+                    if (typeof value == "string" && value.length > 3) {
+                        MakeCopyable(valNode, value)
+                    }
+                    else valNode.text(`${value}`)
+                    pinfo.append(keyNode)
+                    pinfo.append(valNode)
+                }
+            }
+        }
 
         $(s.Profile).show()
     }
