@@ -587,7 +587,7 @@ export class User extends Module {
         const profile = $("#UserProdile dl")
         function Text(selector: string) {
             const f = $(selector)
-            const v = f.find("span.Value")
+            const v = f.find(".Value")
             const i = f.find(".Input")
             i.val(v.text())
             v.hide()
@@ -611,6 +611,7 @@ export class User extends Module {
         Text("#UserLud06")
         Text("#UserLud16")
         Text("#UserAbout")
+        Text("#UserWebsite")
 
         const pub = $("#UserProfilePublish")
         pub.click(() => {
@@ -642,6 +643,7 @@ export class User extends Module {
         user.profile.lud06 = From("#UserLud06")
         user.profile.lud16 = From("#UserLud16")
         user.profile.about = From("#UserAbout")
+        user.profile.website = From("#UserWebsite")
 
         try {
             await user.publish()
@@ -689,7 +691,7 @@ export class User extends Module {
             const upictn = $("#UserPicture")
             const ubannern = $("#UserBanner")
             const ubion = $("#UserBio span.Value")
-            const unip05n: JQuery<HTMLElement> = $("#UserNip05 span.Value")
+            const unip05n = $("#UserNip05 span.Value")
             const ulud06n = $("#UserLud06 span.Value")
             const ulud16n = $("#UserLud16 span.Value")
             const uwebn = $("#UserWebsite a")
@@ -708,8 +710,8 @@ export class User extends Module {
             ca.text(FormattedTime(user.profile?.created_at))
             unn.text(user.profile?.name)
             udnn.text(user.profile?.displayName)
-            upictn.find("img").prop("src", user.profile?.picture)
-            ubannern.find("img").prop("src", user.profile?.banner)
+            if (user.profile?.picture) upictn.find("img").prop("src", user.profile?.picture)
+            if (user.profile?.banner) ubannern.find("img").prop("src", user.profile?.banner)
             ubion.text(user.profile?.bio)
             unip05n.text(user.profile?.nip05)
             if (user.profile?.nip05) {
