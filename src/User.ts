@@ -10,6 +10,7 @@ import type JQuery from "jquery"
 import { CurrentTime, FormattedTime, MakeCopyable } from "./various.js";
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
+import { Profile } from "@/User/Profile.js";
 
 import "@/User.scss"
 import UserHTML from "@/User.html?raw"
@@ -48,6 +49,12 @@ export class User extends Module {
     waitingSigner?: NDKNip46Signer
     nip46autologin: boolean = false
     newlyCreated: boolean = false
+    profile: Profile
+
+    constructor() {
+        super()
+        this.profile = new Profile()
+    }
 
     async get(npub: string|null|undefined = null, profile: boolean = true) : Promise<NDKUser|null|undefined> {
         let user : NDKUser|null|undefined = null
@@ -663,7 +670,6 @@ export class User extends Module {
         const syncSet = $("#SyncSettings")
         const pubSet = $("#PublishSettings")
         const LoginForm = $("#Login")
-        const upn = $("#UserProfile")
         $("#UserLoginNIP46Cancel").click(() => {
             this.cancelNip46Login()
         })
@@ -677,37 +683,12 @@ export class User extends Module {
         if (!user)  user = this.user
 
         if (user) {
-            upn.show()
             if (!user.profile && !this.newlyCreated) {
                 this.warning("Loading user profile failed.")
                 user.profile = {}
             }
-            const upkn = MakeCopyable($("#UserPubkey"), user.pubkey)
-            const unpn = MakeCopyable($("#UserNPub"), user.npub)
-            const unprn = MakeCopyable($("#UserNProfile"), user.nprofile)
-            const ca = $("#UserCreatedAt").text(FormattedTime(user.profile?.created_at))
-            const unn = $("#UserName span.Value").text(user.profile?.name)
-            const udnn = $("#UserDisplayName span.Value").text(user.profile?.displayName)
-            const upictn = $("#UserPicture")
-            const ubannern = $("#UserBanner")
-            const ubion = $("#UserBio span.Value").text(user.profile?.bio)
-            const unip05n = MakeCopyable($("#UserNip05 span.Value"), user.profile?.nip05)
-            const ulud06n = MakeCopyable($("#UserLud06 span.Value"), user.profile?.lud06)
-            const ulud16n = MakeCopyable($("#UserLud16 span.Value"), user.profile?.lud16)
-            const uan = $("#UserAbout span.Value").text(user.profile?.about)
-            const uwebn = $("#UserWebsite a")
-
-            if (user.profile?.picture) upictn.find("img").prop("src", user.profile?.picture)
-            if (user.profile?.banner) ubannern.find("img").prop("src", user.profile?.banner)
-            if (user.profile?.nip05) {
-                user.validateNip05(user.profile.nip05).then((valid) => {
-                    if (valid) {
-                        unip05n.parent().prop("title", "Valid").find(".Valid").show()
-                    }
-                    else  unip05n.parent().prop("title", "Invalid!").find(".Invalid").show()
-                })
-            }
-            uwebn.text(user.profile?.website).prop("href", user.profile?.website)
+            this.profile.user = user
+            this.profile.guiShow()
 
             const ualn = $("#UserArticlesLink")
             App.get().articles.makeLinkActive(ualn, `?author=${user.pubkey}`)
@@ -818,6 +799,8 @@ export class User extends Module {
     }
 
     setup() {
+        this.profile.register("profile", "profile", this)
+
         this.onRoute('', () => {
             this.setCurrent()
             this.clearUI()
@@ -864,5 +847,7 @@ export class User extends Module {
                 $("#SettingsStatus").text(`Published at ${FormattedTime(CurrentTime())}`)
             })
         }
+
+        this.profile.setup()
     }
 }
