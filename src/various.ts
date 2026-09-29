@@ -67,6 +67,14 @@ export function MakeLabelActive(node: JQuery<HTMLElement>) {
     })
 }
 
+export function MakeCopyable(element: JQuery<HTMLElement>, text?: string) {
+    element.addClass("Copyable")
+    element.prop("title", "Click to copy")
+    element.text(text)
+    if (text)  element.click(() => { navigator.clipboard.writeText(text) })
+    return element
+}
+
 export function CurrentTime() {
     const date = new Date()
     return date.getTime() / 1000

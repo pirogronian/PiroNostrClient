@@ -7,7 +7,7 @@ import { bytesToHex, hexToBytes } from "@noble/hashes/utils"
 import $ from "jquery"
 import type JQuery from "jquery"
 
-import { CurrentTime, FormattedTime } from "./various.js";
+import { CurrentTime, FormattedTime, MakeCopyable } from "./various.js";
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
 
@@ -682,43 +682,24 @@ export class User extends Module {
                 this.warning("Loading user profile failed.")
                 user.profile = {}
             }
-            const upkn = $("#UserPubkey")
-            const unpn = $("#UserNPub")
-            const unprn = $("#UserNProfile")
-            const ca = $("#UserCreatedAt")
-            const unn = $("#UserName span.Value")
-            const udnn = $("#UserDisplayName span.Value")
+            const upkn = MakeCopyable($("#UserPubkey"), user.pubkey)
+            const unpn = MakeCopyable($("#UserNPub"), user.npub)
+            const unprn = MakeCopyable($("#UserNProfile"), user.nprofile)
+            const ca = $("#UserCreatedAt").text(FormattedTime(user.profile?.created_at))
+            const unn = $("#UserName span.Value").text(user.profile?.name)
+            const udnn = $("#UserDisplayName span.Value").text(user.profile?.displayName)
             const upictn = $("#UserPicture")
             const ubannern = $("#UserBanner")
-            const ubion = $("#UserBio span.Value")
-            const unip05n = $("#UserNip05 span.Value")
-            const ulud06n = $("#UserLud06 span.Value")
-            const ulud16n = $("#UserLud16 span.Value")
-            const uan = $("#UserAbout span.Value")
+            const ubion = $("#UserBio span.Value").text(user.profile?.bio)
+            const unip05n = MakeCopyable($("#UserNip05 span.Value"), user.profile?.nip05)
+            const ulud06n = MakeCopyable($("#UserLud06 span.Value"), user.profile?.lud06)
+            const ulud16n = MakeCopyable($("#UserLud16 span.Value"), user.profile?.lud16)
+            const uan = $("#UserAbout span.Value").text(user.profile?.about)
             const uwebn = $("#UserWebsite a")
-            upkn.text(user.pubkey)
-            upkn.click(() => {
-                navigator.clipboard.writeText(user.pubkey)
-            })
-            unpn.text(user.npub)
-            unpn.click(() => {
-                navigator.clipboard.writeText(user.npub)
-            })
-            unprn.text(user.nprofile)
-            unprn.click(() => {
-                navigator.clipboard.writeText(user.nprofile)
-            })
-            ca.text(FormattedTime(user.profile?.created_at))
-            unn.text(user.profile?.name)
-            udnn.text(user.profile?.displayName)
+
             if (user.profile?.picture) upictn.find("img").prop("src", user.profile?.picture)
             if (user.profile?.banner) ubannern.find("img").prop("src", user.profile?.banner)
-            ubion.text(user.profile?.bio)
-            unip05n.text(user.profile?.nip05)
             if (user.profile?.nip05) {
-                unip05n.click(() => {
-                    navigator.clipboard.writeText(user.nprofile)
-                })
                 user.validateNip05(user.profile.nip05).then((valid) => {
                     if (valid) {
                         unip05n.parent().prop("title", "Valid").find(".Valid").show()
@@ -726,14 +707,7 @@ export class User extends Module {
                     else  unip05n.parent().prop("title", "Invalid!").find(".Invalid").show()
                 })
             }
-            ulud06n.text(user.profile?.lud06)
-            ulud16n.text(user.profile?.lud16)
-            ulud16n.click(() => {
-                navigator.clipboard.writeText(user.profile?.lud16 ? user.profile?.lud16 : "")
-            })
             uwebn.text(user.profile?.website).prop("href", user.profile?.website)
-            
-            uan.text(user.profile?.about)
 
             const ualn = $("#UserArticlesLink")
             App.get().articles.makeLinkActive(ualn, `?author=${user.pubkey}`)
