@@ -3,7 +3,8 @@ import $ from "jquery"
 import type { JQuery } from "jquery"
 import NDK, { NDKRelay, NDKRelayStatus, NDKPool, NDKRelayAuthPolicies } from "@nostr-dev-kit/ndk";
 import type { NDKRelayInformation } from "@nostr-dev-kit/ndk"
-import { safeAsync, InstallRelayDebugHandlers, MakeLabelActive, FormattedBytes, FormattedTime } from "@/various.js"
+import { safeAsync, InstallRelayDebugHandlers, MakeLabelActive, CreateUrl,
+    FormattedBytes, FormattedTime } from "@/various.js"
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
@@ -343,16 +344,13 @@ export class Relays extends Module {
             const vnode = parent.find("dd".concat(selector))
 
             if (value) {
-                let url
-                if (typeof value == "string") {
-                    try {
-                        url = new URL(value)
-                        if (url.protocol == "git+https:") {
-                            const newUrl = url.href.replace(/^git\+http/, "http")
-                            //console.log("New url:", newUrl)
-                            url = new URL(newUrl)
-                        }
-                    } catch {}
+                let url = CreateUrl(value)
+                if (url) {
+                    if (url.protocol == "git+https:") {
+                        const newUrl = url.href.replace(/^git\+http/, "http")
+                        //console.log("New url:", newUrl)
+                        url = new URL(newUrl)
+                    }
                 }
                 if (url) {
                     const link = $("<a>")

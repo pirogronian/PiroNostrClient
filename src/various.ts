@@ -55,8 +55,15 @@ export function MakeLinkInner(node, url: string, text: string|null = null) {
     //console.log("Prepared inner link:", node.html())
 }
 
-export function CreateLink(url: string|undefined, text?: string): JQuery<HTMLElement>|undefined {
-    if (!url)  return
+export function CreateUrl(url: any): URL|undefined {
+    if (!url || typeof url != "string")  return
+    try {
+        return new URL(url)
+    } catch {}
+}
+
+export function CreateLink(url: any, text?: string): JQuery<HTMLElement>|undefined {
+    if (!url || typeof url != "string")  return
     try {
         const urlObj = new URL(url)
         if (!text)  text = url
