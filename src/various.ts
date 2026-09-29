@@ -55,6 +55,18 @@ export function MakeLinkInner(node, url: string, text: string|null = null) {
     //console.log("Prepared inner link:", node.html())
 }
 
+export function CreateLink(url: string|undefined, text?: string): JQuery<HTMLElement>|undefined {
+    if (!url)  return
+    try {
+        const urlObj = new URL(url)
+        if (!text)  text = url
+        const a = $("<a>")
+        a.prop("href", url)
+        a.text(text)
+        return a
+    } catch (error) {}
+}
+
 export function MakeLabelActive(node: JQuery<HTMLElement>) {
     const input = node.find("input")
     node.addClass("Active")

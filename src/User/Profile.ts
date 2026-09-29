@@ -3,7 +3,7 @@ import $ from "jquery"
 
 import { NDKUser, type NDKUserProfile } from "@nostr-dev-kit/ndk";
 
-import { MakeCopyable, FormattedTime } from "@/various.js";
+import { MakeCopyable, FormattedTime, CreateLink } from "@/various.js";
 
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
@@ -88,8 +88,11 @@ export class Profile extends Module {
                     const keyNode = $("<dt>")
                     keyNode.text(field)
                     const valNode = $("<dd>")
-                    if (typeof value == "string" && value.length > 3) {
-                        MakeCopyable(valNode, value)
+                    if (typeof value == "string") {
+                        const link = CreateLink(value)
+                        if (link) {
+                            valNode.append(link)
+                        } else  MakeCopyable(valNode, value)
                     }
                     else valNode.text(`${value}`)
                     pinfo.append(keyNode)
