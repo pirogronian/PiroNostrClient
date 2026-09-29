@@ -646,7 +646,7 @@ export class User extends Module {
         user.profile.website = From("#UserWebsite")
 
         try {
-            await user.publish()
+            await this.publishProfile(user)
 
             this.navigate()
         } catch(error) {
@@ -694,6 +694,7 @@ export class User extends Module {
             const unip05n = $("#UserNip05 span.Value")
             const ulud06n = $("#UserLud06 span.Value")
             const ulud16n = $("#UserLud16 span.Value")
+            const uan = $("#UserAbout span.Value")
             const uwebn = $("#UserWebsite a")
             upkn.text(user.pubkey)
             upkn.click(() => {
@@ -732,6 +733,8 @@ export class User extends Module {
             })
             uwebn.text(user.profile?.website).prop("href", user.profile?.website)
             
+            uan.text(user.profile?.about)
+
             const ualn = $("#UserArticlesLink")
             App.get().articles.makeLinkActive(ualn, `?author=${user.pubkey}`)
             ualn.show()
@@ -797,6 +800,11 @@ export class User extends Module {
                         App.get().relays.guiRefreshItem(url)
                     }
             }
+
+            if (user.profile)
+                for (const key of Object.keys(user.profile)) {
+                    console.debug("Profile:", key, user.profile[key])
+                }
         } else {
             //upn.hide()
             logout.hide()

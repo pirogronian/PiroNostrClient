@@ -3,9 +3,10 @@ import { EventEmitter } from "tseep"
 import $ from "jquery"
 import Navigo from "navigo"
 import NDK, { NDKEvent, NDKRelay, NDKRelaySet, NDKPool,
-     NDKSubscriptionCacheUsage, type NDKFilter, nip19,
-     NDKSubscription, type NDKSubscriptionOptions,
-    isNip33AValue, filterFromId, relaysFromBech32 } from "@nostr-dev-kit/ndk"
+    NDKSubscriptionCacheUsage, type NDKFilter, nip19,
+    NDKSubscription, type NDKSubscriptionOptions,
+    isNip33AValue, filterFromId, relaysFromBech32,
+    type ContentTaggingOptions, NDKUser } from "@nostr-dev-kit/ndk"
 import { Router } from "@/Router.js"
 import { InnerUrl, InnerLink, MakeLinkInner } from "./various.js"
 
@@ -211,6 +212,23 @@ export class Module extends EventEmitter {
         //console.debug("Module.subscribe:", filters, opts, autoStartOrRelaySet, _autoStart)
 
         return this.ndk.subscribe(filters, opts, autoStartOrRelaySet, _autoStart)
+    }
+
+    async publish(event: NDKEvent, relaySet?: NDKRelaySet,
+        timeoutMs?: number, requiredRelayCount?: number, opts?: ContentTaggingOptions,
+    ): Promise<Set<NDKRelay>> {
+        const relays = await event.publish(relaySet, timeoutMs, requiredRelayCount, opts)
+        if (relays.size && this.ndk.cacheAdapter?.setEvent) {
+            this.ndk.cacheAdapter?.setEvent(event, [{kinds: [event.kind]}], Array.from(relays)[0])
+        }
+        return relays
+    }
+
+    async publishProfile(user: NDKUser) {
+        user.publish()
+        if (user.profile && this.ndk.cacheAdapter?.saveProfile) {
+            this.ndk.cacheAdapter?.saveProfile(user.pubkey, user.profile)
+        }
     }
 
     setup() {}
