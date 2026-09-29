@@ -12,11 +12,21 @@ export class Profile extends Module {
     user: NDKUser|undefined
 
     readonly GuiSelectors = {
+        Profile: "#UserProfile",
         Pubkey: "#UserPubkey",
         NPub: "#UserNPub",
         NProf: "#UserNProfile",
         CreatedAt: "#UserCreatedAt",
         Name: "#UserName span.Value",
+        DisplayName: "#UserDisplayName span.Value",
+        Picture: "#UserPicture",
+        Banner: "#UserBanner",
+        Bio: "#UserBio span.Value",
+        Nip05: "#UserNip05 span.Value",
+        Lud06: "#UserLud06 span.Value",
+        Lud16: "#UserLud16 span.Value",
+        About: "#UserAbout span.Value",
+        Website: "#UserWebsite a"
     }
 
     guiShow() {
@@ -30,15 +40,15 @@ export class Profile extends Module {
         const unprn = MakeCopyable($(s.NProf), this.user.nprofile)
         const ca = $(s.CreatedAt).text(FormattedTime(this.user.profile?.created_at))
         const unn = $(s.Name).text(this.user.profile?.name)
-        const udnn = $("#UserDisplayName span.Value").text(this.user.profile?.displayName)
-        const upictn = $("#UserPicture")
-        const ubannern = $("#UserBanner")
-        const ubion = $("#UserBio span.Value").text(this.user.profile?.bio)
-        const unip05n = MakeCopyable($("#UserNip05 span.Value"), this.user.profile?.nip05)
-        const ulud06n = MakeCopyable($("#UserLud06 span.Value"), this.user.profile?.lud06)
-        const ulud16n = MakeCopyable($("#UserLud16 span.Value"), this.user.profile?.lud16)
-        const uan = $("#UserAbout span.Value").text(this.user.profile?.about)
-        const uwebn = $("#UserWebsite a")
+        const udnn = $(s.DisplayName).text(this.user.profile?.displayName)
+        const upictn = $(s.Picture)
+        const ubannern = $(s.Banner)
+        const ubion = $(s.Bio).text(this.user.profile?.bio)
+        const unip05n = MakeCopyable($(s.Nip05), this.user.profile?.nip05)
+        const ulud06n = MakeCopyable($(s.Lud06), this.user.profile?.lud06)
+        const ulud16n = MakeCopyable($(s.Lud16), this.user.profile?.lud16)
+        const uan = $(s.About).text(this.user.profile?.about)
+        const uwebn = $(s.Website)
 
         if (this.user.profile?.picture) upictn.find("img").prop("src", this.user.profile?.picture)
         if (this.user.profile?.banner) ubannern.find("img").prop("src", this.user.profile?.banner)
@@ -52,6 +62,6 @@ export class Profile extends Module {
         }
         uwebn.text(this.user.profile?.website).prop("href", this.user.profile?.website)
 
-        $("#UserProfile").show()
+        $(s.Profile).show()
     }
 }
