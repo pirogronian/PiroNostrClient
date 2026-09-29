@@ -18,6 +18,10 @@ a:not(:where(#ArticleView a)):hover, label.active:not(:where(#ArticleView label)
     background-color: lightgray;
 }
 
+.Copyable {
+    cursor: pointer
+}
+
 .Copyable:hover {
     text-decoration: underline;
 }
