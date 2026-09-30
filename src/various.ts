@@ -86,12 +86,18 @@ export function MakeLabelActive(node: JQuery<HTMLElement>) {
     })
 }
 
-export function MakeCopyable(element: JQuery<HTMLElement>, text?: string) {
+export function MakeCopyable(element: JQuery<HTMLElement>, text?: any) {
     element.addClass("Copyable")
     element.prop("title", "Click to copy")
-    element.text(text)
+    if (typeof text != "string") text = `${text}`
+    if (text) element.text(text)
+    else text = element.text()
     if (text)  element.click(() => { navigator.clipboard.writeText(text) })
     return element
+}
+
+export function JTagName(element: JQuery<HTMLElement>) {
+    return element.get(0).tagName.toLowerCase()
 }
 
 export function CurrentTime() {

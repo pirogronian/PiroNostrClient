@@ -1,9 +1,9 @@
 
-import $ from "jquery"
+import $, { type JQuery } from "jquery"
 
-import { NDKUser, type NDKUserProfile } from "@nostr-dev-kit/ndk";
+import { NDKEvent, NDKUser, type NDKUserProfile } from "@nostr-dev-kit/ndk";
 
-import { MakeCopyable, FormattedTime, CreateLink } from "@/various.js";
+import { MakeCopyable, FormattedTime, CreateLink, JTagName } from "@/various.js";
 
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
@@ -39,8 +39,8 @@ export class Profile extends Module {
         CachedAt: "#UserCachedAt",
         Name: "#UserName span.Value",
         DisplayName: "#UserDisplayName span.Value",
-        Picture: "#UserPicture",
-        Banner: "#UserBanner",
+        Picture: "#UserPicture img",
+        Banner: "#UserBanner img",
         Bio: "#UserBio span.Value",
         Nip05: "#UserNip05 span.Value",
         Lud06: "#UserLud06 span.Value",
@@ -54,25 +54,48 @@ export class Profile extends Module {
             console.warn("No user to show profile for!")
             return
         }
+
+        const P = (element: JQuery<HTMLElement>, member: string) => {
+            let value
+            if (this.user && this.user.profile && this.user.profile[member])
+                value = this.user.profile[member]
+            if (member == "created_at" || member == "cachedAt") {
+                if (typeof value == "number")  element.text(FormattedTime(value))
+            } else {
+                if (JTagName(element) == "img") {
+                    element.prop("src", value)
+                } else {
+                    if (typeof value == "string") {
+                        const link = CreateLink(value)
+                        if (link) {
+                            element.append(link)
+                        } else  MakeCopyable(element, value)
+                    }
+                }
+            }
+            let dd = element
+            if (JTagName(dd) != "dd") dd = dd.parent()
+            dd.attr("tag", member)
+            return element
+        }
+
         const s = this.GuiSelectors
         const upkn = MakeCopyable($(s.Pubkey), this.user.pubkey)
         const unpn = MakeCopyable($(s.NPub), this.user.npub)
         const unprn = MakeCopyable($(s.NProf), this.user.nprofile)
-        const ca = $(s.CreatedAt).text(FormattedTime(this.user.profile?.created_at))
-        if (typeof this.user.profile?.cachedAt == "number") $(s.CachedAt).text(FormattedTime(this.user.profile?.cachedAt))
-        const unn = $(s.Name).text(this.user.profile?.name)
-        const udnn = $(s.DisplayName).text(this.user.profile?.displayName)
-        const upictn = $(s.Picture)
-        const ubannern = $(s.Banner)
-        const ubion = $(s.Bio).text(this.user.profile?.bio)
-        const unip05n = MakeCopyable($(s.Nip05), this.user.profile?.nip05)
-        const ulud06n = MakeCopyable($(s.Lud06), this.user.profile?.lud06)
-        const ulud16n = MakeCopyable($(s.Lud16), this.user.profile?.lud16)
-        const uan = $(s.About).text(this.user.profile?.about)
-        const uwebn = $(s.Website)
+        P($(s.CreatedAt), "created_at")
+        P($(s.CachedAt), "cachedAt")
+        P($(s.Name), "name")
+        P($(s.DisplayName), "displayName")
+        P($(s.Picture), "picture")
+        P($(s.Banner), "banner")
+        P($(s.Bio), "bio")
+        const unip05n = P($(s.Nip05), "nip05")
+        P($(s.Lud06), "lud06")
+        P($(s.Lud16), "lud16")
+        P($(s.About), "about")
+        P($(s.Website), "website")
 
-        if (this.user.profile?.picture) upictn.find("img").prop("src", this.user.profile?.picture)
-        if (this.user.profile?.banner) ubannern.find("img").prop("src", this.user.profile?.banner)
         if (this.user.profile?.nip05) {
             this.user.validateNip05(this.user.profile.nip05).then((valid) => {
                 if (valid) {
@@ -81,7 +104,6 @@ export class Profile extends Module {
                 else  unip05n.parent().prop("title", "Invalid!").find(".Invalid").show()
             })
         }
-        uwebn.text(this.user.profile?.website).prop("href", this.user.profile?.website)
 
         if (this.user.profile) {
             const pinfo = $(s.Profile).find("dl.Info")
@@ -102,6 +124,20 @@ export class Profile extends Module {
                     pinfo.append(keyNode)
                     pinfo.append(valNode)
                 }
+            }
+        }
+
+        if (this.user.profile) {
+            const jre = this.user.profile?.profileEvent
+            if (jre) {
+                const e = JSON.parse(jre)
+                e.tags.forEach((tag: string[]) => {
+                    let name = tag[0]
+                    if (name == "display_name")  name = "displayName"
+                    if (name && this.user?.profile[name]) {
+                        if (this.user?.profile[name] == tag[1])  return
+                    }
+                })
             }
         }
 
