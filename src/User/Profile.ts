@@ -12,7 +12,9 @@ export class Profile extends Module {
     user: NDKUser|undefined
 
     readonly StandardMembers = new Set<string>([
+        "pubkey",
         "created_at",
+        "cachedAt",
         "name",
         "displayName",
         "image",
@@ -34,6 +36,7 @@ export class Profile extends Module {
         NPub: "#UserNPub",
         NProf: "#UserNProfile",
         CreatedAt: "#UserCreatedAt",
+        CachedAt: "#UserCachedAt",
         Name: "#UserName span.Value",
         DisplayName: "#UserDisplayName span.Value",
         Picture: "#UserPicture",
@@ -56,6 +59,7 @@ export class Profile extends Module {
         const unpn = MakeCopyable($(s.NPub), this.user.npub)
         const unprn = MakeCopyable($(s.NProf), this.user.nprofile)
         const ca = $(s.CreatedAt).text(FormattedTime(this.user.profile?.created_at))
+        if (typeof this.user.profile?.cachedAt == "number") $(s.CachedAt).text(FormattedTime(this.user.profile?.cachedAt))
         const unn = $(s.Name).text(this.user.profile?.name)
         const udnn = $(s.DisplayName).text(this.user.profile?.displayName)
         const upictn = $(s.Picture)
