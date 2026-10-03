@@ -213,6 +213,9 @@ export class Articles extends Module {
         const context = this.context
         this.loadSettings()
         //this.loadFinder(params.author, params.id)
+        //console.debug($("input[name='id']"))
+        $("input[name='id']").val(params.id)
+        $("#FinderResultsNumber").text(`Results: 0, size: 0B`)
         this.author = params.followAuthor
         const err = this.load(params,
             (event: NDKEvent, relay?: NDKRelay) => {
