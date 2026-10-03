@@ -220,7 +220,8 @@ export class Articles extends Module {
                 //console.debug(this.followAuthor, params.followAuthor)
                 if (this.followAuthor && event.pubkey == this.author) {
                     console.debug("Following the author...")
-                    const addr = nip19.naddrEncode(event)
+                    console.debug(event.rawEvent())
+                    const addr = event.naddr
                     App.get().article.navigate(`/${addr}`)
                 } else this.articleHead(NDKWiki.from(event), relay)
             })

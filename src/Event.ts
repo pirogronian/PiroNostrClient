@@ -70,11 +70,21 @@ export namespace Event {
     }
 
     export function naddr(e: NDKEvent): string {
-        return nip19.naddrEncode(e.rawEvent())
+        return nip19.naddrEncode({
+            pubkey: e.pubkey,
+            identifier: e.dTag,
+            kind: e.kind,
+            relays: e.onRelays.map((relay) => relay.url)
+        })
     }
 
     export function nevent(e: NDKEvent): string {
-        return nip19.neventEncode(e.rawEvent())
+        return nip19.neventEncode({
+            id: e.id,
+            relays: e.onRelays.map((relay) => relay.url),
+            author: e.pubkey,
+            kind: e.kind
+        })
     }
 
     export function setup() {
