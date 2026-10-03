@@ -65,14 +65,14 @@ export class Article extends Module {
         return this.event.pubkey == user.pubkey
     }
 
-    showRawEvent(target) : void {
+    showRawEvent() : void {
         const rawObject = this.event?.rawEvent();
         const jsonString = JSON.stringify(rawObject, null, 2);
         const view = $("#RawEventView")
         view.html(jsonString)
     }
 
-    asciidocCreateWikilinks(element) {
+    asciidocCreateWikilinks(element: JQuery<HTMLElement>) {
         element.find("a").each((index, node) => {
             //console.debug(node)
             node = $(node)
@@ -100,7 +100,7 @@ export class Article extends Module {
         return text.replace(/\[([^\]]+)\]\[([^\]]+)\]/g, '[$1](wiki:$2)');
     }
 
-    djotCreateWikilinksAfter(element) {
+    djotCreateWikilinksAfter(element: JQuery<HTMLElement>) {
         element.find("a").each((index, node) => {
             //console.log("Checking node:", $(this).prop("nodeName"))
             //console.log("Checking node:", node)
