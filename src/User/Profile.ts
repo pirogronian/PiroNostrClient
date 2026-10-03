@@ -46,7 +46,7 @@ export class Profile extends Module {
         Lud06: "#UserLud06 span.Value",
         Lud16: "#UserLud16 span.Value",
         About: "#UserAbout span.Value",
-        Website: "#UserWebsite a"
+        Website: "#UserWebsite .Value"
     }
 
     guiShow() {
