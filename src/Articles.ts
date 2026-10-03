@@ -1,6 +1,6 @@
 
 import $ from "jquery"
-import NDK, { NDKEvent, NDKWiki, NDKRelay, nip19 } from "@nostr-dev-kit/ndk";
+import NDK, { NDKEvent, NDKWiki, NDKRelay } from "@nostr-dev-kit/ndk";
 import type { NDKFilter, NDKSubscription } from "@nostr-dev-kit/ndk"
 //import NDKCacheAdapterDexie, { db } from '@nostr-dev-kit/ndk-cache-dexie';
 
@@ -44,7 +44,7 @@ export class Articles extends Module {
         if (!TT) { TT = event.dTag }
         //console.log(`Received article "${TT}"`)
         title.text(TT)
-        App.get().article.makeLinkActive(title, `/${event.encode()}`)
+        App.get().article.makeLinkActive(title, `/${event.naddr}`)
 
         const user = await App.get().user.get(event.pubkey)
         if (!this.isCurrent()) return
@@ -220,7 +220,7 @@ export class Articles extends Module {
                 //console.debug(this.followAuthor, params.followAuthor)
                 if (this.followAuthor && event.pubkey == this.author) {
                     console.debug("Following the author...")
-                    console.debug(event.rawEvent())
+                    //console.debug(event.rawEvent())
                     const addr = event.naddr
                     App.get().article.navigate(`/${addr}`)
                 } else this.articleHead(NDKWiki.from(event), relay)
