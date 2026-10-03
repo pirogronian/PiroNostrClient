@@ -1,5 +1,5 @@
 
-import $ from "jquery"
+import $, { type JQuery } from "jquery"
 
 import NDK, { NDKWiki, NDKDraft, NDKEvent, NDKUser, nip19 } from "@nostr-dev-kit/ndk";
 
@@ -199,6 +199,20 @@ export class Article extends Module {
         }
     }
 
+    createLinksFromWikiProtocol(container: JQuery<HTMLElement>) {
+        const links = container.find("a")
+        links.each((index, a) => {
+            a = $(a)
+            const href = a.prop("href")
+            //console.debug(href, typeof href)
+            if (href && href.startsWith("wiki:")) {
+                //console.debug(a)
+                const entry = href.slice(4)
+                App.get().articles.makeLinkActive(a, `?id=${encodeURIComponent(formatNip54TagD(entry))}&followAuthor=${this.event?.pubkey}`)
+            }
+        })
+    }
+
     async createNode(format: string|null = null, content: string|null = null) {
         if (!content) {
             if (this.event)
@@ -214,12 +228,14 @@ export class Article extends Module {
                 ret = $(cnt)
                 this.asciidocCreateWikilinks(ret)
                 this.createWikiLinksFromTextNodes($("<div>").append(ret).get(0))
+                this.createLinksFromWikiProtocol(ret)
                 break
             case "djot":
                 cnt = this.djot(content)
                 ret = $(cnt)
                 this.djotCreateWikilinksAfter(ret)
                 this.createWikiLinksFromTextNodes($("<div>").append(ret).get(0))
+                this.createLinksFromWikiProtocol(ret)
                 break
             default:
                 cnt = this.plaintext(content)
