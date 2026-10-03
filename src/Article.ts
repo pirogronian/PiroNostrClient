@@ -73,8 +73,9 @@ export class Article extends Module {
     }
 
     asciidocCreateWikilinks(element) {
-        element.find("a").each(() => {
-            const node = $(this)
+        element.find("a").each((index, node) => {
+            //console.debug(node)
+            node = $(node)
             //console.log("Checking node:", $(this).prop("nodeName"))
             //console.log("Checking node:", node)
             if (!node.text() && !node.attr("href")) {
@@ -100,9 +101,10 @@ export class Article extends Module {
     }
 
     djotCreateWikilinksAfter(element) {
-        element.find("a").each((node) => {
+        element.find("a").each((index, node) => {
             //console.log("Checking node:", $(this).prop("nodeName"))
             //console.log("Checking node:", node)
+            node = $(node)
             if (!node.attr("href")) {
                 App.get().articles.makeLinkActive(node,
                     `?id=${formatNip54TagD(node.text())}&followAuthor=${this.event?.pubkey}`)
