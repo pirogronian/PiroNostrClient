@@ -763,7 +763,7 @@ export class Article extends Module {
         this.show(preview)
     }
 
-    publish() {
+    publishArticle() {
         if (!this.editMode) {
             console.warn("Article.publish: not edit mode!")
             return
@@ -883,7 +883,7 @@ export class Article extends Module {
         })
 
         pubButt.click(() => {
-            this.publish()
+            this.publishArticle()
         })
 
         MakeLabelActive(switchEdit.parent())
