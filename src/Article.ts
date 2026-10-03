@@ -72,6 +72,12 @@ export class Article extends Module {
         view.html(jsonString)
     }
 
+    makeLinkWiki(a: JQuery<HTMLElement>, entry: string, alias?: string) {
+        if (!alias && !a.text()) alias = entry
+        App.get().articles.makeLinkActive(a,
+            `?id=${encodeURIComponent(formatNip54TagD(entry))}&followAuthor=${this.event?.pubkey}`, alias)
+    }
+
     asciidocCreateWikilinks(element: JQuery<HTMLElement>) {
         element.find("a").each((index, node) => {
             //console.debug(node)
@@ -79,8 +85,9 @@ export class Article extends Module {
             //console.log("Checking node:", $(this).prop("nodeName"))
             //console.log("Checking node:", node)
             if (!node.text() && !node.attr("href")) {
-                App.get().articles.makeLinkActive(node, 
-                    `?id=${formatNip54TagD(node.attr("id"))}&followAuthor=${this.event?.pubkey}`, node.attr("id"))
+                this.makeLinkWiki(node, node.attr("id"))
+                //App.get().articles.makeLinkActive(node, 
+                //    `?id=${formatNip54TagD(node.attr("id"))}&followAuthor=${this.event?.pubkey}`, `node.attr("id")`)
                 /*node.text(node.attr("id"))
                 node.attr("href", InnerUrl(`/articles?id=${formatNip54TagD(node.attr("id"))}`))*/
             }
@@ -106,8 +113,9 @@ export class Article extends Module {
             //console.log("Checking node:", node)
             node = $(node)
             if (!node.attr("href")) {
-                App.get().articles.makeLinkActive(node,
-                    `?id=${formatNip54TagD(node.text())}&followAuthor=${this.event?.pubkey}`)
+                this.makeLinkWiki(node, node.text())
+                //App.get().articles.makeLinkActive(node,
+                //    `?id=${formatNip54TagD(node.text())}&followAuthor=${this.event?.pubkey}`)
                 //node.attr("href", LocalUrl(`#/articles?id=${formatNip54TagD(node.text())}`))
             }
         })
@@ -181,8 +189,9 @@ export class Article extends Module {
 
                 // Tworzymy klikalny link <a> dla Wikilink
                 const a = document.createElement('a');
-                App.get().articles.makeLinkActive($(a),
-                    `?id=${encodeURIComponent(formatNip54TagD(target))}&followAuthor=${this.event?.pubkey}`, alias)
+                this.makeLinkWiki($(a), target, alias)
+                //App.get().articles.makeLinkActive($(a),
+                //    `?id=${encodeURIComponent(formatNip54TagD(target))}&followAuthor=${this.event?.pubkey}`, alias)
                 a.dataset.target = target; // Przydatne dla Nostr Wiki (np. szukanie eventu po tagu d)
 
                 fragment.appendChild(a);
@@ -208,7 +217,8 @@ export class Article extends Module {
             if (href && href.startsWith("wiki:")) {
                 //console.debug(a)
                 const entry = href.slice(4)
-                App.get().articles.makeLinkActive(a, `?id=${encodeURIComponent(formatNip54TagD(entry))}&followAuthor=${this.event?.pubkey}`)
+                this.makeLinkWiki(a, entry)
+                //App.get().articles.makeLinkActive(a, `?id=${encodeURIComponent(formatNip54TagD(entry))}&followAuthor=${this.event?.pubkey}`)
             }
         })
     }
