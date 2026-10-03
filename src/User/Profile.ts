@@ -55,10 +55,7 @@ export class Profile extends Module {
             return
         }
 
-        const P = (element: JQuery<HTMLElement>, member: string) => {
-            let value
-            if (this.user && this.user.profile && this.user.profile[member])
-                value = this.user.profile[member]
+        const V = (element: JQuery<HTMLElement>, member: string, value: any) => {
             if (member == "created_at" || member == "cachedAt") {
                 if (typeof value == "number")  element.text(FormattedTime(value))
             } else {
@@ -69,12 +66,30 @@ export class Profile extends Module {
                         const link = CreateLink(value)
                         if (link) {
                             element.append(link)
-                        } else  MakeCopyable(element, value)
+                        } else {
+                            MakeCopyable(element, value)
+                            if (value && member == "nip05") {
+                                //console.debug("Nip-05 validation for", value)
+                                this.user.validateNip05(value).then((valid) => {
+                                    if (valid) {
+                                        element.parent().prop("title", "Valid").find(".Valid").show()
+                                    }
+                                    else  element.parent().prop("title", "Invalid!").find(".Invalid").show()
+                                })
+                            }
+                        }
                     }
                 }
             }
+        }
+
+        const P = (element: JQuery<HTMLElement>, member: string) => {
+            let value
+            if (this.user && this.user.profile && this.user.profile[member])
+                value = this.user.profile[member]
+            V(element, member, value)
             let dd = element
-            if (JTagName(dd) != "dd") dd = dd.parent()
+            while (JTagName(dd) != "dd") dd = dd.parent()
             dd.attr("tag", member)
             return element
         }
@@ -90,20 +105,11 @@ export class Profile extends Module {
         P($(s.Picture), "picture")
         P($(s.Banner), "banner")
         P($(s.Bio), "bio")
-        const unip05n = P($(s.Nip05), "nip05")
+        P($(s.Nip05), "nip05")
         P($(s.Lud06), "lud06")
         P($(s.Lud16), "lud16")
         P($(s.About), "about")
         P($(s.Website), "website")
-
-        if (this.user.profile?.nip05) {
-            this.user.validateNip05(this.user.profile.nip05).then((valid) => {
-                if (valid) {
-                    unip05n.parent().prop("title", "Valid").find(".Valid").show()
-                }
-                else  unip05n.parent().prop("title", "Invalid!").find(".Invalid").show()
-            })
-        }
 
         if (this.user.profile) {
             const pinfo = $(s.Profile).find("dl.Info")
@@ -131,11 +137,29 @@ export class Profile extends Module {
             const jre = this.user.profile?.profileEvent
             if (jre) {
                 const e = JSON.parse(jre)
+                console.debug(e.tags)
                 e.tags.forEach((tag: string[]) => {
                     let name = tag[0]
                     if (name == "display_name")  name = "displayName"
                     if (name && this.user?.profile[name]) {
-                        if (this.user?.profile[name] == tag[1])  return
+                        let value = tag[1]
+                        if (this.user?.profile[name] == value) {
+                            //console.debug("Value already existing in profile:", name, value)
+                            return
+                        }
+                        const dd = $(`dd[tag='${name}']`)
+                        //console.debug("Element for tag", name, dd)
+                        let div = $("<div>")
+                        let v = div
+                        if (name == "nip05") {
+                            div = $(s.Nip05).parent().clone()
+                            div.prop("id", null)
+                            v = div.find("span.Value")
+                        }
+                        V(v, name, value)
+                        dd.append(div)
+                    } else {
+                        console.debug("Tag not existing in profile:", name)
                     }
                 })
             }
