@@ -677,7 +677,6 @@ export class User extends Module {
             } else {
                 syncSet.show()
                 pubSet.show()
-                $("#UserProfileEdit").show().click(() => { this.guiEditProfile() })
                 if (this.nsecSigner) {
                     const last = this.localSettings(NSEC_LAST_KEY)
                     const setp = $("#UserNsecSetPassw")

@@ -12,6 +12,7 @@ import ProfileHTML from "./Profile.html?raw"
 
 export class Profile extends Module {
     user: NDKUser|undefined
+    editMode: boolean = false
 
     readonly StandardMembers = new Set<string>([
         "pubkey",
@@ -172,6 +173,7 @@ export class Profile extends Module {
         }
 
         $(s.Profile).show()
+        $("#UserProfileEdit").show().click(() => { this.edit() })
     }
 
     apply(): boolean {
@@ -200,5 +202,61 @@ export class Profile extends Module {
         user.profile.website = From(s.Website)
 
         return true
+    }
+
+    async save() {
+        if (!this.user) throw Error("No user defined!")
+        if (!this.apply())  return
+
+        try {
+            await this.publishProfile(this.user)
+            this.editMode = false
+            App.get().user.navigate()
+        } catch(error) {
+            this.error(error)
+        }
+    }
+
+    guiFillEditor() {
+        function Text(selector: string) {
+            const v = $(selector)
+            //const v = f.find(".Value")
+            const i = v.parent().find(".Input")
+            i.val(v.text())
+            v.hide()
+            i.show()
+        }
+        function Img(selector: string) {
+            const img = $(selector)
+            const i = img.parent().find("input")
+            //const img = f.find("img")
+            i.val(img.prop("src"))
+            img.hide()
+            i.show()
+        }
+
+        const s = this.GuiSelectors
+        Text(s.Name)
+        Text(s.DisplayName)
+        Img(s.Picture)
+        Img(s.Banner)
+        Text(s.Bio)
+        Text(s.Nip05)
+        Text(s.Lud06)
+        Text(s.Lud16)
+        Text(s.About)
+        Text(s.Website)
+
+        const pub = $("#UserProfilePublish")
+        pub.click(() => {
+            this.save()
+        })
+        pub.show()
+        $("#UserProfileEdit").hide()
+    }
+
+    edit() {
+        this.editMode = true
+        this.guiFillEditor()
     }
 }
