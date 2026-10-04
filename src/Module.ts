@@ -230,6 +230,7 @@ export class Module extends EventEmitter {
             console.warn("No user profile!")
             return
         }
+        console.debug("Profile to publish:", user.profile)
         const event = new NDKEvent(this.ndk, {
             kind: 0,
             content: serializeProfile(user.profile),

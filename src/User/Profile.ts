@@ -45,7 +45,6 @@ export class Profile extends Module {
         DisplayName: "#UserDisplayName span.Value",
         Picture: "#UserPicture img",
         Banner: "#UserBanner img",
-        Bio: "#UserBio span.Value",
         Nip05: "#UserNip05 span.Value",
         Lud06: "#UserLud06 span.Value",
         Lud16: "#UserLud16 span.Value",
@@ -112,7 +111,6 @@ export class Profile extends Module {
         P($(s.DisplayName), "displayName")
         P($(s.Picture), "picture")
         P($(s.Banner), "banner")
-        P($(s.Bio), "bio")
         P($(s.Nip05), "nip05")
         P($(s.Lud06), "lud06")
         P($(s.Lud16), "lud16")
@@ -173,7 +171,6 @@ export class Profile extends Module {
             }
         }
 
-        $(s.Profile).show()
         $("#UserProfileEdit").show().click(() => { this.edit() })
         $("#UserProfileRelaysButton").click(() => {
             if (this.event) {
@@ -200,23 +197,22 @@ export class Profile extends Module {
             return i.val()
         }
 
-        const user = this.ndk.activeUser
-        if (!user) {
+        if (!this.user) {
             console.warn("No active user, nothing to save!")
             return false
         }
         const s = this.GuiSelectors
-        if (!user.profile) user.profile = {}
-        user.profile.name = From(s.Name)
-        user.profile.displayName = From(s.DisplayName)
-        user.profile.picture = From(s.Picture)
-        user.profile.banner = From(s.Banner)
-        user.profile.bio = From(s.Bio)
-        user.profile.nip05 = From(s.Nip05)
-        user.profile.lud06 = From(s.Lud06)
-        user.profile.lud16 = From(s.Lud16)
-        user.profile.about = From(s.About)
-        user.profile.website = From(s.Website)
+        if (!this.user.profile) this.user.profile = {}
+        this.user.profile.name = From(s.Name)
+        this.user.profile.displayName = From(s.DisplayName)
+        this.user.profile.picture = From(s.Picture)
+        this.user.profile.banner = From(s.Banner)
+        this.user.profile.nip05 = From(s.Nip05)
+        this.user.profile.lud06 = From(s.Lud06)
+        this.user.profile.lud16 = From(s.Lud16)
+        this.user.profile.about = From(s.About)
+        this.user.profile.website = From(s.Website)
+        //console.debug("Profile about:", this.user.profile.about)
 
         return true
     }
@@ -227,7 +223,6 @@ export class Profile extends Module {
 
         try {
             const relays = await this.publishProfile(this.user)
-            console.debug("Published on", relays)
             this.editMode = false
             App.get().user.navigate()
         } catch(error) {
