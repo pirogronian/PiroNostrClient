@@ -8,6 +8,8 @@ import { MakeCopyable, FormattedTime, CreateLink, JTagName } from "@/various.js"
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
+import ProfileHTML from "./Profile.html?raw"
+
 export class Profile extends Module {
     user: NDKUser|undefined
 
@@ -54,6 +56,10 @@ export class Profile extends Module {
             console.warn("No user to show profile for!")
             return
         }
+
+        const container = $("#UserProfileInfo")
+        container.empty()
+        container.html(ProfileHTML)
 
         const V = (element: JQuery<HTMLElement>, member: string, value: any) => {
             if (member == "created_at" || member == "cachedAt") {
