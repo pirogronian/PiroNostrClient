@@ -174,5 +174,31 @@ export class Profile extends Module {
         $(s.Profile).show()
     }
 
-    
+    apply(): boolean {
+        function From(selector: string): string {
+            const f = $(selector).parent()
+            const i = f.find(".Input")
+            return i.val()
+        }
+
+        const user = this.ndk.activeUser
+        if (!user) {
+            console.warn("No active user, nothing to save!")
+            return false
+        }
+        const s = this.GuiSelectors
+        if (!user.profile) user.profile = {}
+        user.profile.name = From(s.Name)
+        user.profile.displayName = From(s.DisplayName)
+        user.profile.picture = From(s.Picture)
+        user.profile.banner = From(s.Banner)
+        user.profile.bio = From(s.Bio)
+        user.profile.nip05 = From(s.Nip05)
+        user.profile.lud06 = From(s.Lud06)
+        user.profile.lud16 = From(s.Lud16)
+        user.profile.about = From(s.About)
+        user.profile.website = From(s.Website)
+
+        return true
+    }
 }

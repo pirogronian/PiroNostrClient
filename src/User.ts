@@ -629,31 +629,10 @@ export class User extends Module {
     }
 
     async saveProfile() {
-        function From(selector: string): string {
-            const f = $(selector)
-            const i = f.find(".Input")
-            return i.val()
-        }
-
-        const user = this.ndk.activeUser
-        if (!user) {
-            console.warn("No active user, nothing to save!")
-            return
-        }
-        if (!user.profile) user.profile = {}
-        user.profile.name = From("#UserName")
-        user.profile.displayName = From("#UserDisplayName")
-        user.profile.picture = From("#UserPicture")
-        user.profile.banner = From("#UserBanner")
-        user.profile.bio = From("#UserBio")
-        user.profile.nip05 = From("#UserNIP05")
-        user.profile.lud06 = From("#UserLud06")
-        user.profile.lud16 = From("#UserLud16")
-        user.profile.about = From("#UserAbout")
-        user.profile.website = From("#UserWebsite")
+        if (!this.profile.apply())  return
 
         try {
-            await this.publishProfile(user)
+            await this.publishProfile(this.user)
 
             this.navigate()
         } catch(error) {
