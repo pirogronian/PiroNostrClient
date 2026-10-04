@@ -135,7 +135,7 @@ export class Module extends EventEmitter {
         return this.ndk.fetchEvent(idOrFilter, opts, relaySetOrRelay)
     }
 
-    subscribe(
+    subscribeForEvents(
         idOrFilter: string | NDKFilter | NDKFilter[],
         opts?: NDKSubscriptionOptions,
         autoStartOrRelaySet: NDKRelaySet | boolean | NDKSubscriptionEventHandlers = true,
@@ -214,7 +214,7 @@ export class Module extends EventEmitter {
         return this.ndk.subscribe(filters, opts, autoStartOrRelaySet, _autoStart)
     }
 
-    async publish(event: NDKEvent, relaySet?: NDKRelaySet,
+    async publishEvent(event: NDKEvent, relaySet?: NDKRelaySet,
         timeoutMs?: number, requiredRelayCount?: number, opts?: ContentTaggingOptions,
     ): Promise<Set<NDKRelay>> {
         const relays = await event.publish(relaySet, timeoutMs, requiredRelayCount, opts)

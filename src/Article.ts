@@ -763,7 +763,7 @@ export class Article extends Module {
         this.show(preview)
     }
 
-    publishArticle() {
+    publish() {
         if (!this.editMode) {
             console.warn("Article.publish: not edit mode!")
             return
@@ -883,7 +883,7 @@ export class Article extends Module {
         })
 
         pubButt.click(() => {
-            this.publishArticle()
+            this.publish()
         })
 
         MakeLabelActive(switchEdit.parent())
@@ -959,7 +959,7 @@ export class Article extends Module {
         this.wiki = null
         this.editMode = false
         
-        this.subscribe(addr, { closeOnEose: true },
+        this.subscribeForEvents(addr, { closeOnEose: true },
             { onEvent: (event) => {
                 //console.debug("Article: got event:", event)
                 this.onEvent(event)
@@ -975,7 +975,7 @@ export class Article extends Module {
             this.event = null
             this.wiki = null
             //console.debug("Subscribing for event:", data)
-            this.subscribe(data, { closeOnEose: true },
+            this.subscribeForEvents(data, { closeOnEose: true },
             { onEvent: (event) => {
                 //console.debug("Article: got event:", event)
                 this.onEvent(event)
