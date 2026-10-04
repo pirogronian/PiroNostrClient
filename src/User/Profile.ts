@@ -13,6 +13,7 @@ import ProfileHTML from "./Profile.html?raw"
 export class Profile extends Module {
     user: NDKUser|undefined
     editMode: boolean = false
+    event: NDKEvent|undefined
 
     readonly StandardMembers = new Set<string>([
         "pubkey",
@@ -148,9 +149,9 @@ export class Profile extends Module {
                 e.tags.forEach((tag: string[]) => {
                     let name = tag[0]
                     if (name == "display_name")  name = "displayName"
-                    if (name && this.user?.profile[name]) {
+                    if (name && this.user.profile[name]) {
                         let value = tag[1]
-                        if (this.user?.profile[name] == value) {
+                        if (this.user.profile[name] == value) {
                             //console.debug("Value already existing in profile:", name, value)
                             return
                         }
@@ -174,6 +175,22 @@ export class Profile extends Module {
 
         $(s.Profile).show()
         $("#UserProfileEdit").show().click(() => { this.edit() })
+        $("#UserProfileRelaysButton").click(() => {
+            if (this.event) {
+                const relays = this.event.onRelays
+                const d = $("#UserProfileRelaysDialog")
+                const ul = d.find("ul")
+                ul.empty()
+                relays.forEach((relay) => {
+                    const li = $("<li>")
+                    li.text(relay.url)
+                    ul.append(li)
+                })
+                const c = d.find("button")
+                c.click(() => { d.prop("open", false) })
+                d.prop("open", true)
+            }
+        })
     }
 
     apply(): boolean {

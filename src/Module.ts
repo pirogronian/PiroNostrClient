@@ -234,6 +234,7 @@ export class Module extends EventEmitter {
             kind: 0,
             content: serializeProfile(user.profile),
         } as NostrEvent);
+        console.debug("Publishing profile event:", event)
         const relays = await event.publish();
         if (relays.size && user.profile && this.ndk.cacheAdapter?.saveProfile) {
             const ret = this.ndk.cacheAdapter?.saveProfile(user.pubkey, user.profile)

@@ -617,7 +617,8 @@ export class User extends Module {
                 this.warning("Loading user profile failed.")
                 user.profile = {}
             }
-            this.profile.user = user
+            $(this.profile.GuiSelectors.Profile).show()
+            //this.profile.user = user
             this.profile.guiShow()
 
             const ualn = $("#UserArticlesLink")
@@ -721,6 +722,7 @@ export class User extends Module {
         }
         if (this.user) {
             this.profile.user = this.user
+            console.debug("Subscribing for porfile...")
             this.subscribeForEvents(
                 { kinds: [0], authors: [this.user.pubkey] },
                 {closeOnEose: true, groupable: true},
@@ -728,8 +730,10 @@ export class User extends Module {
                     if (this.user && this.user.profile &&
                         this.user.profile.created_at && event.created_at &&
                         this.user.profile.created_at > event.created_at)  return
-                    console.debug("Found newer profile:", FormattedTime(event.created_at))
+                    this.profile.event = event
+                    if (this.user.profile.created_at == event.created_at)  return
                     const profile = profileFromEvent(event)
+                    console.debug("Found newer profile:", FormattedTime(event.created_at))
                     console.debug("Profile data:", profile)
                     if (this.user)  this.user.profile = profile
                     if (this.ndk.cacheAdapter &&
