@@ -2,7 +2,8 @@
 import QRCode from "qrcode";
 import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer,
     NDKPrivateKeySigner, NDKRelay, NDKRelayList, nip19,
-    nip49, type NDKUserProfile} from "@nostr-dev-kit/ndk";
+    nip49, type NDKUserProfile,
+    profileFromEvent} from "@nostr-dev-kit/ndk";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils"
 import $ from "jquery"
 import type JQuery from "jquery"
@@ -590,56 +591,6 @@ export class User extends Module {
         $("#UserLoginCreateNew").click(() => { this.nsecCreateNew() })
     }
 
-    guiEditProfile() {
-        const profile = $("#UserProdile dl")
-        function Text(selector: string) {
-            const f = $(selector)
-            const v = f.find(".Value")
-            const i = f.find(".Input")
-            i.val(v.text())
-            v.hide()
-            i.show()
-        }
-        function Img(selector: string) {
-            const f = $(selector)
-            const i = f.find("input")
-            const img = f.find("img")
-            i.val(img.prop("src"))
-            img.hide()
-            i.show()
-        }
-
-        Text("#UserName")
-        Text("#UserDisplayName")
-        Img("#UserPicture")
-        Img("#UserBanner")
-        Text("#UserBio")
-        Text("#UserNip05")
-        Text("#UserLud06")
-        Text("#UserLud16")
-        Text("#UserAbout")
-        Text("#UserWebsite")
-
-        const pub = $("#UserProfilePublish")
-        pub.click(() => {
-            this.saveProfile()
-        })
-        pub.show()
-        $("#UserProfileEdit").hide()
-    }
-
-    async saveProfile() {
-        if (!this.profile.apply())  return
-
-        try {
-            await this.publishProfile(this.user)
-
-            this.navigate()
-        } catch(error) {
-            this.error(error)
-        }
-    }
-
     async show(user: NDKUser|null|undefined = undefined) {
         const context = this.context
 
@@ -752,7 +703,7 @@ export class User extends Module {
         $("#UserLink").addClass("Current")
         if (id) {
             try {
-                this.user = await this.get(id)
+                this.user = await this.get(id, false)
             } catch (error) {
                 this.error(error)
             }
@@ -761,13 +712,34 @@ export class User extends Module {
         } else {
             this.foreign = false
             try {
-                this.user = await this.get()
+                this.user = await this.get(undefined, false)
             } catch(error) {
                 this.error(error)
             }
 
             if (!this.sameContext(context))  return
         }
+        if (this.user) {
+            this.profile.user = this.user
+            this.subscribeForEvents(
+                { kinds: [0], authors: [this.user.pubkey] },
+                {closeOnEose: true, groupable: true},
+                { onEvent: (event) => {
+                    if (this.user && this.user.profile &&
+                        this.user.profile.created_at && event.created_at &&
+                        this.user.profile.created_at > event.created_at)  return
+                    console.debug("Found newer profile:", FormattedTime(event.created_at))
+                    const profile = profileFromEvent(event)
+                    console.debug("Profile data:", profile)
+                    if (this.user)  this.user.profile = profile
+                    if (this.ndk.cacheAdapter &&
+                        this.ndk.cacheAdapter.saveProfile) {
+                        this.ndk.cacheAdapter.saveProfile(event.pubkey, profile);
+                    }
+                    this.profile.guiShow()
+                }})
+        }
+
         this.show()
     }
 

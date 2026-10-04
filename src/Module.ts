@@ -6,7 +6,8 @@ import NDK, { NDKEvent, NDKRelay, NDKRelaySet, NDKPool,
     NDKSubscriptionCacheUsage, type NDKFilter, nip19,
     NDKSubscription, type NDKSubscriptionOptions,
     isNip33AValue, filterFromId, relaysFromBech32,
-    type ContentTaggingOptions, NDKUser } from "@nostr-dev-kit/ndk"
+    type ContentTaggingOptions, NDKUser, serializeProfile,
+    type NostrEvent, type NDKUserProfile } from "@nostr-dev-kit/ndk"
 import { Router } from "@/Router.js"
 import { InnerUrl, InnerLink, MakeLinkInner } from "./various.js"
 
@@ -225,10 +226,20 @@ export class Module extends EventEmitter {
     }
 
     async publishProfile(user: NDKUser) {
-        user.publish()
-        if (user.profile && this.ndk.cacheAdapter?.saveProfile) {
-            this.ndk.cacheAdapter?.saveProfile(user.pubkey, user.profile)
+        if (!user.profile) {
+            console.warn("No user profile!")
+            return
         }
+        const event = new NDKEvent(this.ndk, {
+            kind: 0,
+            content: serializeProfile(user.profile),
+        } as NostrEvent);
+        const relays = await event.publish();
+        if (relays.size && user.profile && this.ndk.cacheAdapter?.saveProfile) {
+            const ret = this.ndk.cacheAdapter?.saveProfile(user.pubkey, user.profile)
+            console.debug("Profile cached:", ret)
+        }
+        return relays
     }
 
     setup() {}

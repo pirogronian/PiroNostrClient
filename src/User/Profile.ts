@@ -209,7 +209,8 @@ export class Profile extends Module {
         if (!this.apply())  return
 
         try {
-            await this.publishProfile(this.user)
+            const relays = await this.publishProfile(this.user)
+            console.debug("Published on", relays)
             this.editMode = false
             App.get().user.navigate()
         } catch(error) {
