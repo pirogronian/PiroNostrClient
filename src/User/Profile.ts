@@ -167,7 +167,7 @@ export class Profile extends Module {
 
         if (this.user.profile) {
             const pinfo = $(s.Profile).find("dl.Info")
-            for (const [field, value] of Object.entries(this.user.profile)) {
+            for (const [field, value] of Object.entries(profile)) {
                 if (!this.StandardMembers.has(field)) {
                     //console.debug("Profile.additional:", field, value)
                     $(s.Additional).show()
@@ -176,17 +176,17 @@ export class Profile extends Module {
             }
         }
 
-        if (this.user.profile) {
-            const jre = this.user.profile?.profileEvent
+        if (profile) {
+            const jre = profile.profileEvent
             if (jre) {
                 const e = JSON.parse(jre)
                 console.debug(e.tags)
                 e.tags.forEach((tag: string[]) => {
                     let name = tag[0]
                     if (name == "display_name")  name = "displayName"
-                    if (name && this.user.profile[name]) {
+                    if (name && profile[name]) {
                         let value = tag[1]
-                        if (this.user.profile[name] == value) {
+                        if (profile[name] == value) {
                             //console.debug("Value already existing in profile:", name, value)
                             return
                         }
@@ -249,6 +249,7 @@ export class Profile extends Module {
             input = $(input)
             const name = input.prop("name")
             if (!name)  return
+            //console.debug(`Apply '${input.val()}' to '${name}'`)
             this.editProfile[name] = input.val()
         })
 
