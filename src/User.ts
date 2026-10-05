@@ -589,6 +589,8 @@ export class User extends Module {
             this.login(selector.val())
         })
         $("#UserLoginCreateNew").click(() => { this.nsecCreateNew() })
+
+        this.profile.guiSetup()
     }
 
     async show(user: NDKUser|null|undefined = undefined) {

@@ -10,6 +10,15 @@ import { App } from "@/App.js"
 
 import ProfileHTML from "./Profile.html?raw"
 
+function E(field: string) {
+    const dd = $(`#UserProfileField${field}`)
+    const v = dd.find(".Value")
+    const i = dd.find(".Input")
+    i.val(v.text())
+    v.hide()
+    i.show()
+}
+
 export class Profile extends Module {
     user: NDKUser|undefined
     editMode: boolean = false
@@ -87,6 +96,7 @@ export class Profile extends Module {
             console.warn("No user to show profile for!")
             return
         }
+        $("#UserProfileEdit").show()
         $("#UserProfilePreview").hide()
         const ee = $("#UserProfileExitEdit")
         if (this.editMode) ee.show()
@@ -198,22 +208,14 @@ export class Profile extends Module {
             }
         }
 
-        $("#UserProfileEdit").show().click(() => { this.edit() })
-        $("#UserProfileRelaysButton").click(() => {
-            if (this.event) {
-                const relays = this.event.onRelays
-                const d = $("#UserProfileRelaysDialog")
-                const ul = d.find("ul")
-                ul.empty()
-                relays.forEach((relay) => {
-                    const li = $("<li>")
-                    li.text(relay.url)
-                    ul.append(li)
-                })
-                const c = d.find("button")
-                c.click(() => { d.prop("open", false) })
-                d.prop("open", true)
-            }
+        const nf = $("#UserProfileNewField")
+        const i = nf.find("input")
+        const b = nf.find("button")
+        b.click(() => {
+            const v = i.val()
+            if (!v || !this.user || !this.user.profile)  return
+            this.guiCustomField(v)
+            E(v)
         })
     }
 
@@ -238,7 +240,7 @@ export class Profile extends Module {
         this.editProfile.lud16 = From(s.Lud16)
         this.editProfile.about = From(s.About)
         this.editProfile.website = From(s.Website)
-        //console.debug("Profile about:", this.user.profile.about)
+        console.debug("Edit profile:", this.editProfile)
 
         const info = $("#UserProfileInfo")
         const inputs = info.find(".Input")
@@ -254,6 +256,7 @@ export class Profile extends Module {
     }
 
     preview() {
+        console.debug("Preview:")
         this.apply()
         this.guiShow()
     }
@@ -306,46 +309,18 @@ export class Profile extends Module {
         Text(s.About)
         Text(s.Website)
 
-        function E(field: string) {
-            const dd = $(`#UserProfileField${field}`)
-            const v = dd.find(".Value")
-            const i = dd.find(".Input")
-            i.val(v.text())
-            v.hide()
-            i.show()
-        }
-
         for (const [name, value] of Object.entries(this.user.profile)) {
             if (!this.StandardMembers.has(name)) {
                 E(name)
             }
         }
 
-        const pub = $("#UserProfilePublish")
-        pub.click(() => {
-            this.save()
-        })
-        pub.show()
+        $("#UserProfilePublish").show()
         $("#UserProfileEdit").hide()
-        const pp = $("#UserProfilePreview")
-        pp.click(() => { this.preview() })
-        pp.show()
-        const ee = $("#UserProfileExitEdit")
-        ee.click(() => {
-            this.editMode = false
-            this.guiShow()
-        })
-        ee.show()
-        const nf = $("#UserProfileNewField")
-        const i = nf.find("input")
-        const b = nf.find("button")
-        b.click(() => {
-            const v = i.val()
-            if (!v || !this.user || !this.user.profile)  return
-            this.guiCustomField(v)
-            E(v)
-        })
-        nf.show()
+        $("#UserProfilePreview").show()
+        $("#UserProfileExitEdit").show()
+
+        $("#UserProfileNewField").show()
     }
 
     edit() {
@@ -358,5 +333,34 @@ export class Profile extends Module {
 
     checkProfile(): boolean {
         return !!(this.user && this.user.profile)
+    }
+
+    guiSetup() {
+        $("#UserProfileEdit").click(() => { this.edit() })
+        $("#UserProfilePreview").click(() => { this.preview() })
+        $("#UserProfileExitEdit").click(() => {
+            this.editMode = false
+            this.guiShow()
+        })
+        $("#UserProfilePublish").click(() => {
+            this.save()
+        })
+
+        const d = $("#UserProfileRelaysDialog")
+        const c = d.find("button")
+        c.click(() => { d.prop("open", false) })
+        $("#UserProfileRelaysButton").click(() => {
+            if (this.event) {
+                const relays = this.event.onRelays
+                const ul = d.find("ul")
+                ul.empty()
+                relays.forEach((relay) => {
+                    const li = $("<li>")
+                    li.text(relay.url)
+                    ul.append(li)
+                })
+                d.prop("open", true)
+            }
+        })
     }
 }
