@@ -13,6 +13,8 @@ import ProfileHTML from "./Profile.html?raw"
 export class Profile extends Module {
     user: NDKUser|undefined
     editMode: boolean = false
+    editProfile: NDKUserProfile|undefined
+    editEvent: NDKEvent|undefined
     event: NDKEvent|undefined
 
     readonly StandardMembers = new Set<string>([
@@ -85,6 +87,14 @@ export class Profile extends Module {
             console.warn("No user to show profile for!")
             return
         }
+        $("#UserProfilePreview").hide()
+        const ee = $("#UserProfileExitEdit")
+        if (this.editMode) ee.show()
+        else ee.hide()
+
+        let profile:NDKUserProfile = {}
+        if (this.editMode && this.editProfile) profile = this.editProfile
+        else if (this.user && this.user.profile) profile = this.user.profile
 
         const container = $("#UserProfileInfo")
         container.empty()
@@ -120,8 +130,8 @@ export class Profile extends Module {
 
         const P = (element: JQuery<HTMLElement>, member: string) => {
             let value
-            if (this.user && this.user.profile && this.user.profile[member])
-                value = this.user.profile[member]
+            if (profile[member])
+                value = profile[member]
             V(element, member, value)
             let dd = element
             while (JTagName(dd) != "dd") dd = dd.parent()
@@ -130,9 +140,9 @@ export class Profile extends Module {
         }
 
         const s = this.GuiSelectors
-        const upkn = MakeCopyable($(s.Pubkey), this.user.pubkey)
-        const unpn = MakeCopyable($(s.NPub), this.user.npub)
-        const unprn = MakeCopyable($(s.NProf), this.user.nprofile)
+        MakeCopyable($(s.Pubkey), this.user.pubkey)
+        MakeCopyable($(s.NPub), this.user.npub)
+        MakeCopyable($(s.NProf), this.user.nprofile)
         P($(s.CreatedAt), "created_at")
         P($(s.CachedAt), "cachedAt")
         P($(s.Name), "name")
@@ -214,30 +224,30 @@ export class Profile extends Module {
             return i.val()
         }
 
-        if (!this.user) {
-            console.warn("No active user, nothing to save!")
+        if (!this.editProfile) {
+            console.warn("No edit profile to save!")
             return false
         }
         const s = this.GuiSelectors
-        if (!this.user.profile) this.user.profile = {}
-        this.user.profile.name = From(s.Name)
-        this.user.profile.displayName = From(s.DisplayName)
-        this.user.profile.picture = From(s.Picture)
-        this.user.profile.banner = From(s.Banner)
-        this.user.profile.nip05 = From(s.Nip05)
-        this.user.profile.lud06 = From(s.Lud06)
-        this.user.profile.lud16 = From(s.Lud16)
-        this.user.profile.about = From(s.About)
-        this.user.profile.website = From(s.Website)
+        this.editProfile.name = From(s.Name)
+        this.editProfile.displayName = From(s.DisplayName)
+        this.editProfile.picture = From(s.Picture)
+        this.editProfile.banner = From(s.Banner)
+        this.editProfile.nip05 = From(s.Nip05)
+        this.editProfile.lud06 = From(s.Lud06)
+        this.editProfile.lud16 = From(s.Lud16)
+        this.editProfile.about = From(s.About)
+        this.editProfile.website = From(s.Website)
         //console.debug("Profile about:", this.user.profile.about)
 
         const info = $("#UserProfileInfo")
         const inputs = info.find(".Input")
         inputs.each((index, input) => {
+            if (!this.editProfile)  return
             input = $(input)
             const name = input.prop("name")
             if (!name)  return
-            this.user.profile[name] = input.val()
+            this.editProfile[name] = input.val()
         })
 
         return true
@@ -252,6 +262,7 @@ export class Profile extends Module {
         if (!this.user) throw Error("No user defined!")
         if (!this.apply())  return
 
+        if (this.editProfile) this.user.profile = this.editProfile
         try {
             const relays = await this.publishProfile(this.user)
             this.editMode = false
@@ -262,7 +273,7 @@ export class Profile extends Module {
     }
 
     guiFillEditor() {
-        if (!this.user || !this.user.profile)  {
+        if (!this.editProfile)  {
             console.warn("Cannot fill editor: no profile to edit!")
             return
         }
@@ -319,6 +330,12 @@ export class Profile extends Module {
         const pp = $("#UserProfilePreview")
         pp.click(() => { this.preview() })
         pp.show()
+        const ee = $("#UserProfileExitEdit")
+        ee.click(() => {
+            this.editMode = false
+            this.guiShow()
+        })
+        ee.show()
         const nf = $("#UserProfileNewField")
         const i = nf.find("input")
         const b = nf.find("button")
@@ -332,7 +349,14 @@ export class Profile extends Module {
     }
 
     edit() {
+        if (!this.checkProfile())  return
         this.editMode = true
+        if (this?.user?.profile) this.editProfile = Object.create(this.user.profile)
+        else this.editProfile = {}
         this.guiFillEditor()
+    }
+
+    checkProfile(): boolean {
+        return !!(this.user && this.user.profile)
     }
 }
