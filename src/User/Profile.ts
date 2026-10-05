@@ -151,27 +151,7 @@ export class Profile extends Module {
                 if (!this.StandardMembers.has(field)) {
                     //console.debug("Profile.additional:", field, value)
                     $(s.Additional).show()
-                    const keyNode = $("<dt>")
-                    keyNode.text(field)
-                    const defNode = $("<dd>")
-                    const valNode = $("<div>")
-                    const iNode = $("<input>")
-                    defNode.id(`UserProfileField${field}`)
-                    valNode.addClass("Value")
-                    if (typeof value == "string") {
-                        const link = CreateLink(value)
-                        if (link) {
-                            valNode.append(link)
-                        } else  MakeCopyable(valNode, value)
-                    }
-                    else valNode.text(`${value}`)
-                    iNode.prop("type", "text")
-                    iNode.addClass("Input")
-                    iNode.hide()
-                    pinfo.append(keyNode)
-                    defNode.append(valNode)
-                    defNode.append(iNode)
-                    pinfo.append(defNode)
+                    this.guiCustomField(field, `${value}`)
                 }
             }
         }
@@ -263,6 +243,11 @@ export class Profile extends Module {
         return true
     }
 
+    preview() {
+        this.apply()
+        this.guiShow()
+    }
+
     async save() {
         if (!this.user) throw Error("No user defined!")
         if (!this.apply())  return
@@ -277,6 +262,11 @@ export class Profile extends Module {
     }
 
     guiFillEditor() {
+        if (!this.user || !this.user.profile)  {
+            console.warn("Cannot fill editor: no profile to edit!")
+            return
+        }
+
         function Text(selector: string) {
             const v = $(selector)
             //const v = f.find(".Value")
@@ -314,13 +304,21 @@ export class Profile extends Module {
             i.show()
         }
 
+        for (const [name, value] of Object.entries(this.user.profile)) {
+            if (!this.StandardMembers.has(name)) {
+                E(name)
+            }
+        }
+
         const pub = $("#UserProfilePublish")
         pub.click(() => {
             this.save()
         })
         pub.show()
         $("#UserProfileEdit").hide()
-        $("#UserProfilePreview").show()
+        const pp = $("#UserProfilePreview")
+        pp.click(() => { this.preview() })
+        pp.show()
         const nf = $("#UserProfileNewField")
         const i = nf.find("input")
         const b = nf.find("button")
