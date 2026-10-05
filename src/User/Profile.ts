@@ -52,6 +52,34 @@ export class Profile extends Module {
         Website: "#UserWebsite .Value"
     }
 
+    guiCustomField(name: string, value?: string) {
+        const pinfo = $(this.GuiSelectors.Profile).find("dl.Info")
+        const keyNode = $("<dt>")
+        keyNode.text(name)
+        const defNode = $("<dd>")
+        const valNode = $("<div>")
+        const iNode = $("<input>")
+        defNode.prop("id", `UserProfileField${name}`)
+        valNode.addClass("Value")
+        if (value !== null && value !== undefined) {
+            if (typeof value == "string") {
+                const link = CreateLink(value)
+                if (link) {
+                    valNode.append(link)
+                } else  MakeCopyable(valNode, value)
+            }
+            else valNode.text(`${value}`)
+        }
+        iNode.prop("type", "text")
+        iNode.prop("name", name)
+        iNode.addClass("Input")
+        iNode.hide()
+        pinfo.append(keyNode)
+        defNode.append(valNode)
+        defNode.append(iNode)
+        pinfo.append(defNode)
+    }
+
     guiShow() {
         if (!this.user) {
             console.warn("No user to show profile for!")
@@ -125,7 +153,11 @@ export class Profile extends Module {
                     $(s.Additional).show()
                     const keyNode = $("<dt>")
                     keyNode.text(field)
-                    const valNode = $("<dd>")
+                    const defNode = $("<dd>")
+                    const valNode = $("<div>")
+                    const iNode = $("<input>")
+                    defNode.id(`UserProfileField${field}`)
+                    valNode.addClass("Value")
                     if (typeof value == "string") {
                         const link = CreateLink(value)
                         if (link) {
@@ -133,8 +165,13 @@ export class Profile extends Module {
                         } else  MakeCopyable(valNode, value)
                     }
                     else valNode.text(`${value}`)
+                    iNode.prop("type", "text")
+                    iNode.addClass("Input")
+                    iNode.hide()
                     pinfo.append(keyNode)
-                    pinfo.append(valNode)
+                    defNode.append(valNode)
+                    defNode.append(iNode)
+                    pinfo.append(defNode)
                 }
             }
         }
@@ -214,6 +251,15 @@ export class Profile extends Module {
         this.user.profile.website = From(s.Website)
         //console.debug("Profile about:", this.user.profile.about)
 
+        const info = $("#UserProfileInfo")
+        const inputs = info.find(".Input")
+        inputs.each((index, input) => {
+            input = $(input)
+            const name = input.prop("name")
+            if (!name)  return
+            this.user.profile[name] = input.val()
+        })
+
         return true
     }
 
@@ -253,12 +299,20 @@ export class Profile extends Module {
         Text(s.DisplayName)
         Img(s.Picture)
         Img(s.Banner)
-        Text(s.Bio)
         Text(s.Nip05)
         Text(s.Lud06)
         Text(s.Lud16)
         Text(s.About)
         Text(s.Website)
+
+        function E(field: string) {
+            const dd = $(`#UserProfileField${field}`)
+            const v = dd.find(".Value")
+            const i = dd.find(".Input")
+            i.val(v.text())
+            v.hide()
+            i.show()
+        }
 
         const pub = $("#UserProfilePublish")
         pub.click(() => {
@@ -266,6 +320,17 @@ export class Profile extends Module {
         })
         pub.show()
         $("#UserProfileEdit").hide()
+        $("#UserProfilePreview").show()
+        const nf = $("#UserProfileNewField")
+        const i = nf.find("input")
+        const b = nf.find("button")
+        b.click(() => {
+            const v = i.val()
+            if (!v || !this.user || !this.user.profile)  return
+            this.guiCustomField(v)
+            E(v)
+        })
+        nf.show()
     }
 
     edit() {
