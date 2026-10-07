@@ -4,23 +4,62 @@
     <dt>NProfile:</dt><dd id="UserNProfile" title="Click to copy"></dd>
     <dt>Created at:</dt><dd id="UserCreatedAt"><span class="Value"></span><input type="text" class="Input" style="display: none"/></dd>
     <dt>Cached at:</dt><dd id="UserCachedAt"></dd>
-    <dt>Name:</dt><dd id="UserName"><span class="Value"></span><input class="Input" type="text" style="display: none"/></dd>
-    <dt>Display name:</dt><dd id="UserDisplayName"><span class="Value"></span><input class="Input" type="text" style="display: none"/></dd>
-    <dt>Picture:</dt><dd id="UserPicture"><img/><input class="Input" type="text" style="display: none"/></dd>
-    <dt>Banner:</dt><dd id="UserBanner"><img/><input class="Input" type="text" style="display: none"/></dd>
-    <dt>NIP-05:</dt>
-    <dd>
-    <div id="UserNip05">
-        <span class="Value" title="Click to copy"></span>
-        <span class="Valid" style="display: none">✓</span>
-        <span class="Invalid" style="display: none">!</span>
-    </div>
-    <input type="text" class="Input" style="display: none"/>
+    <dt>Name:</dt>
+    <dd id="UserName" name="name">
+        <span class="Value"></span>
+        <input class="Input" type="text" style="display: none"/>
+        <div class="UserProfileNewValue" style="display: none"><input type="text" name="name" class="Input2"/><button>Add</button></div>
     </dd>
-    <dt>LUD-06:</dt><dd id="UserLud06"><span class="Value"></span><input type="text" class="Input" style="display: none"/></dd>
-    <dt>LUD-16:</dt><dd id="UserLud16" title="Click to copy"><span class="Value"></span><input type="text" class="Input" style="display: none"/></dd>
-    <dt>About:</dt><dd id="UserAbout"><span class="Value"></span><textarea class="Input" style="display: none"></textarea></dd>
-    <dt>Website:</dt><dd id="UserWebsite"><div class="Value"></div><input type="text" class="Input" style="display: none"/></dd>
+    <dt>Display name:</dt>
+    <dd id="UserDisplayName" name="displayName">
+        <span class="Value"></span>
+        <input class="Input" type="text" style="display: none"/>
+        <div class="UserProfileNewValue" style="display: none"><input type="text" name="displayName" class="Input2"/><button>Add</button></div>
+    </dd>
+    <dt>Picture:</dt>
+    <dd id="UserPicture" name="picture">
+        <img/><input class="Input" type="text" style="display: none"/>
+        <div class="UserProfileNewValue" style="display: none"><input type="text" name="picture" class="Input2"/><button>Add</button></div>
+    </dd>
+    <dt>Banner:</dt>
+    <dd id="UserBanner" name="banner">
+        <img/><input class="Input" type="text" style="display: none"/>
+        <div class="UserProfileNewValue" style="display: none"><input type="text" name="banner" class="Input2"/><button>Add</button></div>
+    </dd>
+    <dt>NIP-05:</dt>
+    <dd name="nip05">
+        <div id="UserNip05">
+            <span class="Value" title="Click to copy"></span>
+            <span class="Valid" style="display: none">✓</span>
+            <span class="Invalid" style="display: none">!</span>
+        </div>
+        <input type="text" class="Input" style="display: none"/>
+        <div class="UserProfileNewValue" style="display: none"><input type="text" name="nip05" class="Input2"/><button>Add</button></div>
+    </dd>
+    <dt>LUD-06:</dt>
+    <dd id="UserLud06" name="lud06">
+        <span class="Value"></span>
+        <input type="text" class="Input" style="display: none"/>
+        <div class="UserProfileNewValue" style="display: none"><input type="text" name="lud06" class="Input2"/><button>Add</button></div>
+    </dd>
+    <dt>LUD-16:</dt>
+    <dd id="UserLud16" title="Click to copy" name="lud16">
+        <span class="Value"></span>
+        <input type="text" class="Input" style="display: none"/>
+        <div class="UserProfileNewValue" style="display: none"><input type="text" name="lud16" class="Input2"/><button>Add</button></div>
+    </dd>
+    <dt>About:</dt>
+    <dd id="UserAbout" name="about">
+        <span class="Value"></span>
+        <textarea class="Input" style="display: none"></textarea>
+        <div class="UserProfileNewValue" style="display: none"><textarea name="about" class="Input2"></textarea><button>Add</button></div>
+    </dd>
+    <dt>Website:</dt>
+    <dd id="UserWebsite" name="website">
+        <div class="Value"></div>
+        <input type="text" class="Input" style="display: none"/>
+        <div class="UserProfileNewValue" style="display: none"><input type="text" name="website" class="Input2"/><button>Add</button></div>
+    </dd>
     <div id="UserProfileAdditionalFields" style="display: none"><h3>Non-standard fields:</h3></div>
 </dl>
 <label id="UserProfileNewField" style="display: none">New Field:<input type="text"/><button>Add</button></label>

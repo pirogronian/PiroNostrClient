@@ -1,7 +1,7 @@
 
 import $, { type JQuery } from "jquery"
 
-import { NDKEvent, NDKUser, type NDKUserProfile } from "@nostr-dev-kit/ndk";
+import { NDKEvent, NDKUser, type NDKUserProfile, type NostrEvent, profileFromEvent, serializeProfile } from "@nostr-dev-kit/ndk";
 
 import { MakeCopyable, FormattedTime, CreateLink, JTagName } from "@/various.js";
 
@@ -46,6 +46,7 @@ export class Profile extends Module {
 
     readonly GuiSelectors = {
         Profile: "#UserProfile",
+        ProfileInfo: "#UserProfileInfo",
         Additional: "#UserProfileAdditionalFields",
         Pubkey: "#UserPubkey",
         NPub: "#UserNPub",
@@ -63,14 +64,40 @@ export class Profile extends Module {
         Website: "#UserWebsite .Value"
     }
 
+    guiNewValueNode(value: string) {
+        const node = $("<div>")
+        node.text(value)
+        node.addClass("AdditionalProfileValue")
+        node.addClass("RemovableItem")
+        node.prop("title", "Click to remove")
+        node.click(() => node.remove())
+        return node
+    }
+
+    guiNewValueInputSetup(div: JQuery<HTMLElement>) {
+        const input = div.find(".Input2")
+        const button = div.find("button")
+        const name = input.attr("name")
+        //console.debug("New value input setup for:", name, div)
+        button.click(() => {
+            console.debug("Create new value:")
+            if (!input.val())  return
+            //console.debug(input.val())
+            const nvn = this.guiNewValueNode(input.val())
+            nvn.attr("name", name)
+            div.parent().append(nvn)
+        })
+    }
+
     guiCustomField(name: string, value?: string) {
-        const pinfo = $(this.GuiSelectors.Profile).find("dl.Info")
+        const pinfo = $(`${this.GuiSelectors.ProfileInfo} > dl.Info`)
         const keyNode = $("<dt>")
         keyNode.text(name)
         const defNode = $("<dd>")
         const valNode = $("<div>")
         const iNode = $("<input>")
         defNode.prop("id", `UserProfileField${name}`)
+        defNode.prop("name", name)
         valNode.addClass("Value")
         if (value !== null && value !== undefined) {
             if (typeof value == "string") {
@@ -86,8 +113,30 @@ export class Profile extends Module {
         iNode.addClass("Input")
         iNode.hide()
         pinfo.append(keyNode)
+        defNode.attr("name", name)
         defNode.append(valNode)
         defNode.append(iNode)
+        const nvni = $("<div>")
+        nvni.addClass("UserProfileNewValue")
+        nvni.prop("style", "display: none")
+        const i = $("<textarea>")
+        i.prop("name", name)
+        i.addClass("Input2")
+        const b = $("<button>")
+        b.text("Add")
+        /*b.click(() => {
+            console.debug("Adding new value:", i.val())
+            //console.debug(i)
+            if (!i.val())  return
+            const nvn = this.guiNewValueNode(i.val())
+            console.debug(nvn)
+            nvn.attr("name", name)
+            nvni.parent().append(nvn)
+        })*/
+        nvni.append(i)
+        nvni.append(b)
+        defNode.append(nvni)
+        //this.guiNewValueInputSetup(nvni)
         pinfo.append(defNode)
     }
 
@@ -98,6 +147,7 @@ export class Profile extends Module {
         }
         $("#UserProfileEdit").show()
         $("#UserProfilePreview").hide()
+        $(".UserProfileNewValue").hide()
         const ee = $("#UserProfileExitEdit")
         if (this.editMode) ee.show()
         else ee.hide()
@@ -190,9 +240,10 @@ export class Profile extends Module {
                             //console.debug("Value already existing in profile:", name, value)
                             return
                         }
-                        const dd = $(`dd[tag='${name}']`)
+                        const dd = $(`dd[name='${name}']`)
                         //console.debug("Element for tag", name, dd)
                         let div = $("<div>")
+                        div.attr("name", name)
                         let v = div
                         if (name == "nip05") {
                             div = $(s.Nip05).parent().clone()
@@ -200,6 +251,7 @@ export class Profile extends Module {
                             v = div.find("span.Value")
                         }
                         V(v, name, value)
+                        div.addClass("AdditionalProfileValue")
                         dd.append(div)
                     } else {
                         console.debug("Tag not existing in profile:", name)
@@ -216,6 +268,11 @@ export class Profile extends Module {
             if (!v || !this.user || !this.user.profile)  return
             this.guiCustomField(v)
             E(v)
+        })
+
+        const nvs = $(".UserProfileNewValue")
+        nvs.each((index, node) => {
+            this.guiNewValueInputSetup($(node))
         })
     }
 
@@ -240,7 +297,7 @@ export class Profile extends Module {
         this.editProfile.lud16 = From(s.Lud16)
         this.editProfile.about = From(s.About)
         this.editProfile.website = From(s.Website)
-        console.debug("Edit profile:", this.editProfile)
+        //console.debug("Edit profile:", this.editProfile)
 
         const info = $("#UserProfileInfo")
         const inputs = info.find(".Input")
@@ -252,6 +309,26 @@ export class Profile extends Module {
             //console.debug(`Apply '${input.val()}' to '${name}'`)
             this.editProfile[name] = input.val()
         })
+
+        this.editEvent = new NDKEvent(this.ndk)
+        this.editEvent.kind = 0
+        this.editEvent.content = serializeProfile(this.editProfile)
+
+        const apvs = $(".AdditionalProfileValue")
+        apvs.each((index, node) => {
+            node = $(node)
+            const name = node.attr("name")
+            const value = node.text()
+            console.debug(`Apply additional value: '${name}': '${value}'`)
+            if (name && value) {
+                this.editEvent?.tags.push([name, value])
+            }
+        })
+
+        this.editProfile = profileFromEvent(this.editEvent)
+        //console.debug("Applied profile:", this.editProfile)
+        //if (this.editProfile.profileEvent)
+            //console.debug("Profile event:", JSON.parse(this.editProfile.profileEvent))
 
         return true
     }
@@ -265,11 +342,12 @@ export class Profile extends Module {
     async save() {
         if (!this.user) throw Error("No user defined!")
         if (!this.apply())  return
+        if (!this.editEvent)  return
 
-        if (this.editProfile) this.user.profile = this.editProfile
         try {
-            const relays = await this.publishProfile(this.user)
+            const relays = await this.publishEvent(this.editEvent)
             this.editMode = false
+            if (!this.isCurrent())  return
             App.get().user.navigate()
         } catch(error) {
             this.error(error)
@@ -315,6 +393,18 @@ export class Profile extends Module {
                 E(name)
             }
         }
+
+        const apvs = $(".AdditionalProfileValue")
+        apvs.each((index, node) => {
+            node = $(node)
+            node.addClass("RemovableItem")
+            node.prop("title", "Click to remove")
+            node.click(() => {
+                node.remove()
+            })
+        })
+
+        $(".UserProfileNewValue").show()
 
         $("#UserProfilePublish").show()
         $("#UserProfileEdit").hide()
