@@ -12,7 +12,7 @@ import ProfileHTML from "./Profile.html?raw"
 
 function E(field: string) {
     //console.debug(`E('${field}')`)
-    const dd = $(`#UserProfileField${field}`)
+    const dd = $(`dd[name='${field}']`)
     //console.debug(dd)
     const v = dd.find(".Value")
     const i = dd.find(".Input")
