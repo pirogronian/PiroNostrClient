@@ -112,7 +112,6 @@ export class Profile extends Module {
         iNode.prop("type", "text")
         iNode.prop("name", name)
         iNode.addClass("Input")
-        iNode.hide()
         pinfo.append(keyNode)
         delB.text("Delete")
         delB.addClass("UserProfileCustomFieldDelete")
@@ -124,27 +123,18 @@ export class Profile extends Module {
         defNode.append(valNode)
         defNode.append(iNode)
         defNode.append(delB)
+
         const nvni = $("<div>")
         nvni.addClass("UserProfileNewValue")
-        nvni.prop("style", "display: none")
         const i = $("<textarea>")
         i.prop("name", name)
         i.addClass("Input2")
         const b = $("<button>")
         b.text("Add")
-        /*b.click(() => {
-            console.debug("Adding new value:", i.val())
-            //console.debug(i)
-            if (!i.val())  return
-            const nvn = this.guiNewValueNode(i.val())
-            console.debug(nvn)
-            nvn.attr("name", name)
-            nvni.parent().append(nvn)
-        })*/
         nvni.append(i)
         nvni.append(b)
         defNode.append(nvni)
-        //this.guiNewValueInputSetup(nvni)
+
         pinfo.append(defNode)
     }
 
@@ -155,7 +145,7 @@ export class Profile extends Module {
         }
         $("#UserProfileEdit").show()
         $("#UserProfilePreview").hide()
-        $(".UserProfileNewValue").hide()
+
         const ee = $("#UserProfileExitEdit")
         if (this.editMode) ee.show()
         else ee.hide()
@@ -283,6 +273,8 @@ export class Profile extends Module {
             this.guiNewValueInputSetup($(node))
         })
 
+        $(".Input").hide()
+        $(".UserProfileNewValue").hide()
         $(".UserProfileCustomFieldDelete").hide()
     }
 
