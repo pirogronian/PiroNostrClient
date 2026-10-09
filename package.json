@@ -12,6 +12,7 @@
     "@djot/djot": "^0.3.2",
     "@nostr-dev-kit/ndk": "^3.0.3",
     "@nostr-dev-kit/ndk-cache-dexie": "^2.6.44",
+    "@nostr-dev-kit/sync": "^1.0.0",
     "asciidoctor": "^4.0.11",
     "bcp-47": "^2.1.1",
     "bcp-47-match": "^2.0.3",
