@@ -96,6 +96,7 @@ export class Profile extends Module {
         const defNode = $("<dd>")
         const valNode = $("<div>")
         const iNode = $("<input>")
+        const delB = $("<button>")
         defNode.prop("id", `UserProfileField${name}`)
         defNode.prop("name", name)
         valNode.addClass("Value")
@@ -113,9 +114,16 @@ export class Profile extends Module {
         iNode.addClass("Input")
         iNode.hide()
         pinfo.append(keyNode)
+        delB.text("Delete")
+        delB.addClass("UserProfileCustomFieldDelete")
+        delB.click(() => {
+            defNode.remove()
+            keyNode.remove()
+        })
         defNode.attr("name", name)
         defNode.append(valNode)
         defNode.append(iNode)
+        defNode.append(delB)
         const nvni = $("<div>")
         nvni.addClass("UserProfileNewValue")
         nvni.prop("style", "display: none")
@@ -274,6 +282,8 @@ export class Profile extends Module {
         nvs.each((index, node) => {
             this.guiNewValueInputSetup($(node))
         })
+
+        $(".UserProfileCustomFieldDelete").hide()
     }
 
     apply(): boolean {
@@ -412,6 +422,7 @@ export class Profile extends Module {
         $("#UserProfileExitEdit").show()
 
         $("#UserProfileNewField").show()
+        $(".UserProfileCustomFieldDelete").show()
     }
 
     edit() {
