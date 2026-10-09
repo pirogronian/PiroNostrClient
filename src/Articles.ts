@@ -2,6 +2,7 @@
 import $ from "jquery"
 import NDK, { NDKEvent, NDKWiki, NDKRelay } from "@nostr-dev-kit/ndk";
 import type { NDKFilter, NDKSubscription } from "@nostr-dev-kit/ndk"
+import { NDKSync } from "@nostr-dev-kit/sync"
 //import NDKCacheAdapterDexie, { db } from '@nostr-dev-kit/ndk-cache-dexie';
 
 import { safeAsync, EventTagValues, FormattedTime, FormattedBytes, formatNip54TagD } from "@/various.js";
@@ -140,7 +141,7 @@ export class Articles extends Module {
         $("#FinderResult").empty()
     }
 
-    load(params: object,
+    async load(params: object,
         onEvent: (event: NDKEvent, relay?: NDKRelay) => any)
     {
         this.enabled = true
@@ -192,10 +193,11 @@ export class Articles extends Module {
         console.log("Subscribing for articles with filter", filter)
         
         try {
-            this.sub = this.ndk.subscribe(
+            this.sub = await NDKSync.syncAndSubscribe(
+                this.ndk,
                 filter,
-                { closeOnEose : true },
-                { onEvent: onEvent })
+                { closeOnEose : true,
+                onEvent: onEvent })
         } catch (e) {
             return e
         }
@@ -208,7 +210,7 @@ export class Articles extends Module {
         this.enabled = false
     }
 
-    handle(params: object) {
+    async handle(params: object) {
         this.newContext()
         const context = this.context
         this.loadSettings()
@@ -217,7 +219,7 @@ export class Articles extends Module {
         $("input[name='id']").val(params.id)
         $("#FinderResultsNumber").text(`Results: 0, size: 0B`)
         this.author = params.followAuthor
-        const err = this.load(params,
+        const err = await this.load(params,
             (event: NDKEvent, relay?: NDKRelay) => {
                 if (!this.sameContext(context))  return
                 //console.debug(this.followAuthor, params.followAuthor)
@@ -229,7 +231,7 @@ export class Articles extends Module {
                 } else this.articleHead(NDKWiki.from(event), relay)
             })
         if (err) {
-            this.error(err.message)
+            this.error(err)
         }
     }
 
