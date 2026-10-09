@@ -41,6 +41,14 @@
     border: red solid 0.5mm
 }
 
+.UserProfileNewValue {
+    display: flex
+}
+
+.UserProfileNewValue > * {
+    display: inline-block
+}
+
 #UserReadRelays {
     @extend .RelaysList
 }
