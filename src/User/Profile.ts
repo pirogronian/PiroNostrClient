@@ -11,7 +11,9 @@ import { App } from "@/App.js"
 import ProfileHTML from "./Profile.html?raw"
 
 function E(field: string) {
+    //console.debug(`E('${field}')`)
     const dd = $(`#UserProfileField${field}`)
+    //console.debug(dd)
     const v = dd.find(".Value")
     const i = dd.find(".Input")
     i.val(v.text())
@@ -133,6 +135,7 @@ export class Profile extends Module {
         b.text("Add")
         nvni.append(i)
         nvni.append(b)
+        this.guiNewValueInputSetup(nvni)
         defNode.append(nvni)
 
         pinfo.append(defNode)
@@ -150,9 +153,17 @@ export class Profile extends Module {
         if (this.editMode) ee.show()
         else ee.hide()
 
-        let profile:NDKUserProfile = {}
-        if (this.editMode && this.editProfile) profile = this.editProfile
-        else if (this.user && this.user.profile) profile = this.user.profile
+        let profile: NDKUserProfile = {}
+        let event: NDKEvent|undefined
+        if (this.editMode && this.editProfile) {
+            profile = this.editProfile
+            event = this.editEvent
+        }
+        else if (this.user && this.user.profile) {
+            profile = this.user.profile
+            if (profile.profileEvent)
+                event = JSON.parse(profile.profileEvent)
+        }
 
         const container = $("#UserProfileInfo")
         container.empty()
@@ -213,7 +224,7 @@ export class Profile extends Module {
         P($(s.About), "about")
         P($(s.Website), "website")
 
-        if (this.user.profile) {
+        if (profile) {
             const pinfo = $(s.Profile).find("dl.Info")
             for (const [field, value] of Object.entries(profile)) {
                 if (!this.StandardMembers.has(field)) {
@@ -224,38 +235,35 @@ export class Profile extends Module {
             }
         }
 
-        if (profile) {
-            const jre = profile.profileEvent
-            if (jre) {
-                const e = JSON.parse(jre)
-                console.debug(e.tags)
-                e.tags.forEach((tag: string[]) => {
-                    let name = tag[0]
-                    if (name == "display_name")  name = "displayName"
-                    if (name && profile[name]) {
-                        let value = tag[1]
-                        if (profile[name] == value) {
-                            //console.debug("Value already existing in profile:", name, value)
-                            return
-                        }
-                        const dd = $(`dd[name='${name}']`)
-                        //console.debug("Element for tag", name, dd)
-                        let div = $("<div>")
-                        div.attr("name", name)
-                        let v = div
-                        if (name == "nip05") {
-                            div = $(s.Nip05).parent().clone()
-                            div.prop("id", null)
-                            v = div.find("span.Value")
-                        }
-                        V(v, name, value)
-                        div.addClass("AdditionalProfileValue")
-                        dd.append(div)
-                    } else {
-                        console.debug("Tag not existing in profile:", name)
+        if (event) {
+            const e = event
+            console.debug("tags:", e.tags)
+            e.tags.forEach((tag: string[]) => {
+                let name = tag[0]
+                if (name == "display_name")  name = "displayName"
+                if (name && profile[name]) {
+                    let value = tag[1]
+                    if (profile[name] == value) {
+                        //console.debug("Value already existing in profile:", name, value)
+                        return
                     }
-                })
-            }
+                    const dd = $(`dd[name='${name}']`)
+                    //console.debug("Element for tag", name, dd)
+                    let div = $("<div>")
+                    div.attr("name", name)
+                    let v = div
+                    if (name == "nip05") {
+                        div = $(s.Nip05).parent().clone()
+                        div.prop("id", null)
+                        v = div.find("span.Value")
+                    }
+                    V(v, name, value)
+                    div.addClass("AdditionalProfileValue")
+                    dd.append(div)
+                } else {
+                    console.debug("Tag not existing in profile:", name)
+                }
+            })
         }
 
         const nf = $("#UserProfileNewField")
@@ -266,11 +274,6 @@ export class Profile extends Module {
             if (!v || !this.user || !this.user.profile)  return
             this.guiCustomField(v)
             E(v)
-        })
-
-        const nvs = $(".UserProfileNewValue")
-        nvs.each((index, node) => {
-            this.guiNewValueInputSetup($(node))
         })
 
         $(".Input").hide()
@@ -329,8 +332,10 @@ export class Profile extends Module {
 
         this.editProfile = profileFromEvent(this.editEvent)
         //console.debug("Applied profile:", this.editProfile)
-        //if (this.editProfile.profileEvent)
+        if (this.editProfile.profileEvent) {
             //console.debug("Profile event:", JSON.parse(this.editProfile.profileEvent))
+            //console.debug("Edit event:", this.editEvent)
+        }
 
         return true
     }
@@ -390,7 +395,8 @@ export class Profile extends Module {
         Text(s.About)
         Text(s.Website)
 
-        for (const [name, value] of Object.entries(this.user.profile)) {
+        console.debug("Edited profile:", this.editProfile)
+        for (const [name, value] of Object.entries(this.editProfile)) {
             if (!this.StandardMembers.has(name)) {
                 E(name)
             }
@@ -406,6 +412,7 @@ export class Profile extends Module {
             })
         })
 
+        $(".Input").show()
         $(".UserProfileNewValue").show()
 
         $("#UserProfilePublish").show()
@@ -419,9 +426,11 @@ export class Profile extends Module {
 
     edit() {
         if (!this.checkProfile())  return
+        if (!this.editMode) {
+            if (this?.user?.profile) this.editProfile = structuredClone(this.user.profile)
+            else this.editProfile = {}
+        }
         this.editMode = true
-        if (this?.user?.profile) this.editProfile = Object.create(this.user.profile)
-        else this.editProfile = {}
         this.guiFillEditor()
     }
 
