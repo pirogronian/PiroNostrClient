@@ -616,7 +616,7 @@ export class User extends Module {
 
         if (user) {
             if (!user.profile && !this.newlyCreated) {
-                this.warning("Loading user profile failed.")
+                //this.warning("Loading user profile failed.")
                 user.profile = {}
             }
             $(this.profile.GuiSelectors.Profile).show()
