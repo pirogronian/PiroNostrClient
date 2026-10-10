@@ -169,6 +169,7 @@ export class Module extends EventEmitter {
                 const decoded = nip19.decode(idOrFilter);
 
                 if (decoded.type === 'naddr') {
+                    console.debug("Decoded type: naddr")
                     const data = decoded.data;
                     const filter: NDKFilter = {
                         kinds: [data.kind],
@@ -182,8 +183,10 @@ export class Module extends EventEmitter {
 
                     filters = [filter];
                 } else if (decoded.type === 'nevent') {
+                    console.debug("Decoded type: nevent")
                     filters = [{ ids: [decoded.data.id] }];
                 } else if (decoded.type === 'note') {
+                    console.debug("Decoded type: note")
                     filters = [{ ids: [decoded.data] }];
                 } else {
                     // Fallback dla surowego ID w hex lub innych typów
@@ -191,7 +194,9 @@ export class Module extends EventEmitter {
                 }
             } catch {
                 // Jeśli to nie jest bech32 (np. surowy hex ID lub tag 'd')
+                console.debug("Cannot detect address type, fallback to filterFromId()")
                 filters = [filterFromId(idOrFilter)];
+                this.warning("Cannot resolve given address, trying fallback!")
             }
         } else if (Array.isArray(idOrFilter)) {
             filters = idOrFilter;
