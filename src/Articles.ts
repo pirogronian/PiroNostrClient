@@ -160,6 +160,10 @@ export class Articles extends Module {
                 console.log("Subscribing with id:", params.id)
                 filter['#d'] = [ decodeURIComponent(formatNip54TagD(params.id)) ]
             }
+            if (params.content) {
+                console.debug("Subscribing with content:", params.content)
+                filter.search = params.content
+            }
             for (const [key, value] of Object.entries(params)) {
                 if (key.length == 1) {
                     const tkey = `#${key}`
