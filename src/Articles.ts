@@ -123,6 +123,14 @@ export class Articles extends Module {
             if (e.key === "Enter")
                 console.log("Enter pressed in input field.")
         })*/
+
+        const aa = $("#ArticleAddress")
+        const aag = $("#ArticleAddressGo")
+        aag.click(() => {
+            const addr = aa.val()
+            if (addr)  App.get().article.navigate(`/${addr}`)
+        })
+
         const cnB = $("#CreateNewButton")
         const idI = form.find("input[name='id']")
         cnB.click(() => {
