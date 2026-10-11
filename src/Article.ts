@@ -7,10 +7,13 @@ import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core'
 import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
 import { EditorView as CodeMirrorEditorView, basicSetup as CodeMirrorBasicSetup } from "codemirror";
+import { undo as CodeMirrorUndo, redo as CodeMirrorRedo } from "@codemirror/commands";
 
 const CodeMirror = {
     view: CodeMirrorEditorView,
-    basicSetup: CodeMirrorBasicSetup
+    basicSetup: CodeMirrorBasicSetup,
+    undo: CodeMirrorUndo,
+    redo: CodeMirrorRedo
 }
 
 import { Module } from "@/Module.js"
@@ -802,6 +805,14 @@ export class Article extends Module {
                 CodeMirror.basicSetup,
                 CodeMirrorEditorView.lineWrapping
             ]
+        })
+        $("#CodeMirrorUndoButton").click(() => {
+            CodeMirror.undo(view)
+            view.focus()
+        })
+        $("#CodeMirrorRedoButton").click(() => {
+            CodeMirror.redo(view)
+            view.focus()
         })
         this.codeMirror = view
     }
