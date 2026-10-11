@@ -192,7 +192,6 @@ export class Articles extends Module {
                             }
                             i += 1
                         }
-                        
                     }
                 }
                 //console.debug("Hiding", event)
