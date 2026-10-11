@@ -134,6 +134,75 @@ export class Articles extends Module {
         })
     }
 
+    filter() {
+        let text:string = $("#ArticlesFilterText").val()
+        const content = $("#ArticlesFilterContent").prop("checked")
+        const title = $("#ArticlesFilterTitle").prop("checked")
+        const tagn = $("#ArticlesFilterTagName").prop("checked")
+        const tagv = $("#ArticlesFilterTagValue").prop("checked")
+        const caseS = $("#ArticlesFilterCase").prop("checked")
+
+        const sr = $("#FinderResult")
+
+        console.debug("Filter:", content, title, tagn, tagv, caseS)
+        if (!caseS) text = text.toLocaleLowerCase()
+        sr.children().each((index, item) => {
+            item = $(item)
+            try {
+                if (!text) {
+                    item.show()
+                    return
+                }
+                const event = JSON.parse(item.attr("data"))
+                let match: boolean = false
+                if (content) {
+                    const cText = caseS? event.content : event.content.toLocaleLowerCase()
+                    if (cText.includes(text)) {
+                        item.show()
+                        return
+                    }
+                }
+                if (title) {
+                    const wiki = new NDKWiki(undefined, event)
+                    let tText = caseS? wiki.title : wiki.title?.toLocaleLowerCase()
+                    if (!tText)  tText = caseS? wiki.dTag : wiki.dTag?.toLocaleLowerCase()
+                    if (tText?.includes(text)) {
+                        item.show()
+                        return
+                    }
+                }
+                if (tagn) {
+                    for (const tag of event.tags) {
+                        const tText = caseS? tag[0] : tag[0]?.toLocaleLowerCase()
+                        //console.debug("Tag names:", text, tText)
+                        if (tText?.includes(text)) {
+                            item.show()
+                            return
+                        }
+                    }
+                }
+                if (tagv) {
+                    for (const tag of event.tags) {
+                        let i = 1
+                        while(i < tag.length) {
+                            const tText = caseS? tag[i] : tag[i]?.toLocaleLowerCase()
+                            if (tText?.includes(text)) {
+                                item.show()
+                                return
+                            }
+                            i += 1
+                        }
+                        
+                    }
+                }
+                //console.debug("Hiding", event)
+                item.hide()
+            } catch(error) {
+                console.error(error)
+            }
+        })
+    }
+
     async finder() {
         const o = $(FinderHTML)
         this.mainView().append(o)
@@ -201,6 +270,7 @@ export class Articles extends Module {
             this.sort()
         })*/
         $("#ArticlesSortButton").click(() => { this.sort() })
+        $("#ArticlesFilterButton").click(() => { this.filter() })
     }
 
     isFinder(): boolean {
