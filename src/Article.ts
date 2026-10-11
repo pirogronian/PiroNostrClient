@@ -653,8 +653,6 @@ export class Article extends Module {
                 this.guiAddTag(tag)
             }
         })
-
-        //this.onFormatUpdate()
     }
 
     applyEditor() {
@@ -796,18 +794,6 @@ export class Article extends Module {
         }
     }
 
-    /*onFormatUpdate() {
-        const format = $("#ArticleFormat").val()
-        console.debug("On format:", format)
-        if (format == "plaintext") {
-            $("#CodeMirrorContainer").hide()
-            $("#ArticleContent").show()
-        } else {
-            $("#CodeMirrorContainer").show()
-            $("#ArticleContent").hide()
-        }
-    }*/
-
     codeMirrorSetup() {
         const c = $("#CodeMirrorContainer")
         const view = new CodeMirror.view({
@@ -840,10 +826,8 @@ export class Article extends Module {
             const format = fmtSel.val()
             console.debug("Set format to", format)
             fmt.val(format)
-            //this.onFormatUpdate()
         })
-        //console.debug(prevButt)
-        //console.debug(pubButt)
+        
         const topicL = en.find("label[for='ArticleTopic']")
         const topicI = topicL.find("input")
         const topicB = topicL.find("button")
@@ -934,7 +918,6 @@ export class Article extends Module {
 
         this.mainView(en)
         this.codeMirrorSetup()
-        //this.onFormatUpdate()
     }
 
     async load(addr : string) : Promise<NDKEvent|Error|string|null> {
