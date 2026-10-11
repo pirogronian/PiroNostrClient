@@ -16,4 +16,17 @@
     <input type="submit" value="Search" id="FinderSubmit"/>
     <div id="FinderResultsInfo"><div id="FinderResultsNumber"></div></div>
 </form>
+<div class="FlexContainer">
+    <label for="ArticlesOrderField">Sort by
+        <select name="ArticlesOrderField" id="ArticlesOrderField">
+            <option value="title">Title</option>
+            <option value="content">Content</option>
+            <option value="creationTime">Creation</option>
+            <option value="publicationTime">Publication</option>
+        </select>
+    </label>
+    <label>Asc:<input type="radio" name="ArticlesOrder" id="ArticlesOrderAsc" value="asc"/></label>
+    <label>Desc:<input type="radio" name="ArticlesOrder" value="desc"/></label>
+    <button id="ArticlesSortButton">Sort</button>
+</div>
 <div id="FinderResult" class="Scrollable"></div>

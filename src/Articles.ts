@@ -17,12 +17,56 @@ import "@/Articles.scss"
 
 const FOLLOW_AUTHOR_SETTING_KEY = "FollowAuthor"
 
+function sortItems(item1:HTMLElement, item2:HTMLElement): number {
+    const asc = $("#ArticlesOrderAsc").prop("checked")
+    const field = $("#ArticlesOrderField").val()
+    let field1
+    let field2
+    const jtem1 = $(item1)
+    const jtem2 = $(item2)
+    const event1 = new NDKWiki(undefined, JSON.parse(jtem1.attr("data")))
+    const event2 = new NDKWiki(undefined, JSON.parse(jtem2.attr("data")))
+    switch (field) {
+        case "title":
+            field1 = event1.title
+            if (!field1) field1 = event1.dTag
+            field2 = event2.title
+            if (!field2) field2 = event2.dTag
+            break
+        case "content":
+            field1 = event1.content
+            field2 = event2.content
+            break
+        case "creationTime":
+            field1 = event1.created_at
+            field2 = event2.created_at
+            break
+        case "publicationTime":
+            field1 = event1.published_at
+            if (!field1) field1 = event1.created_at
+            field2 = event2.published_at
+            if (!field2) field2 = event2.created_at
+            break
+    }
+    let ret: number = 0
+    if (!field1) field1 = ""
+    if (!field2) field2 = ""
+    if (field1 && field2) {
+        if (field1 < field2) ret = -1
+        if (field1 > field2) ret = 1
+        if (!asc) ret = -ret
+    }
+    //console.debug("sort:", field1, field2, ret)
+    return ret
+}
+
 export class Articles extends Module {
     sub: NDKSubscription | null = null
     enabled: boolean = false
     resultSize: number = 0
     followAuthor: boolean = false
     author: string|undefined
+    results: HTMLElement[] = []
 
     loadSettings() {
         this.followAuthor = this.settings(FOLLOW_AUTHOR_SETTING_KEY) == "1"? true : false
@@ -40,6 +84,7 @@ export class Articles extends Module {
         if (!this.isCurrent()) return
         //console.log("Articles enabled")
         const Head = $(ArtHeadHTML)
+        Head.attr("data", JSON.stringify(event.rawEvent()))
         const title = Head.find(".ArticleTitle")
         let TT = event.title
         if (!TT) { TT = event.dTag }
@@ -73,9 +118,20 @@ export class Articles extends Module {
         this.resultSize += es
 
         const fr = this.mainView().find("#FinderResult")
+        this.results.push(Head.get(0))
         fr.append(Head)
         $("#FinderResultsNumber").text(`Results: ${fr.children().length}, size: ${FormattedBytes(this.resultSize, 2)}`)
 
+    }
+
+    sort() {
+        this.results.sort(sortItems)
+        const resn = $("#FinderResult")
+        //console.debug("Finder results container:", resn)
+        resn.empty()
+        this.results.forEach((item) => {
+            resn.append($(item))
+        })
     }
 
     async finder() {
@@ -139,6 +195,12 @@ export class Articles extends Module {
             if (id)  param = `?id=${id}`
             App.get().article.navigate(`/edit/${param}`)
         })
+
+        /*const sfi = $("select[name='ArticlesOrderField']")
+        sfi.change(() => {
+            this.sort()
+        })*/
+        $("#ArticlesSortButton").click(() => { this.sort() })
     }
 
     isFinder(): boolean {
@@ -253,6 +315,7 @@ export class Articles extends Module {
             console.log("Route: /articles")
             //console.log(match.params)
             $("#SearchLink").addClass("Current")
+            this.results = []
             if (this.isFinder()) {
                 console.log("Is finder, clearing results.")
                 this.clearFinderResult()
