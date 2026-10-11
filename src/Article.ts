@@ -6,6 +6,13 @@ import NDK, { NDKWiki, NDKDraft, NDKEvent, NDKUser, nip19 } from "@nostr-dev-kit
 import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core';
 import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
+import { EditorView as CodeMirrorEditorView, basicSetup as CodeMirrorBasicSetup, basicSetup } from "codemirror";
+
+const CodeMirror = {
+    view: CodeMirrorEditorView,
+    basicSetup: CodeMirrorBasicSetup
+}
+
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
 import { safeAsync, formatNip54TagD, EventTagValues,
@@ -32,6 +39,7 @@ export class Article extends Module {
     editMode: boolean = false
     editorNode: JQuery<HTMLElement>|undefined
     draftId: string|undefined
+    codeMirror?: CodeMirrorEditorView
 
     constructor() {
         super()
@@ -645,6 +653,8 @@ export class Article extends Module {
                 this.guiAddTag(tag)
             }
         })
+
+        //this.onFormatUpdate()
     }
 
     applyEditor() {
@@ -656,7 +666,9 @@ export class Article extends Module {
         this.wiki.tags.push(["f", en.find("input[name='ArticleFormat']").val()])
         this.wiki.tags.push(["published_at", `${TimeToUnix(en.find("input[name='ArticlePublishedAt']").val())}`])
         this.wiki.summary = en.find("textarea#ArticleSummary").val()
-        this.wiki.content = en.find("textarea#ArticleContent").val()
+        //this.wiki.content = en.find("textarea#ArticleContent").val()
+        const content = this.codeMirror?.state.doc.toString()
+        if (content)  this.wiki.content = content
         if (!this.wiki.tags)  return // To shut up editor warnings.
         const cats = en.find(".Category")
         cats.each((index, cat) => {
@@ -784,6 +796,29 @@ export class Article extends Module {
         }
     }
 
+    /*onFormatUpdate() {
+        const format = $("#ArticleFormat").val()
+        console.debug("On format:", format)
+        if (format == "plaintext") {
+            $("#CodeMirrorContainer").hide()
+            $("#ArticleContent").show()
+        } else {
+            $("#CodeMirrorContainer").show()
+            $("#ArticleContent").hide()
+        }
+    }*/
+
+    codeMirrorSetup() {
+        const c = $("#CodeMirrorContainer")
+        console.debug("CM parent:", c)
+        const view = new CodeMirror.view({
+            parent: c.get(0),
+            extensions: [ CodeMirror.basicSetup ]
+        })
+        this.codeMirror = view
+        console.debug("CM obj:", view)
+    }
+
     async setupEditors(id: string|undefined = undefined) {
         this.editorNode = $(ArticleEditHTML)
         const en = this.editorNode
@@ -801,8 +836,10 @@ export class Article extends Module {
         const fmt = en.find("input[name='ArticleFormat']")
         const fmtSel = en.find("select[name='ArticleFormatSelect']")
         fmtSel.change(() => {
-            console.debug("Set format to", fmtSel.val())
-            fmt.val(fmtSel.val())
+            const format = fmtSel.val()
+            console.debug("Set format to", format)
+            fmt.val(format)
+            //this.onFormatUpdate()
         })
         //console.debug(prevButt)
         //console.debug(pubButt)
@@ -895,6 +932,8 @@ export class Article extends Module {
         this.guiUpdateRawEventEdit()
 
         this.mainView(en)
+        this.codeMirrorSetup()
+        //this.onFormatUpdate()
     }
 
     async load(addr : string) : Promise<NDKEvent|Error|string|null> {

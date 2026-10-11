@@ -12,7 +12,7 @@
         <label for="ArticleTitle">Title:<input type="text" name="ArticleTitle"/></label>
         <label for="ArticleId" id="ArticleId">Id:<input type="text" name="ArticleId"/></label>
         <label for="ArticleFormat">Format:
-            <input type="text" name="ArticleFormat"/>
+            <input type="text" name="ArticleFormat" id="ArticleFormat"/>
             <select name="ArticleFormatSelect">
                 <option value="">Select</option>
                 <option value="plaintext">Plain text</option>
@@ -45,7 +45,8 @@
         <h3>Summary:</h3>
         <textarea id="ArticleSummary"></textarea>
         <h3>Content:</h3>
-        <textarea id="ArticleContent"></textarea>
+        <div id="CodeMirrorContainer"></div>
+        <!--<textarea id="ArticleContent"></textarea>-->
     </div>
     <textarea id="ArticleEditRawEvent" style="display: none;"></textarea>
 </div>
