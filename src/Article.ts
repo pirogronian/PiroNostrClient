@@ -6,7 +6,7 @@ import NDK, { NDKWiki, NDKDraft, NDKEvent, NDKUser, nip19 } from "@nostr-dev-kit
 import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core';
 import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
-import { EditorView as CodeMirrorEditorView, basicSetup as CodeMirrorBasicSetup, basicSetup } from "codemirror";
+import { EditorView as CodeMirrorEditorView, basicSetup as CodeMirrorBasicSetup } from "codemirror";
 
 const CodeMirror = {
     view: CodeMirrorEditorView,
@@ -810,13 +810,14 @@ export class Article extends Module {
 
     codeMirrorSetup() {
         const c = $("#CodeMirrorContainer")
-        console.debug("CM parent:", c)
         const view = new CodeMirror.view({
             parent: c.get(0),
-            extensions: [ CodeMirror.basicSetup ]
+            extensions: [
+                CodeMirror.basicSetup,
+                CodeMirrorEditorView.lineWrapping
+            ]
         })
         this.codeMirror = view
-        console.debug("CM obj:", view)
     }
 
     async setupEditors(id: string|undefined = undefined) {
