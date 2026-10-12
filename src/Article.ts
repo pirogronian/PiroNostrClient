@@ -40,7 +40,7 @@ export class Article extends Module {
     event: NDKEvent|null = null
     wiki: NDKWiki|null = null
     lastFormat: string = ""
-    useLastFormat: string = "1"
+    useLastFormat: boolean = true
     editMode: boolean = false
     editorNode: JQuery<HTMLElement>|undefined
     draftId: string|undefined
@@ -52,14 +52,14 @@ export class Article extends Module {
 
     saveSettings() {
         this.settings(LAST_ARTICLE_FORMAT_KEY, this.lastFormat)
-        this.settings(USE_LAST_ARTICLE_FORMAT_KEY, this.useLastFormat)
+        this.settings(USE_LAST_ARTICLE_FORMAT_KEY, this.useLastFormat? "1": null)
     }
 
     restoreSettings() {
         let tmp = this.settings(LAST_ARTICLE_FORMAT_KEY)
         this.lastFormat = tmp ? tmp : ""
         tmp = this.settings(USE_LAST_ARTICLE_FORMAT_KEY)
-        this.useLastFormat = tmp ? tmp : ""
+        this.useLastFormat = tmp ? true : false
     }
 
     setEvent(event: NDKEvent) {
@@ -456,11 +456,11 @@ export class Article extends Module {
 
         this.guiUpdateRelays()
 
-        const ulf = $("input[name='uselastformat']")
-        if (this.useLastFormat)  ulf.prop("checked", "checked")
+        const ulf = $("#ArticleUseTheLastFormat").find("input")
+        if (this.useLastFormat)  ulf.prop("checked", true)
         ulf.change(() => {
             console.log("Checked")
-            this.useLastFormat = ulf.prop("checked") ? "1" : ""
+            this.useLastFormat = ulf.prop("checked")
             this.saveSettings()
         })
 
