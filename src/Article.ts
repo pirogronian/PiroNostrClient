@@ -811,6 +811,16 @@ export class Article extends Module {
         if (fmt == "asciidoc") asciidoc.show()
     }
 
+    CMInsert(text: string) {
+        const view = this.codeMirror
+        if (!view)  {
+            console.warn("No CodeMirror editor present!")
+            return
+        }
+        view.dispatch(view.state.replaceSelection(text))
+        view.focus()
+    }
+
     codeMirrorWrapSelection(prefix: string, suffix?: string) {
         const view = this.codeMirror
         if (!view)  {
@@ -852,6 +862,50 @@ export class Article extends Module {
         this.codeMirrorWrapSelection("{=", "=}")
     }
 
+    CMDjotSup() {
+        this.codeMirrorWrapSelection("{^", "^}")
+    }
+
+    CMDjotSub() {
+        this.codeMirrorWrapSelection("{~", "~}")
+    }
+
+    CMDjotIns() {
+        this.codeMirrorWrapSelection("{+", "+}")
+    }
+
+    CMDjotDel() {
+        this.codeMirrorWrapSelection("{-", "-}")
+    }
+
+    CMDjotQ1() {
+        this.codeMirrorWrapSelection("{'", "'}")
+    }
+
+    CMDjotQ2() {
+        this.codeMirrorWrapSelection("{\"", "\"}")
+    }
+
+    CMDjotEllipse() {
+        this.CMInsert("...")
+    }
+
+    CMDjotNDash() {
+        this.CMInsert("--")
+    }
+
+    CMDjotMDash() {
+        this.CMInsert("---")
+    }
+
+    CMDjotMath() {
+        this.codeMirrorWrapSelection("$`", "`")
+    }
+
+    CMDjotMathBlock() {
+        this.codeMirrorWrapSelection("$$` ", " `")
+    }
+
     codeMirrorSetup() {
         const c = $("#CodeMirrorContainer")
         const view = new CodeMirror.view({
@@ -880,6 +934,39 @@ export class Article extends Module {
         })
         $("#CodeMirrorDjotHigh").click(() => {
             this.CMDjotHigh()
+        })
+        $("#CodeMirrorDjotSup").click(() => {
+            this.CMDjotSup()
+        })
+        $("#CodeMirrorDjotSub").click(() => {
+            this.CMDjotSub()
+        })
+        $("#CodeMirrorDjotIns").click(() => {
+            this.CMDjotIns()
+        })
+        $("#CodeMirrorDjotDel").click(() => {
+            this.CMDjotDel()
+        })
+        $("#CodeMirrorDjotQ1").click(() => {
+            this.CMDjotQ1()
+        })
+        $("#CodeMirrorDjotQ2").click(() => {
+            this.CMDjotQ2()
+        })
+        $("#CodeMirrorDjotEllipse").click(() => {
+            this.CMDjotEllipse()
+        })
+        $("#CodeMirrorDjotNDash").click(() => {
+            this.CMDjotNDash()
+        })
+        $("#CodeMirrorDjotMDash").click(() => {
+            this.CMDjotMDash()
+        })
+        $("#CodeMirrorDjotMath").click(() => {
+            this.CMDjotMath()
+        })
+        $("#CodeMirrorDjotMathBlock").click(() => {
+            this.CMDjotMathBlock()
         })
         this.codeMirror = view
     }
