@@ -629,7 +629,18 @@ export class Article extends Module {
         if (this.wiki.published_at)
             en.find("input[name='ArticlePublishedAt']").val(TimeToISO(this.wiki.published_at))
         en.find("textarea#ArticleSummary").val(this.wiki.summary)
-        en.find("textarea#ArticleContent").val(this.wiki.content)
+        const cm = this.codeMirror
+        if (cm) {
+            console.debug("Editor: insert wiki content.")
+            cm.dispatch({
+                changes: {
+                    from: 0,
+                    to: cm.state.doc.length,
+                    insert: this.wiki.content
+                }
+            })
+        }
+        //en.find("textarea#ArticleContent").val(this.wiki.content)
 
         this.guiClearCategories()
         const cats = this.wiki.getMatchingTags("c")
@@ -1174,12 +1185,12 @@ export class Article extends Module {
             this.switchEditor(switchEdit.prop("checked"))
         })
 
-        this.guiUpdateEditor()
-        this.guiUpdateRawEventEdit()
-
         this.mainView(en)
         this.codeMirrorSetup()
         this.onFormatUpdate()
+
+        this.guiUpdateEditor()
+        this.guiUpdateRawEventEdit()
     }
 
     async load(addr : string) : Promise<NDKEvent|Error|string|null> {
