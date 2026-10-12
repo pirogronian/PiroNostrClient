@@ -1284,20 +1284,24 @@ export class Article extends Module {
             this.wiki?.tag(this.event)
         }
         this.clearUI()
-        if (data && typeof data == "object" && data.id) {
+        if (data && typeof data == "object") {
+            if (data.new) {
+                this.event = null
+                this.wiki = null
+            }
             this.setupEditors(data.id)
         }
         else this.setupEditors()
     }
 
     setup() {
-        this.onRoute("/edit/", (match) => {
-            this.setCurrent()
-            this.edit(match.params)
-        })
         this.onRoute("/edit/:id", (match) => {
             this.setCurrent()
             this.edit(match.data.id)
+        })
+        this.onRoute("/edit/", (match) => {
+            this.setCurrent()
+            this.edit(match.params)
         })
         this.onRoute("/:id", (match) => {
             this.setCurrent()

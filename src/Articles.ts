@@ -258,9 +258,9 @@ export class Articles extends Module {
         const cnB = $("#CreateNewButton")
         const idI = form.find("input[name='id']")
         cnB.click(() => {
-            let param = ""
+            let param = "?new=1"
             const id = idI.val()
-            if (id)  param = `?id=${id}`
+            if (id)  param = param+`&id=${id}`
             App.get().article.navigate(`/edit/${param}`)
         })
 
