@@ -631,7 +631,7 @@ export class Article extends Module {
         en.find("textarea#ArticleSummary").val(this.wiki.summary)
         const cm = this.codeMirror
         if (cm) {
-            console.debug("Editor: insert wiki content.")
+            //console.debug("Editor: insert wiki content.")
             cm.dispatch({
                 changes: {
                     from: 0,

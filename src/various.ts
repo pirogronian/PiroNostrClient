@@ -77,13 +77,15 @@ export function CreateLink(url: any, text?: string): JQuery<HTMLElement>|undefin
 export function MakeLabelActive(node: JQuery<HTMLElement>) {
     const input = node.find("input")
     node.addClass("Active")
-    node.click((e) => {
+    /*node.click((e) => {
+        console.debug("Active label clicked.")
         if ($(e.target).is('input[type="checkbox"]')) {
             return;
         }
-        input.prop("checked", !input.prop("checked"))
-        input.trigger("change")
-    })
+        //console.debug("Manually change state.")
+        //input.prop("checked", !input.prop("checked"))
+        //input.trigger("change")
+    })*/
 }
 
 export function MakeCopyable(element: JQuery<HTMLElement>, text?: any) {
