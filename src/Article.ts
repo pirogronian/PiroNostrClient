@@ -273,8 +273,10 @@ export class Article extends Module {
         const p = this.createNode(format)
         p.then((n) => {
             if (this.isCurrent()) {
-                $("#ArticleContentView").html("")
-                $("#ArticleContentView").append(n)
+                const cn = $("#ArticleContentView")
+                cn.empty()
+                cn.append(n)
+                this.renderMath(cn.get(0))
             }
         })
     }

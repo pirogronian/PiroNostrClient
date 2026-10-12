@@ -325,4 +325,19 @@ export class Module extends EventEmitter {
             this.navigate($(e.currentTarget).attr("inner"))
         })
     }
+
+    renderMath(target: HTMLElement) {
+        if (!target)  target = document.body
+        //console.debug(target)
+        if (window.MathJax) {
+            //console.debug("Math rendering started.")
+            const doc = window.MathJax.startup.document
+            doc.options.elements = [target]
+            doc.reset()
+            doc.render()
+            //console.debug("Math rendered.")
+        } else {
+            console.warn("No MathJax object installed.")
+        }
+    }
 }

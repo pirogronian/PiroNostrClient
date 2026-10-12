@@ -1,6 +1,7 @@
 
 
 import $ from "jquery"
+import 'mathjax/es5/tex-chtml.js'
 import NDK, { NDKEvent, NDKUser, NDKRelay } from "@nostr-dev-kit/ndk";
 import NDKCacheAdapterDexie from '@nostr-dev-kit/ndk-cache-dexie';
 import { Relays } from '@/Relays.js';
@@ -124,6 +125,20 @@ export class App extends Module {
 
     }
 
+    setupMathJax() {
+        window.MathJax.config.tex.inlineMath = [['$', '$'], ['\\(', '\\)']]
+        window.MathJax.config.tex.displayMath = [['$$', '$$'], ['\\[', '\\]']]
+        window.MathJax.config.tex.processEscapes = true
+        window.MathJax.config.options.processHtmlClass = 'math inline|math display'
+        window.MathJax.config.options.ignoreHtmlClass = ".*"
+        window.MathJax.config.startup.ready = () => {
+            window.MathJax.startup.defaultReady();
+            console.log('MathJax ready.');
+        }
+
+        console.debug("MathJax config:", window.MathJax)
+    }
+
     setup() {
         this.about.setup()
         this.relays.setup()
@@ -145,7 +160,7 @@ export class App extends Module {
             }
             this.guiIndex()
         })
-
+        this.setupMathJax()
         this.router.resolve();
     }
 }
