@@ -814,6 +814,16 @@ export class Article extends Module {
         if (fmt == "asciidoc") asciidoc.show()
     }
 
+    CMSelected(): string {
+        const view = this.codeMirror
+        if (!view)  {
+            console.warn("No CodeMirror editor present!")
+            return ""
+        }
+        const { from, to } = view.state.selection.main;
+        return view.state.sliceDoc(from, to);
+    }
+
     CMInsert(text: string) {
         const view = this.codeMirror
         if (!view)  {
@@ -921,6 +931,11 @@ export class Article extends Module {
         this.CMInsert("\\\n")
     }
 
+    CMDjotLink(label: string, target: string) {
+        this.CMInsert("["+label+"]")
+        this.CMInsert("("+target+")")
+    }
+
     codeMirrorSetup() {
         const c = $("#CodeMirrorContainer")
         const view = new CodeMirror.view({
@@ -992,6 +1007,32 @@ export class Article extends Module {
         $("#CodeMirrorDjotBreak").click(() => {
             this.CMDjotBreak()
         })
+        {
+            const b = $("#CodeMirrorDjotLink")
+            const d = $("#CodeMirrorDjotLinkDialog")
+            const l = $("#CodeMirrorDjotLinkDialogLabel")
+            const t = $("#CodeMirrorDjotLinkDialogTarget")
+            const c = $("#CodeMirrorDjotLinkDialogCancel")
+            const i = $("#CodeMirrorDjotLinkDialogInsert")
+            b.click(() => {
+                const text = this.CMSelected()
+                l.val(text)
+                t.val(text)
+                d.prop("open", true)
+            })
+            c.click(() => {
+                d.prop("open", false)
+            })
+            i.click(() => {
+                const label = l.val()
+                const target = t.val()
+                if (label && target) {
+                    this.CMDjotLink(label, target)
+                    d.prop("open", false)
+                }
+            })
+        }
+
         this.codeMirror = view
     }
 

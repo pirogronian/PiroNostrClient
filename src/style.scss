@@ -18,6 +18,10 @@ a:not(:where(#ArticleView a)):hover, label.active:not(:where(#ArticleView label)
     background-color: lightgray;
 }
 
+dialog {
+    z-index: 1000;
+}
+
 .Copyable {
     cursor: pointer
 }
