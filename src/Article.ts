@@ -908,6 +908,18 @@ export class Article extends Module {
         this.codeMirrorWrapSelection("$$` ", " `")
     }
 
+    CMDjotFootnRef() {
+        this.codeMirrorWrapSelection("[^", "]")
+    }
+
+    CMDjotFootn() {
+        this.codeMirrorWrapSelection("[^", "]:")
+    }
+
+    CMDjotBreak() {
+        this.CMInsert("\\\n")
+    }
+
     codeMirrorSetup() {
         const c = $("#CodeMirrorContainer")
         const view = new CodeMirror.view({
@@ -969,6 +981,15 @@ export class Article extends Module {
         })
         $("#CodeMirrorDjotMathBlock").click(() => {
             this.CMDjotMathBlock()
+        })
+        $("#CodeMirrorDjotFootnRef").click(() => {
+            this.CMDjotFootnRef()
+        })
+        $("#CodeMirrorDjotFootn").click(() => {
+            this.CMDjotFootn()
+        })
+        $("#CodeMirrorDjotBreak").click(() => {
+            this.CMDjotBreak()
         })
         this.codeMirror = view
     }
