@@ -7,10 +7,12 @@ import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core'
 import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
 
 import { EditorView as CodeMirrorEditorView, basicSetup as CodeMirrorBasicSetup } from "codemirror";
+import { EditorSelection as CodeMirrorEditorSelection } from "@codemirror/state";
 import { undo as CodeMirrorUndo, redo as CodeMirrorRedo } from "@codemirror/commands";
 
 const CodeMirror = {
     view: CodeMirrorEditorView,
+    selection: CodeMirrorEditorSelection,
     basicSetup: CodeMirrorBasicSetup,
     undo: CodeMirrorUndo,
     redo: CodeMirrorRedo
@@ -656,6 +658,7 @@ export class Article extends Module {
                 this.guiAddTag(tag)
             }
         })
+        this.onFormatUpdate()
     }
 
     applyEditor() {
@@ -797,6 +800,58 @@ export class Article extends Module {
         }
     }
 
+    onFormatUpdate() {
+        const fmt = $("#ArticleFormat").val()
+        const cmt = $("#CodeMirrorToolbar")
+        const djot = cmt.find(".djot")
+        const asciidoc = cmt.find(".asciidoc")
+        djot.hide()
+        asciidoc.hide()
+        if (fmt == "djot") djot.show()
+        if (fmt == "asciidoc") asciidoc.show()
+    }
+
+    codeMirrorWrapSelection(prefix: string, suffix?: string) {
+        const view = this.codeMirror
+        if (!view)  {
+            console.warn("No CodeMirror editor present!")
+            return
+        }
+        if (!suffix) suffix = prefix
+        const trans = view.state.changeByRange(range => {
+            const selected = view.state.sliceDoc(range.from, range.to)
+            return {
+                changes: {
+                    from: range.from,
+                    to: range.to,
+                    insert: prefix + selected + suffix
+                },
+                range: CodeMirror.selection.range(
+                        range.from + prefix.length,
+                        range.to + prefix.length
+                    )
+            };
+        })
+        view.dispatch(trans)
+        view.focus()
+    }
+
+    CMDjotVerb() {
+        this.codeMirrorWrapSelection("```")
+    }
+
+    CMDjotEmph() {
+        this.codeMirrorWrapSelection("{_", "_}")
+    }
+
+    CMDjotStrong() {
+        this.codeMirrorWrapSelection("{*", "*}")
+    }
+
+    CMDjotHigh() {
+        this.codeMirrorWrapSelection("{=", "=}")
+    }
+
     codeMirrorSetup() {
         const c = $("#CodeMirrorContainer")
         const view = new CodeMirror.view({
@@ -813,6 +868,18 @@ export class Article extends Module {
         $("#CodeMirrorRedoButton").click(() => {
             CodeMirror.redo(view)
             view.focus()
+        })
+        $("#CodeMirrorDjotVerb").click(() => {
+            this.CMDjotVerb()
+        })
+        $("#CodeMirrorDjotEmph").click(() => {
+            this.CMDjotEmph()
+        })
+        $("#CodeMirrorDjotStrong").click(() => {
+            this.CMDjotStrong()
+        })
+        $("#CodeMirrorDjotHigh").click(() => {
+            this.CMDjotHigh()
         })
         this.codeMirror = view
     }
@@ -837,6 +904,7 @@ export class Article extends Module {
             const format = fmtSel.val()
             console.debug("Set format to", format)
             fmt.val(format)
+            this.onFormatUpdate()
         })
         
         const topicL = en.find("label[for='ArticleTopic']")
@@ -929,6 +997,7 @@ export class Article extends Module {
 
         this.mainView(en)
         this.codeMirrorSetup()
+        this.onFormatUpdate()
     }
 
     async load(addr : string) : Promise<NDKEvent|Error|string|null> {
