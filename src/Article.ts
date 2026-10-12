@@ -504,7 +504,7 @@ export class Article extends Module {
 
         this.showRawEvent($('#RawEventView').get(0))
 
-        const facheck = $("label[for='FollowAuthor']")
+        const facheck = $("#ArticleFollowTheAuthor")
         MakeLabelActive(facheck)
         const facheckinp = facheck.find("input")
         const arts = App.get().articles
