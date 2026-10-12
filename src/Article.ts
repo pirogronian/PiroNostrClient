@@ -143,7 +143,8 @@ export class Article extends Module {
     plaintext(content : string) : string {  return content}
 
     createWikiLinksFromTextNodes(container: HTMLElement): void {
-        const wikiLinkRegex = /\[\[([^\]|]+)(?:|([^\]]+))?\]\]/g;
+        //const wikiLinkRegex = /\[\[([^\]|]+)(?:|([^\]]+))?\]\]/g;
+        const wikiLinkRegex = /\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g;
 
         // 1. Tworzymy TreeWalker, który szuka wyłącznie węzłów tekstowych
         const walker = document.createTreeWalker(
