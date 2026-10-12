@@ -936,6 +936,11 @@ export class Article extends Module {
         this.CMInsert("("+target+")")
     }
 
+    CMDjotImage(label: string, target: string) {
+        this.CMInsert("!["+label+"]")
+        this.CMInsert("("+target+")")
+    }
+
     codeMirrorSetup() {
         const c = $("#CodeMirrorContainer")
         const view = new CodeMirror.view({
@@ -1028,6 +1033,31 @@ export class Article extends Module {
                 const target = t.val()
                 if (label && target) {
                     this.CMDjotLink(label, target)
+                    d.prop("open", false)
+                }
+            })
+        }
+        {
+            const b = $("#CodeMirrorDjotImage")
+            const d = $("#CodeMirrorDjotImageDialog")
+            const l = $("#CodeMirrorDjotImageDialogLabel")
+            const t = $("#CodeMirrorDjotImageDialogTarget")
+            const c = $("#CodeMirrorDjotImageDialogCancel")
+            const i = $("#CodeMirrorDjotImageDialogInsert")
+            b.click(() => {
+                const text = this.CMSelected()
+                l.val(text)
+                t.val(text)
+                d.prop("open", true)
+            })
+            c.click(() => {
+                d.prop("open", false)
+            })
+            i.click(() => {
+                const label = l.val()
+                const target = t.val()
+                if (target) {
+                    this.CMDjotImage(label, target)
                     d.prop("open", false)
                 }
             })
