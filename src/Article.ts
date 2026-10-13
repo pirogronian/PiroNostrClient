@@ -505,10 +505,12 @@ export class Article extends Module {
 
         this.guiUpdateRelays()
 
-        const ulf = $("#ArticleUseTheLastFormat").find("input")
+        const ulfl = $("#ArticleUseTheLastFormat")
+        MakeLabelActive(ulfl)
+        const ulf = ulfl.find("input")
         if (this.useLastFormat)  ulf.prop("checked", true)
         ulf.change(() => {
-            console.log("Checked")
+            //console.log("Checked")
             this.useLastFormat = ulf.prop("checked")
             this.saveSettings()
         })
