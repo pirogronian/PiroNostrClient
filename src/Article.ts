@@ -896,13 +896,13 @@ export class Article extends Module {
         view.focus()
     }
 
-    codeMirrorWrapSelection(prefix: string, suffix?: string) {
+    CMWrapSelection(prefix: string, suffix?: string) {
         const view = this.codeMirror
         if (!view)  {
             console.warn("No CodeMirror editor present!")
             return
         }
-        if (!suffix) suffix = prefix
+        if (suffix == undefined) suffix = prefix
         const trans = view.state.changeByRange(range => {
             const selected = view.state.sliceDoc(range.from, range.to)
             return {
@@ -922,43 +922,43 @@ export class Article extends Module {
     }
 
     CMDjotVerb() {
-        this.codeMirrorWrapSelection("```")
+        this.CMWrapSelection("```")
     }
 
     CMDjotEmph() {
-        this.codeMirrorWrapSelection("{_", "_}")
+        this.CMWrapSelection("{_", "_}")
     }
 
     CMDjotStrong() {
-        this.codeMirrorWrapSelection("{*", "*}")
+        this.CMWrapSelection("{*", "*}")
     }
 
     CMDjotHigh() {
-        this.codeMirrorWrapSelection("{=", "=}")
+        this.CMWrapSelection("{=", "=}")
     }
 
     CMDjotSup() {
-        this.codeMirrorWrapSelection("{^", "^}")
+        this.CMWrapSelection("{^", "^}")
     }
 
     CMDjotSub() {
-        this.codeMirrorWrapSelection("{~", "~}")
+        this.CMWrapSelection("{~", "~}")
     }
 
     CMDjotIns() {
-        this.codeMirrorWrapSelection("{+", "+}")
+        this.CMWrapSelection("{+", "+}")
     }
 
     CMDjotDel() {
-        this.codeMirrorWrapSelection("{-", "-}")
+        this.CMWrapSelection("{-", "-}")
     }
 
     CMDjotQ1() {
-        this.codeMirrorWrapSelection("{'", "'}")
+        this.CMWrapSelection("{'", "'}")
     }
 
     CMDjotQ2() {
-        this.codeMirrorWrapSelection("{\"", "\"}")
+        this.CMWrapSelection("{\"", "\"}")
     }
 
     CMDjotEllipse() {
@@ -974,19 +974,19 @@ export class Article extends Module {
     }
 
     CMDjotMath() {
-        this.codeMirrorWrapSelection("$`", "`")
+        this.CMWrapSelection("$`", "`")
     }
 
     CMDjotMathBlock() {
-        this.codeMirrorWrapSelection("$$` ", " `")
+        this.CMWrapSelection("$$` ", " `")
     }
 
     CMDjotFootnRef() {
-        this.codeMirrorWrapSelection("[^", "]")
+        this.CMWrapSelection("[^", "]")
     }
 
     CMDjotFootn() {
-        this.codeMirrorWrapSelection("[^", "]:")
+        this.CMWrapSelection("[^", "]:")
     }
 
     CMDjotBreak() {
@@ -1001,6 +1001,13 @@ export class Article extends Module {
     CMDjotImage(label: string, target: string) {
         this.CMInsert("!["+label+"]")
         this.CMInsert("("+target+")")
+    }
+
+    CMDjotHeading(level: number) {
+        if (level > 0 && level < 7) {
+            const prefix = "#".repeat(level) + " "
+            this.CMWrapSelection(prefix, "")
+        }
     }
 
     codeMirrorSetup() {
@@ -1122,6 +1129,13 @@ export class Article extends Module {
                     this.CMDjotImage(label, target)
                     d.prop("open", false)
                 }
+            })
+        }
+        {
+            const s = $("#CodeMirrorDjotHeading")
+            s.change(() => {
+                this.CMDjotHeading(Number(s.val()))
+                s.val("Heading")
             })
         }
 
