@@ -4,7 +4,7 @@ import $, { type JQuery } from "jquery"
 import NDK, { NDKWiki, NDKDraft, NDKEvent, NDKUser, nip19 } from "@nostr-dev-kit/ndk";
 
 import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core';
-import { parse as DjotParse, renderHTML as DJotRenderHTML } from '@djot/djot';
+import { parse as DjotParse, renderHTML as DJotRenderHTML, type AstNode, type Doc } from '@djot/djot';
 
 import { EditorView as CodeMirrorEditorView, basicSetup as CodeMirrorBasicSetup } from "codemirror";
 import { EditorSelection as CodeMirrorEditorSelection } from "@codemirror/state";
@@ -85,10 +85,17 @@ export class Article extends Module {
         view.html(jsonString)
     }
 
+    wikiBaseUrl(entry: string) {
+        return `?id=${encodeURIComponent(formatNip54TagD(entry))}&followAuthor=${this.event?.pubkey}`
+    }
+
+    wikiUrl(entry: string) {
+        return App.get().articles.innerUrl(this.wikiBaseUrl(entry))
+    }
+
     makeLinkWiki(a: JQuery<HTMLElement>, entry: string, alias?: string) {
         if (!alias && !a.text()) alias = entry
-        App.get().articles.makeLinkActive(a,
-            `?id=${encodeURIComponent(formatNip54TagD(entry))}&followAuthor=${this.event?.pubkey}`, alias)
+        App.get().articles.makeLinkActive(a, this.wikiBaseUrl(entry), alias)
     }
 
     asciidocCreateWikilinks(element: JQuery<HTMLElement>) {
@@ -134,9 +141,50 @@ export class Article extends Module {
         })
     }
 
+    astExtractText(node: any) {
+        if (node.text)  return node.text
+        if (node.children) {
+            return node.children.map(this.astExtractText).join('')
+        }
+        return ""
+    }
+
+    astMakeWikilinks(node: any, root: any) {
+        //console.debug("Parsing:", node)
+        if (node.children) {
+            for (let i = 0; i < node.children.length; i++) {
+                this.astMakeWikilinks(node.children[i], root)
+            }
+        }
+
+        if (node.tag == "link") {
+            //console.debug("Got link.")
+            if (!node.destination && node.reference) {
+                const target = node.reference || this.astExtractText(node)
+                if (!root.references[target]) {
+                    //console.debug("Transforming unresolved link:", target)
+                    node.destination = this.wikiBaseUrl(target)
+                    node.reference = undefined
+                    node.attributes = node.attributes || {}
+                    node.attributes.class = "djot-wiki-todo"
+                    //console.debug(node)
+                }
+            }
+        }
+    }
+
+    djotMakeWikilinksActive(root: JQuery<HTMLElement>) {
+        const links = root.find("a.djot-wiki-todo")
+        links.each((index, link) => {
+            link = $(link)
+            App.get().articles.makeLinkActive(link, link.attr("href"))
+        })
+    }
+
     djot(content: string) : string {
-        content = this.djotCreateWikilinksBefore(content)
+        //content = this.djotCreateWikilinksBefore(content)
         const ast = DjotParse(content);
+        this.astMakeWikilinks(ast, ast)
         return DJotRenderHTML(ast);
     }
 
@@ -257,8 +305,9 @@ export class Article extends Module {
             case "djot":
                 cnt = this.djot(content)
                 ret = $(cnt)
-                this.djotCreateWikilinksAfter(ret)
+                //this.djotCreateWikilinksAfter(ret)
                 this.createWikiLinksFromTextNodes($("<div>").append(ret).get(0))
+                this.djotMakeWikilinksActive(ret)
                 this.createLinksFromWikiProtocol(ret)
                 break
             default:
