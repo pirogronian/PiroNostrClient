@@ -7,44 +7,47 @@
         <button type="button" id="ArticlePreviewButton">Preview</button>
         <button type="button" id="ArticlePublishButton">Publish</button>
         <label>Raw event:<input type="checkbox" id="RawEventCheckbox"/></label>
+        <label class="Active">Content only:<input type="checkbox" id="ArticleEditContentCheckbox"/></label>
     </div>
     <div id="ArticleEdit">
-        <label for="ArticleTitle">Title:<input type="text" name="ArticleTitle"/></label>
-        <label for="ArticleId" id="ArticleId">Id:<input type="text" name="ArticleId"/></label>
-        <label for="ArticleFormat">Format:
-            <input type="text" name="ArticleFormat" id="ArticleFormat"/>
-            <select name="ArticleFormatSelect">
-                <option value="">Select</option>
-                <option value="plaintext">Plain text</option>
-                <option value="djot">DJot</option>
-                <option value="asciidoc">Asciidoc</option>
-            </select>
-        </label>
-        <label for="ArticlePublishedAt">Published at:<input type="datetime-local" name="ArticlePublishedAt"/></label>
-        <div class="Frame">
-            <label for="ArticleTopic">Topic:<input type="text" name="ArticleTopic"/><button type="button">Add</button></label>
-            <label for="ArticleCategory">Category:<input type="text" name="ArticleCategory"/><button type="button">Add</button></label>
-            <label for="ArticleLanguage">Language:<input type="text" name="ArticleLanguage" list="AllLanguagesList"/><button type="button">Add</button></label>
+        <div id="ArticleEditTagStuff">
+            <label for="ArticleTitle">Title:<input type="text" name="ArticleTitle"/></label>
+            <label for="ArticleId" id="ArticleId">Id:<input type="text" name="ArticleId"/></label>
+            <label for="ArticleFormat">Format:
+                <input type="text" name="ArticleFormat" id="ArticleFormat"/>
+                <select name="ArticleFormatSelect">
+                    <option value="">Select</option>
+                    <option value="plaintext">Plain text</option>
+                    <option value="djot">DJot</option>
+                    <option value="asciidoc">Asciidoc</option>
+                </select>
+            </label>
+            <label for="ArticlePublishedAt">Published at:<input type="datetime-local" name="ArticlePublishedAt"/></label>
+            <div class="Frame">
+                <label for="ArticleTopic">Topic:<input type="text" name="ArticleTopic"/><button type="button">Add</button></label>
+                <label for="ArticleCategory">Category:<input type="text" name="ArticleCategory"/><button type="button">Add</button></label>
+                <label for="ArticleLanguage">Language:<input type="text" name="ArticleLanguage" list="AllLanguagesList"/><button type="button">Add</button></label>
+            </div>
+            <datalist id="AllLanguagesList"></datalist>
+            <fieldset id="NewTag">
+                <legend>New tag:</legend>
+                <span>
+                    <input type="text" value="TagName"/>
+                    <input type="text" value="TagValue"/>
+                    <input type="text" value="TagMarker"/>
+                </span>
+                <button id="AddTagFieldButton">Add field</button>
+                <button id="RemoveTagFieldButton">Remove field</button>
+                <button id="AddTagButton">Add tag</button>
+            </fieldset>
+            <fieldset id="Topics"><legend>Topics:</legend></fieldset>
+            <fieldset id="Categories"><legend>Categories:</legend></fieldset>
+            <fieldset id="Languages"><legend>Languages:</legend></fieldset>
+            <fieldset id="Tags"><legend>Tags:</legend></fieldset>
+            <h3>Summary:</h3>
+            <textarea id="ArticleSummary"></textarea>
         </div>
-        <datalist id="AllLanguagesList"></datalist>
-        <fieldset id="NewTag">
-            <legend>New tag:</legend>
-            <span>
-                <input type="text" value="TagName"/>
-                <input type="text" value="TagValue"/>
-                <input type="text" value="TagMarker"/>
-            </span>
-            <button id="AddTagFieldButton">Add field</button>
-            <button id="RemoveTagFieldButton">Remove field</button>
-            <button id="AddTagButton">Add tag</button>
-        </fieldset>
-        <fieldset id="Topics"><legend>Topics:</legend></fieldset>
-        <fieldset id="Categories"><legend>Categories:</legend></fieldset>
-        <fieldset id="Languages"><legend>Languages:</legend></fieldset>
-        <fieldset id="Tags"><legend>Tags:</legend></fieldset>
-        <h3>Summary:</h3>
-        <textarea id="ArticleSummary"></textarea>
-        <h3>Content:</h3>
+        <h3 id="ArticleEditContentHeading">Content:</h3>
         <div id="CodeMirrorToolbar">
             <button id="CodeMirrorUndoButton">Undo</button>
             <button id="CodeMirrorRedoButton">Redo</button>

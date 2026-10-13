@@ -876,6 +876,18 @@ export class Article extends Module {
         if (fmt == "asciidoc") asciidoc.show()
     }
 
+    setContentOnly(set: boolean) {
+        const s = $("#ArticleEditTagStuff")
+        const h = $("#ArticleEditContentHeading")
+        if (set) {
+            s.hide()
+            h.hide()
+        } else {
+            s.show()
+            h.show()
+        }
+    }
+
     CMSelected(): string {
         const view = this.codeMirror
         if (!view)  {
@@ -1329,6 +1341,13 @@ export class Article extends Module {
         switchEdit.change(() => {
             this.switchEditor(switchEdit.prop("checked"))
         })
+
+        {
+            const c = en.find("#ArticleEditContentCheckbox")
+            c.change(() => {
+                this.setContentOnly(c.prop("checked"))
+            })
+        }
 
         this.mainView(en)
         this.codeMirrorSetup()
