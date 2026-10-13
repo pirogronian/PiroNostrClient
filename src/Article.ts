@@ -921,6 +921,42 @@ export class Article extends Module {
         view.focus()
     }
 
+    CMWrapLines(prefix: string, suffix?: string) {
+        const view = this.codeMirror
+        if (!view)  {
+            console.warn("No CodeMirror editor present!")
+            return
+        }
+        if (suffix == undefined) suffix = prefix
+
+        const trans = view.state.changeByRange(range => {
+            const first = view.state.doc.lineAt(range.from)
+            const last = view.state.doc.lineAt(range.to)
+
+            const modified: string[] = []
+
+            for (let i = first.number; i <= last.number; i++) {
+                const line = view.state.doc.line(i)
+                modified.push(prefix + line.text + suffix)
+            }
+
+            const repl = modified.join("\n")
+            const to = first.from + repl.length
+
+            return {
+                changes: {
+                    from: first.from,
+                    to: last.to,
+                    insert: repl
+                },
+                range: CodeMirror.selection.range(first.from, to)
+            }
+        })
+
+        view.dispatch(trans)
+        view.focus()
+    }
+
     CMDjotVerb() {
         this.CMWrapSelection("```")
     }
@@ -1006,7 +1042,7 @@ export class Article extends Module {
     CMDjotHeading(level: number) {
         if (level > 0 && level < 7) {
             const prefix = "#".repeat(level) + " "
-            this.CMWrapSelection(prefix, "")
+            this.CMWrapLines(prefix, "")
         }
     }
 
