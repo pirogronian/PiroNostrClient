@@ -722,6 +722,7 @@ export class Article extends Module {
             }
         })
         this.onFormatUpdate()
+        $("#ArticleRememberFormat").prop("checked", this.useLastFormat)
     }
 
     applyEditor() {
@@ -872,6 +873,10 @@ export class Article extends Module {
         asciidoc.hide()
         if (fmt == "djot") djot.show()
         if (fmt == "asciidoc") asciidoc.show()
+        if (this.useLastFormat) {
+            this.lastFormat = fmt
+            this.saveSettings()
+        }
     }
 
     setContentOnly(set: boolean) {
@@ -1267,9 +1272,9 @@ export class Article extends Module {
             fmt.val(format)
             this.onFormatUpdate()
         })
-        if (this.useLastFormat)  {
-            console.debug("Use last format:", this.lastFormat)
+        if (this.useLastFormat) {
             fmtSel.val(this.lastFormat)
+            fmt.val(this.lastFormat)
         }
         
         const topicL = en.find("label[for='ArticleTopic']")
@@ -1372,6 +1377,7 @@ export class Article extends Module {
                 else t.show()
             })
         }
+        en.find("#ArticleRememberFormat").prop("checked", this.useLastFormat)
 
         this.mainView(en)
         this.codeMirrorSetup()
