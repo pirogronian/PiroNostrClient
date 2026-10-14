@@ -1269,6 +1269,10 @@ export class Article extends Module {
             fmt.val(format)
             this.onFormatUpdate()
         })
+        if (this.useLastFormat)  {
+            console.debug("Use last format:", this.lastFormat)
+            fmtSel.val(this.lastFormat)
+        }
         
         const topicL = en.find("label[for='ArticleTopic']")
         const topicI = topicL.find("input")
