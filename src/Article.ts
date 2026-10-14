@@ -933,7 +933,7 @@ export class Article extends Module {
         view.focus()
     }
 
-    CMWrapLines(prefix: string, suffix?: string) {
+    CMWrapLines(prefix: string, suffix?: string, strict: boolean = true) {
         const view = this.codeMirror
         if (!view)  {
             console.warn("No CodeMirror editor present!")
@@ -947,21 +947,34 @@ export class Article extends Module {
 
             const modified: string[] = []
 
+            let begin: number, end: number
             for (let i = first.number; i <= last.number; i++) {
+                begin = 0
+                end = 0
                 const line = view.state.doc.line(i)
-                modified.push(prefix + line.text + suffix)
+                if (strict && line.number == first.number) {
+                    begin = range.from - line.from
+                    //console.debug("First line, begin = ", range.from, line.from)
+                }
+                if (strict && line.number == last.number) {
+                    //console.debug("End line:", line.to, range.to)
+                    end = line.to - range.to
+                }
+                const text = line.text.slice(begin, line.text.length - end)
+                modified.push(prefix + text + suffix)
             }
 
             const repl = modified.join("\n")
-            const to = first.from + repl.length
+            const from = (strict? range.from : first.from) + prefix.length
+            const to = from + repl.length - suffix.length - (strict? end : 0)
 
             return {
                 changes: {
-                    from: first.from,
-                    to: last.to,
+                    from: strict? range.from : first.from,
+                    to: strict? range.to : last.to,
                     insert: repl
                 },
-                range: CodeMirror.selection.range(first.from, to)
+                range: CodeMirror.selection.range(from, to)
             }
         })
 
@@ -1091,12 +1104,12 @@ export class Article extends Module {
     CMDjotHeading(level: number) {
         if (level > 0 && level < 7) {
             const prefix = "#".repeat(level) + " "
-            this.CMWrapLines(prefix, "")
+            this.CMWrapLines(prefix, "", false)
         }
     }
 
     CMDjotBlQuote() {
-        this.CMWrapSelection("> ", "")
+        this.CMWrapLines("> ", "")
     }
 
     codeMirrorSetup() {
