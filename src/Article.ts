@@ -1377,6 +1377,20 @@ export class Article extends Module {
                 else t.show()
             })
         }
+
+        {
+            const c = en.find("#ArticleEditSafeModeCheckbox")
+            c.change(() => {
+                if (c.prop("checked")) {
+                    draftNewButt.hide()
+                    pubButt.hide()
+                } else {
+                    draftNewButt.show()
+                    pubButt.show()
+                }
+            })
+        }
+
         en.find("#ArticleRememberFormat").prop("checked", this.useLastFormat)
 
         this.mainView(en)
