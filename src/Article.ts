@@ -1362,6 +1362,15 @@ export class Article extends Module {
             })
         }
 
+        {
+            const c = en.find("#ArticleEditToolbarCheckbox")
+            const t = en.find("#CodeMirrorToolbar")
+            c.change(() => {
+                if (c.prop("checked"))  t.hide()
+                else t.show()
+            })
+        }
+
         this.mainView(en)
         this.codeMirrorSetup()
         this.onFormatUpdate()
