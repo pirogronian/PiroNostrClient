@@ -407,8 +407,6 @@ export class Article extends Module {
             return
         }
 
-        this.restoreSettings()
-
         const o = $(ArticleViewHTML)
     
         const user = await App.get().user.get(this.event.pubkey)
@@ -1487,15 +1485,18 @@ export class Article extends Module {
     setup() {
         this.onRoute("/edit/:id", (match) => {
             this.setCurrent()
+            this.restoreSettings()
             this.edit(match.data.id)
         })
         this.onRoute("/edit/", (match) => {
             this.setCurrent()
+            this.restoreSettings()
             this.edit(match.params)
         })
         this.onRoute("/:id", (match) => {
             this.setCurrent()
             const addr = match.data.id
+            this.restoreSettings()
             this.view(addr)
         })
         App.get().user.on("login", () => { this.guiUpdateEditButtons() })
