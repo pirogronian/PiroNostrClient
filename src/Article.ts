@@ -1135,6 +1135,10 @@ export class Article extends Module {
         this.CMInsert("\\\n")
     }
 
+    CMDjotParag() {
+        this.CMInsert("\n\n")
+    }
+
     CMDjotLink(label: string, target: string) {
         this.CMInsert("["+label+"]")
         this.CMInsert("("+target+")")
@@ -1222,6 +1226,12 @@ export class Article extends Module {
         $("#CodeMirrorDjotQ2").click(() => {
             this.CMDjotQ2()
         })
+        {
+            const s = $("#CodeMirrorDjotInsertNew")
+            s.change(() => {
+                s.val("-")
+            })
+        }
         $("#CodeMirrorDjotEllipse").click(() => {
             this.CMDjotEllipse()
         })
@@ -1245,6 +1255,9 @@ export class Article extends Module {
         })
         $("#CodeMirrorDjotBreak").click(() => {
             this.CMDjotBreak()
+        })
+        $("#CodeMirrorDjotParagraph").click(() => {
+            this.CMDjotParag()
         })
         {
             const s = $("#CodeMirrorDjotLinkSelector")
