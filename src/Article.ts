@@ -51,7 +51,7 @@ export class Article extends Module {
     codeMirror?: CodeMirrorEditorView
     guiShowContentOnly: boolean = false
     guiHideToolbar: boolean = false
-    guiSafeMode: boolean = false
+    guiSafeMode: boolean = true
 
     constructor() {
         super()
