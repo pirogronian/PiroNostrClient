@@ -36,6 +36,10 @@ import "@/Article.scss"
 const LAST_ARTICLE_FORMAT_KEY = "last_format"
 const USE_LAST_ARTICLE_FORMAT_KEY = "use_last_format"
 
+const SHOW_CONTENT_ONLY_SETTING = "show_content_only"
+const HIDE_TOOLBAR_SETTING = "hide_toolbar"
+const SAFE_MODE_SETTING = "safe_mode"
+
 export class Article extends Module {
     event: NDKEvent|null = null
     wiki: NDKWiki|null = null
@@ -45,6 +49,9 @@ export class Article extends Module {
     editorNode: JQuery<HTMLElement>|undefined
     draftId: string|undefined
     codeMirror?: CodeMirrorEditorView
+    guiShowContentOnly: boolean = false
+    guiHideToolbar: boolean = false
+    guiSafeMode: boolean = false
 
     constructor() {
         super()
@@ -53,6 +60,9 @@ export class Article extends Module {
     saveSettings() {
         this.settings(LAST_ARTICLE_FORMAT_KEY, this.lastFormat)
         this.settings(USE_LAST_ARTICLE_FORMAT_KEY, this.useLastFormat? "1": null)
+        this.settings(SHOW_CONTENT_ONLY_SETTING, this.guiShowContentOnly? "1": null)
+        this.settings(HIDE_TOOLBAR_SETTING, this.guiHideToolbar? "1": null)
+        this.settings(SAFE_MODE_SETTING, this.guiSafeMode? "1": null)
     }
 
     restoreSettings() {
@@ -60,6 +70,9 @@ export class Article extends Module {
         this.lastFormat = tmp ? tmp : ""
         tmp = this.settings(USE_LAST_ARTICLE_FORMAT_KEY)
         this.useLastFormat = tmp ? true : false
+        this.guiShowContentOnly = this.settings(SHOW_CONTENT_ONLY_SETTING)? true : false
+        this.guiHideToolbar = this.settings(HIDE_TOOLBAR_SETTING)? true : false
+        this.guiSafeMode = this.settings(SAFE_MODE_SETTING)? true : false
     }
 
     setEvent(event: NDKEvent) {
@@ -670,6 +683,12 @@ export class Article extends Module {
     }
 
     guiUpdateEditor() {
+        $("#ArticleEditContentCheckbox").prop("checked", this.guiShowContentOnly)
+        this.guiUpdateNonContentVisibility()
+        $("#ArticleEditToolbarCheckbox").prop("checked", this.guiHideToolbar)
+        this.guiUpdateToolbarVisibility()
+        $("#ArticleEditSafeModeCheckbox").prop("checked", this.guiSafeMode)
+        this.guiUpdateSafeMode()
         if (!this.wiki)  return
         const en = this.editorNode
         en.find("input[name='ArticleTitle']").val(this.wiki.title)
@@ -888,6 +907,28 @@ export class Article extends Module {
         } else {
             s.show()
             h.show()
+        }
+    }
+
+    guiUpdateNonContentVisibility() {
+        this.setContentOnly(this.guiShowContentOnly)
+    }
+
+    guiUpdateToolbarVisibility() {
+        const t = $("#CodeMirrorToolbar")
+        if (this.guiHideToolbar) t.hide()
+        else t.show()
+    }
+
+    guiUpdateSafeMode() {
+        const nd = $("#ArticleDraftNewButton")
+        const p = $("#ArticlePublishButton")
+        if (this.guiSafeMode) {
+            nd.hide()
+            p.hide()
+        } else {
+            nd.show()
+            p.show()
         }
     }
 
@@ -1474,29 +1515,27 @@ export class Article extends Module {
         {
             const c = en.find("#ArticleEditContentCheckbox")
             c.change(() => {
-                this.setContentOnly(c.prop("checked"))
+                this.guiShowContentOnly = c.prop("checked")
+                this.guiUpdateNonContentVisibility()
+                this.saveSettings()
             })
         }
 
         {
             const c = en.find("#ArticleEditToolbarCheckbox")
-            const t = en.find("#CodeMirrorToolbar")
             c.change(() => {
-                if (c.prop("checked"))  t.hide()
-                else t.show()
+                this.guiHideToolbar = c.prop("checked")
+                this.guiUpdateToolbarVisibility()
+                this.saveSettings()
             })
         }
 
         {
             const c = en.find("#ArticleEditSafeModeCheckbox")
             c.change(() => {
-                if (c.prop("checked")) {
-                    draftNewButt.hide()
-                    pubButt.hide()
-                } else {
-                    draftNewButt.show()
-                    pubButt.show()
-                }
+                this.guiSafeMode = c.prop("checked")
+                this.guiUpdateSafeMode()
+                this.saveSettings()
             })
         }
 
