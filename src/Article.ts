@@ -1253,7 +1253,13 @@ export class Article extends Module {
         $("#CodeMirrorDjotMDash").click(() => {
             this.CMDjotMDash()
         })
-        $("#CodeMirrorDjotMath").click(() => {
+        {
+            const s = $("#CodeMirrorDjotMath")
+            s.change(() => {
+                s.val("-")
+            })
+        }
+        $("#CodeMirrorDjotMathInline").click(() => {
             this.CMDjotMath()
         })
         $("#CodeMirrorDjotMathBlock").click(() => {
