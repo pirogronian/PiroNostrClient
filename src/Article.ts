@@ -1226,6 +1226,12 @@ export class Article extends Module {
         $("#CodeMirrorDjotDel").click(() => {
             this.CMDjotDel()
         })
+        {
+            const s = $("#CodeMirrorDjotQuote")
+            s.change(() => {
+                s.val("-")
+            })
+        }
         $("#CodeMirrorDjotQ1").click(() => {
             this.CMDjotQ1()
         })
@@ -1412,7 +1418,7 @@ export class Article extends Module {
                 s.val("Heading")
             })
         }
-        $("#CodeMirrorDjotBlQuote").click(() => {
+        $("#CodeMirrorDjotQBl").click(() => {
             this.CMDjotBlQuote()
         })
 

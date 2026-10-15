@@ -65,8 +65,12 @@
                 <option id="CodeMirrorDjotIns">Ins</option>
                 <option id="CodeMirrorDjotDel">Del</option>
             </select>
-            <button id="CodeMirrorDjotQ1" class="djot">'</button>
-            <button id="CodeMirrorDjotQ2" class="djot">"</button>
+            <select id="CodeMirrorDjotQuote" class="djot">
+                <option value="-">Quote:</option>
+                <option id="CodeMirrorDjotQ1">Single</option>
+                <option id="CodeMirrorDjotQ2">Double</option>
+                <option id="CodeMirrorDjotQBl">Block</option>
+            </select>
             <select id="CodeMirrorDjotInsertNew" class="djot">
                 <option value="-">Insert:</option>
                 <option id="CodeMirrorDjotEllipse">...</option>
@@ -130,7 +134,6 @@
                 <option>5</option>
                 <option>6</option>
             </select>
-            <button id="CodeMirrorDjotBlQuote" class="djot">Block quote</button>
             <span class="djot">Comprehensive instructions of using Djot are <a href="https://htmlpreview.github.io/?https://github.com/jgm/djot/blob/master/doc/syntax.html" target="_blank">on this page</a>.</span>
         </div>
         <div id="CodeMirrorContainer"></div>
