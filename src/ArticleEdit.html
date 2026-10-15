@@ -96,12 +96,22 @@
                 <button id="CodeMirrorDjotLinkRefDialogCancel">Cancel</button>
                 <button id="CodeMirrorDjotLinkRefDialogInsert">Insert</button>
             </dialog>
-            <button id="CodeMirrorDjotImage" class="djot">Image</button>
+            <select id="CodeMirrorDjotImageSelector" class="djot">
+                <option value="-">Images:</option>
+                <option id="CodeMirrorDjotImage">Image</option>
+                <option id="CodeMirrorDjotRefImage">Ref. image</option>
+            </select>
             <dialog id="CodeMirrorDjotImageDialog">
                 <label>Label:<input type="text" id="CodeMirrorDjotImageDialogLabel"/></label>
                 <label>Target:<input type="text" id="CodeMirrorDjotImageDialogTarget"/></label>
                 <button id="CodeMirrorDjotImageDialogCancel">Cancel</button>
                 <button id="CodeMirrorDjotImageDialogInsert">Insert</button>
+            </dialog>
+            <dialog id="CodeMirrorDjotRefImageDialog">
+                <label>Label:<input type="text" id="CodeMirrorDjotRefImageDialogLabel"/></label>
+                <label>Reference:<input type="text" id="CodeMirrorDjotRefImageDialogRef"/></label>
+                <button id="CodeMirrorDjotRefImageDialogCancel">Cancel</button>
+                <button id="CodeMirrorDjotRefImageDialogInsert">Insert</button>
             </dialog>
             <select id="CodeMirrorDjotHeading" class="djot">
                 <option>Heading</option>

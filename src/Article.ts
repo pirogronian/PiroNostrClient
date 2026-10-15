@@ -1114,6 +1114,11 @@ export class Article extends Module {
         this.CMInsert("("+target+")")
     }
 
+    CMDjotRefImage(label: string, ref: string) {
+        this.CMInsert("!["+label+"]")
+        this.CMInsert("["+ref+"]")
+    }
+
     CMDjotHeading(level: number) {
         if (level > 0 && level < 7) {
             const prefix = "#".repeat(level) + " "
@@ -1278,6 +1283,12 @@ export class Article extends Module {
             })
         }
         {
+            const s = $("#CodeMirrorDjotImageSelector")
+            s.change(() => {
+                s.val("-")
+            })
+        }
+        {
             const b = $("#CodeMirrorDjotImage")
             const d = $("#CodeMirrorDjotImageDialog")
             const l = $("#CodeMirrorDjotImageDialogLabel")
@@ -1298,6 +1309,31 @@ export class Article extends Module {
                 const target = t.val()
                 if (target) {
                     this.CMDjotImage(label, target)
+                    d.prop("open", false)
+                }
+            })
+        }
+        {
+            const b = $("#CodeMirrorDjotRefImage")
+            const d = $("#CodeMirrorDjotRefImageDialog")
+            const l = $("#CodeMirrorDjotRefImageDialogLabel")
+            const t = $("#CodeMirrorDjotRefImageDialogRef")
+            const c = $("#CodeMirrorDjotRefImageDialogCancel")
+            const i = $("#CodeMirrorDjotRefImageDialogInsert")
+            b.click(() => {
+                const text = this.CMSelected()
+                l.val(text)
+                t.val(text)
+                d.prop("open", true)
+            })
+            c.click(() => {
+                d.prop("open", false)
+            })
+            i.click(() => {
+                const label = l.val()
+                const ref = t.val()
+                if (ref) {
+                    this.CMDjotRefImage(label, ref)
                     d.prop("open", false)
                 }
             })
