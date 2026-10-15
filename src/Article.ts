@@ -1109,6 +1109,10 @@ export class Article extends Module {
         this.CMInsert(target)
     }
 
+    CMDjotAutolink() {
+        this.CMWrapSelection("<", ">")
+    }
+
     CMDjotImage(label: string, target: string) {
         this.CMInsert("!["+label+"]")
         this.CMInsert("("+target+")")
@@ -1282,6 +1286,9 @@ export class Article extends Module {
                 }
             })
         }
+        $("#CodeMirrorDjotAutolink").click(() => {
+            this.CMDjotAutolink()
+        })
         {
             const s = $("#CodeMirrorDjotImageSelector")
             s.change(() => {
