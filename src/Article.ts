@@ -1196,6 +1196,12 @@ export class Article extends Module {
             CodeMirror.redo(view)
             view.focus()
         })
+        {
+            const s = $("#CodeMirrorDjotText")
+            s.change(() => {
+                s.val("-")
+            })
+        }
         $("#CodeMirrorDjotVerb").click(() => {
             this.CMDjotVerb()
         })
