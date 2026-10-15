@@ -1099,6 +1099,16 @@ export class Article extends Module {
         this.CMInsert("("+target+")")
     }
 
+    CMDjotRefLink(label: string, ref: string) {
+        this.CMInsert("["+label+"]")
+        this.CMInsert("["+ref+"]")
+    }
+
+    CMDjotLinkRef(ref: string, target: string) {
+        this.CMInsert("["+ref+"]: ")
+        this.CMInsert(target)
+    }
+
     CMDjotImage(label: string, target: string) {
         this.CMInsert("!["+label+"]")
         this.CMInsert("("+target+")")
@@ -1207,6 +1217,56 @@ export class Article extends Module {
                 const target = t.val()
                 if (label && target) {
                     this.CMDjotLink(label, target)
+                    d.prop("open", false)
+                }
+            })
+        }
+        {
+            const b = $("#CodeMirrorDjotRefLink")
+            const d = $("#CodeMirrorDjotRefLinkDialog")
+            const l = $("#CodeMirrorDjotRefLinkDialogLabel")
+            const t = $("#CodeMirrorDjotRefLinkDialogRef")
+            const c = $("#CodeMirrorDjotRefLinkDialogCancel")
+            const i = $("#CodeMirrorDjotRefLinkDialogInsert")
+            b.click(() => {
+                const text = this.CMSelected()
+                l.val(text)
+                t.val(text)
+                d.prop("open", true)
+            })
+            c.click(() => {
+                d.prop("open", false)
+            })
+            i.click(() => {
+                const label = l.val()
+                const ref = t.val()
+                if (label && ref) {
+                    this.CMDjotRefLink(label, ref)
+                    d.prop("open", false)
+                }
+            })
+        }
+        {
+            const b = $("#CodeMirrorDjotLinkRef")
+            const d = $("#CodeMirrorDjotLinkRefDialog")
+            const l = $("#CodeMirrorDjotLinkRefDialogRef")
+            const t = $("#CodeMirrorDjotLinkRefDialogTarget")
+            const c = $("#CodeMirrorDjotLinkRefDialogCancel")
+            const i = $("#CodeMirrorDjotLinkRefDialogInsert")
+            b.click(() => {
+                const text = this.CMSelected()
+                l.val(text)
+                t.val(text)
+                d.prop("open", true)
+            })
+            c.click(() => {
+                d.prop("open", false)
+            })
+            i.click(() => {
+                const ref = l.val()
+                const target = t.val()
+                if (ref && target) {
+                    this.CMDjotLinkRef(ref, target)
                     d.prop("open", false)
                 }
             })
