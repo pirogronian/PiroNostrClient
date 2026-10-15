@@ -1197,6 +1197,12 @@ export class Article extends Module {
             this.CMDjotBreak()
         })
         {
+            const s = $("#CodeMirrorDjotLinkSelector")
+            s.change(() => {
+                s.val("-")
+            })
+        }
+        {
             const b = $("#CodeMirrorDjotLink")
             const d = $("#CodeMirrorDjotLinkDialog")
             const l = $("#CodeMirrorDjotLinkDialogLabel")

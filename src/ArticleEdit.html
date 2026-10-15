@@ -72,9 +72,12 @@
             <button id="CodeMirrorDjotFootnRef" class="djot">Footn. ref.</button>
             <button id="CodeMirrorDjotFootn" class="djot">Footn.</button>
             <button id="CodeMirrorDjotBreak" class="djot">Break</button>
-            <button id="CodeMirrorDjotLink" class="djot">Link</button>
-            <button id="CodeMirrorDjotRefLink" class="djot">Ref. link</button>
-            <button id="CodeMirrorDjotLinkRef" class="djot">Link ref.</button>
+            <select id="CodeMirrorDjotLinkSelector" class="djot">
+                <option value="-">Link:</option>
+                <option id="CodeMirrorDjotLink">Direct link</option>
+                <option id="CodeMirrorDjotRefLink">Ref. link</option>
+                <option id="CodeMirrorDjotLinkRef">Link ref.</option>
+            </select>
             <dialog id="CodeMirrorDjotLinkDialog">
                 <label>Label:<input type="text" id="CodeMirrorDjotLinkDialogLabel"/></label>
                 <label>Target:<input type="text" id="CodeMirrorDjotLinkDialogTarget"/></label>
@@ -88,7 +91,7 @@
                 <button id="CodeMirrorDjotRefLinkDialogInsert">Insert</button>
             </dialog>
             <dialog id="CodeMirrorDjotLinkRefDialog">
-                <label>Label:<input type="text" id="CodeMirrorDjotLinkRefDialogRef"/></label>
+                <label>Reference:<input type="text" id="CodeMirrorDjotLinkRefDialogRef"/></label>
                 <label>Target:<input type="text" id="CodeMirrorDjotLinkRefDialogTarget"/></label>
                 <button id="CodeMirrorDjotLinkRefDialogCancel">Cancel</button>
                 <button id="CodeMirrorDjotLinkRefDialogInsert">Insert</button>
