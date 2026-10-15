@@ -1265,10 +1265,16 @@ export class Article extends Module {
         $("#CodeMirrorDjotMathBlock").click(() => {
             this.CMDjotMathBlock()
         })
-        $("#CodeMirrorDjotFootnRef").click(() => {
+        {
+            const s = $("#CodeMirrorDjotFootnote")
+            s.change(() => {
+                s.val("-")
+            })
+        }
+        $("#CodeMirrorDjotFootnoteRef").click(() => {
             this.CMDjotFootnRef()
         })
-        $("#CodeMirrorDjotFootn").click(() => {
+        $("#CodeMirrorDjotFootnoteDef").click(() => {
             this.CMDjotFootn()
         })
         $("#CodeMirrorDjotBreak").click(() => {
