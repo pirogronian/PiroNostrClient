@@ -76,6 +76,8 @@ export class Relays extends Module {
 
     relays: { [url: string]: NDKRelay } = {}
 
+    knownTags: Set<string> = new Set<string>()
+
     saveSettings() {
         this.settings("autoUse", this.autoUse ? "1" : null)
         this.settings("autoConnect", this.autoConnect ? "1" : null)
@@ -320,6 +322,7 @@ export class Relays extends Module {
             return false
         }
         s.tags.push(tag)
+
         return true
     }
 
@@ -517,6 +520,31 @@ export class Relays extends Module {
         return rin
     }
 
+    guiCreateKnownTag(tag: string): JQuery<HTMLElement> {
+        const op = $("<option>")
+        op.text(tag)
+        return op
+    }
+
+    guiUpdateTagList() {
+        const dl = $("#AllRelaysTags")
+        dl.empty()
+        for (const tag of this.knownTags) {
+            dl.append(this.guiCreateKnownTag(tag))
+        }
+    }
+
+    guiAddKnownTag(tag: string) {
+        $("#AllRelaysTags").append(this.guiCreateKnownTag(tag))
+    }
+
+    guiRemoveKnownTag(tag: string) {
+        $("#AllRelaysTags").children().each((index, op) => {
+            op = $(op)
+            if (op.val() == tag)  op.remove()
+        })
+    }
+
     guiCreateTag(url: string, tag: string): JQuery<HTMLElement> {
         const div = $("<div>")
         div.addClass("RemovableItem")
@@ -527,6 +555,9 @@ export class Relays extends Module {
             div.remove()
             this.saveKnown()
         })
+        if (!this.knownTags.has(tag)) {
+            this.knownTags.add(tag)
+        }
 
         return div
     }
@@ -811,6 +842,8 @@ export class Relays extends Module {
         })
 
         App.get().user.guiPublishRelaysButtonSetup()
+
+        this.guiUpdateTagList()
 
         return [Head, arl, orl]
     }
