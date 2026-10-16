@@ -76,7 +76,7 @@ export class Relays extends Module {
 
     relays: { [url: string]: NDKRelay } = {}
 
-    knownTags: Set<string> = new Set<string>()
+    knownTags: Map<string, number> = new Map<string, number>()
 
     saveSettings() {
         this.settings("autoUse", this.autoUse ? "1" : null)
@@ -315,6 +315,31 @@ export class Relays extends Module {
         }
     }
 
+    addKnownTag(tag: string) {
+        let n = this.knownTags.get(tag)
+        if (n == undefined) n = 1
+        else n++
+        this.knownTags.set(tag, n)
+    }
+
+    delKnownTag(tag: string) {
+        let n = this.knownTags.get(tag)
+        if (n == undefined)  return
+        if (n < 2) this.knownTags.delete(tag)
+        else this.knownTags.set(tag, n-1)
+    }
+
+    loadKnownTags() {
+        for (const url in this.known) {
+            const info = this.known[url]
+            if (info) {
+                for (const tag of info.tags) {
+                    this.addKnownTag(tag)
+                }
+            }
+        }
+    }
+
     addTag(relay: NDKRelay|string, tag: string): boolean {
         const s = this.relaySettings(relay)
         if (s.tags.includes(tag)) {
@@ -322,6 +347,7 @@ export class Relays extends Module {
             return false
         }
         s.tags.push(tag)
+        this.addKnownTag(tag)
 
         return true
     }
@@ -334,11 +360,22 @@ export class Relays extends Module {
             return
         }
         s.tags.splice(key, 1)
+        this.delKnownTag(tag)
     }
 
     getTags(relay: NDKRelay|string): string[] {
         const s = this.relaySettings(relay)
         return s.tags
+    }
+
+    getRelaysByTag(tag: string): string[] {
+        const ret: string[] = []
+        for (const url in this.known) {
+            if (this.known[url] && this.known[url].tags.includes(tag))
+                ret.push(url)
+        }
+
+        return ret
     }
 
     onConnectedUpdate() {
@@ -520,29 +557,22 @@ export class Relays extends Module {
         return rin
     }
 
-    guiCreateKnownTag(tag: string): JQuery<HTMLElement> {
+    guiCreateKnownTag(tag: string, count: number): JQuery<HTMLElement> {
         const op = $("<option>")
-        op.text(tag)
+        op.prop("value", tag)
+        op.text(`${tag} (${count})`)
         return op
     }
 
     guiUpdateTagList() {
+        console.debug("Update tag list()")
+        console.debug(this.knownTags)
         const dl = $("#AllRelaysTags")
         dl.empty()
-        for (const tag of this.knownTags) {
-            dl.append(this.guiCreateKnownTag(tag))
+        for (const [tag, number] of this.knownTags) {
+//            console.debug("Update tag list:", tag, number)
+            dl.append(this.guiCreateKnownTag(tag, number))
         }
-    }
-
-    guiAddKnownTag(tag: string) {
-        $("#AllRelaysTags").append(this.guiCreateKnownTag(tag))
-    }
-
-    guiRemoveKnownTag(tag: string) {
-        $("#AllRelaysTags").children().each((index, op) => {
-            op = $(op)
-            if (op.val() == tag)  op.remove()
-        })
     }
 
     guiCreateTag(url: string, tag: string): JQuery<HTMLElement> {
@@ -554,10 +584,8 @@ export class Relays extends Module {
             this.delTag(url, tag)
             div.remove()
             this.saveKnown()
+            this.guiUpdateTagList()
         })
-        if (!this.knownTags.has(tag)) {
-            this.knownTags.add(tag)
-        }
 
         return div
     }
@@ -646,6 +674,7 @@ export class Relays extends Module {
                 if (!tag)  return
                 if (!this.addTag(url, tag))  return
                 this.saveKnown()
+                this.guiUpdateTagList()
                 const div = this.guiCreateTag(url, tag)
                 tagsC.append(div)
             })
@@ -1026,6 +1055,7 @@ export class Relays extends Module {
 
         this.loadSettins()
         this.load()
+        this.loadKnownTags()
         this.onConnectedUpdate()
     }
 }
