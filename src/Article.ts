@@ -1450,7 +1450,12 @@ export class Article extends Module {
             })
         }
 
-        en.find("#ArticleRememberFormat").prop("checked", this.useLastFormat)
+        const arf = en.find("#ArticleRememberFormat")
+        arf.prop("checked", this.useLastFormat)
+        arf.change(() => {
+            this.useLastFormat = arf.prop("checked")
+            this.saveSettings()
+        })
 
         this.mainView(en)
         this.codeMirrorSetup()
