@@ -1179,6 +1179,41 @@ export class Article extends Module {
         this.CMWrapLines("> ", "")
     }
 
+    readonly CMDjotTextMap: Record<string, () => void> = {
+        verb: this.CMDjotVerb.bind(this),
+        emph: this.CMDjotEmph.bind(this),
+        strong: this.CMDjotStrong.bind(this),
+        high: this.CMDjotHigh.bind(this),
+        sup: this.CMDjotSup.bind(this),
+        sub: this.CMDjotSub.bind(this),
+        ins: this.CMDjotIns.bind(this),
+        del: this.CMDjotDel.bind(this)
+    }
+
+    readonly CMDjotQuoteMap: Record<string, () => void> = {
+        1: this.CMDjotQ1.bind(this),
+        2: this.CMDjotQ2.bind(this),
+        bl: this.CMDjotBlQuote.bind(this)
+    }
+
+    readonly CMDjotInsertMap: Record<string, () => void> = {
+        ellipse: this.CMDjotEllipse.bind(this),
+        ndash: this.CMDjotNDash.bind(this),
+        mdash: this.CMDjotMDash.bind(this),
+        break: this.CMDjotBreak.bind(this),
+        parag: this.CMDjotParag.bind(this),
+    }
+
+    readonly CMDjotMathMap: Record<string, () => void> = {
+        inline: this.CMDjotMath.bind(this),
+        block: this.CMDjotMathBlock.bind(this),
+    }
+
+    readonly CMDjotFootnMap: Record<string, () => void> = {
+        ref: this.CMDjotFootnRef.bind(this),
+        def: this.CMDjotFootn.bind(this),
+    }
+
     codeMirrorSetup() {
         const c = $("#CodeMirrorContainer")
         const view = new CodeMirror.view({
@@ -1199,90 +1234,52 @@ export class Article extends Module {
         {
             const s = $("#CodeMirrorDjotText")
             s.change(() => {
+                const op = s.val()
+                const handler = this.CMDjotTextMap[op]
+                if (handler)  handler()
                 s.val("-")
             })
         }
-        $("#CodeMirrorDjotVerb").click(() => {
-            this.CMDjotVerb()
-        })
-        $("#CodeMirrorDjotEmph").click(() => {
-            this.CMDjotEmph()
-        })
-        $("#CodeMirrorDjotStrong").click(() => {
-            this.CMDjotStrong()
-        })
-        $("#CodeMirrorDjotHigh").click(() => {
-            this.CMDjotHigh()
-        })
-        $("#CodeMirrorDjotSup").click(() => {
-            this.CMDjotSup()
-        })
-        $("#CodeMirrorDjotSub").click(() => {
-            this.CMDjotSub()
-        })
-        $("#CodeMirrorDjotIns").click(() => {
-            this.CMDjotIns()
-        })
-        $("#CodeMirrorDjotDel").click(() => {
-            this.CMDjotDel()
-        })
+        
         {
             const s = $("#CodeMirrorDjotQuote")
             s.change(() => {
+                const op = s.val()
+                const h = this.CMDjotQuoteMap[op]
+                if (h)  h()
                 s.val("-")
             })
         }
-        $("#CodeMirrorDjotQ1").click(() => {
-            this.CMDjotQ1()
-        })
-        $("#CodeMirrorDjotQ2").click(() => {
-            this.CMDjotQ2()
-        })
         {
             const s = $("#CodeMirrorDjotInsertNew")
             s.change(() => {
+                const op = s.val()
+                const h = this.CMDjotInsertMap[op]
+                if (h)  h()
                 s.val("-")
             })
         }
-        $("#CodeMirrorDjotEllipse").click(() => {
-            this.CMDjotEllipse()
-        })
-        $("#CodeMirrorDjotNDash").click(() => {
-            this.CMDjotNDash()
-        })
-        $("#CodeMirrorDjotMDash").click(() => {
-            this.CMDjotMDash()
-        })
+        
         {
             const s = $("#CodeMirrorDjotMath")
             s.change(() => {
+                const op = s.val()
+                const h = this.CMDjotMathMap[op]
+                if (h)  h()
                 s.val("-")
             })
         }
-        $("#CodeMirrorDjotMathInline").click(() => {
-            this.CMDjotMath()
-        })
-        $("#CodeMirrorDjotMathBlock").click(() => {
-            this.CMDjotMathBlock()
-        })
+
         {
             const s = $("#CodeMirrorDjotFootnote")
             s.change(() => {
+                const op = s.val()
+                const h = this.CMDjotFootnMap[op]
+                if (h)  h()
                 s.val("-")
             })
         }
-        $("#CodeMirrorDjotFootnoteRef").click(() => {
-            this.CMDjotFootnRef()
-        })
-        $("#CodeMirrorDjotFootnoteDef").click(() => {
-            this.CMDjotFootn()
-        })
-        $("#CodeMirrorDjotBreak").click(() => {
-            this.CMDjotBreak()
-        })
-        $("#CodeMirrorDjotParagraph").click(() => {
-            this.CMDjotParag()
-        })
+        
         {
             const s = $("#CodeMirrorDjotLinkSelector")
             s.change(() => {
@@ -1430,9 +1427,6 @@ export class Article extends Module {
                 s.val("Heading")
             })
         }
-        $("#CodeMirrorDjotQBl").click(() => {
-            this.CMDjotBlQuote()
-        })
 
         this.codeMirror = view
     }
