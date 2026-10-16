@@ -89,47 +89,48 @@
                 <option value="ref">Ref.</option>
                 <option value="def">Def.</option>
             </select>
-            <select id="CodeMirrorDjotLinkSelector" class="djot">
+            <select id="CodeMirrorDjotLink" class="djot">
                 <option value="-">Link:</option>
-                <option id="CodeMirrorDjotLink">Direct link</option>
-                <option id="CodeMirrorDjotRefLink">Ref. link</option>
-                <option id="CodeMirrorDjotLinkRef">Link ref.</option>
-                <option id="CodeMirrorDjotAutolink">Autolink</option>
+                <option value="direct">Direct link</option>
+                <option value="ref">Ref. link</option>
+                <option value="def">Link ref.</option>
+                <option value="auto">Autolink</option>
             </select>
             <dialog id="CodeMirrorDjotLinkDialog">
-                <label>Label:<input type="text" id="CodeMirrorDjotLinkDialogLabel"/></label>
-                <label>Target:<input type="text" id="CodeMirrorDjotLinkDialogTarget"/></label>
-                <button id="CodeMirrorDjotLinkDialogCancel">Cancel</button>
-                <button id="CodeMirrorDjotLinkDialogInsert">Insert</button>
+                <label>Label:<input type="text" class="Key"/></label>
+                <label>Target:<input type="text" class="Target"/></label>
+                <button class="Cancel">Cancel</button>
+                <button class="Insert">Insert</button>
             </dialog>
             <dialog id="CodeMirrorDjotRefLinkDialog">
-                <label>Label:<input type="text" id="CodeMirrorDjotRefLinkDialogLabel"/></label>
-                <label>Reference:<input type="text" id="CodeMirrorDjotRefLinkDialogRef"/></label>
-                <button id="CodeMirrorDjotRefLinkDialogCancel">Cancel</button>
-                <button id="CodeMirrorDjotRefLinkDialogInsert">Insert</button>
+                <label>Label:<input type="text" class="Key"/></label>
+                <label>Reference:<input type="text" class="Target"/></label>
+                <button class="Cancel">Cancel</button>
+                <button class="Insert">Insert</button>
             </dialog>
             <dialog id="CodeMirrorDjotLinkRefDialog">
-                <label>Reference:<input type="text" id="CodeMirrorDjotLinkRefDialogRef"/></label>
-                <label>Target:<input type="text" id="CodeMirrorDjotLinkRefDialogTarget"/></label>
-                <button id="CodeMirrorDjotLinkRefDialogCancel">Cancel</button>
-                <button id="CodeMirrorDjotLinkRefDialogInsert">Insert</button>
+                <label>Reference:<input type="text" class="Key"/></label>
+                <label>Target:<input type="text" class="Target"/></label>
+                <button class="Cancel">Cancel</button>
+                <button class="Insert">Insert</button>
             </dialog>
-            <select id="CodeMirrorDjotImageSelector" class="djot">
+            <select id="CodeMirrorDjotImage" class="djot">
                 <option value="-">Images:</option>
-                <option id="CodeMirrorDjotImage">Image</option>
-                <option id="CodeMirrorDjotRefImage">Ref. image</option>
+                <option value="direct">Image</option>
+                <option value="ref">Ref. image</option>
+                <option value="def">Image ref.</option>
             </select>
             <dialog id="CodeMirrorDjotImageDialog">
-                <label>Label:<input type="text" id="CodeMirrorDjotImageDialogLabel"/></label>
-                <label>Target:<input type="text" id="CodeMirrorDjotImageDialogTarget"/></label>
-                <button id="CodeMirrorDjotImageDialogCancel">Cancel</button>
-                <button id="CodeMirrorDjotImageDialogInsert">Insert</button>
+                <label>Label:<input type="text" class="Key"/></label>
+                <label>Target:<input type="text" class="Target"/></label>
+                <button class="Cancel">Cancel</button>
+                <button class="Insert">Insert</button>
             </dialog>
             <dialog id="CodeMirrorDjotRefImageDialog">
-                <label>Label:<input type="text" id="CodeMirrorDjotRefImageDialogLabel"/></label>
-                <label>Reference:<input type="text" id="CodeMirrorDjotRefImageDialogRef"/></label>
-                <button id="CodeMirrorDjotRefImageDialogCancel">Cancel</button>
-                <button id="CodeMirrorDjotRefImageDialogInsert">Insert</button>
+                <label>Label:<input type="text" class="Key"/></label>
+                <label>Reference:<input type="text" class="Target"/></label>
+                <button class="Cancel">Cancel</button>
+                <button class="Insert">Insert</button>
             </dialog>
             <select id="CodeMirrorDjotHeading" class="djot">
                 <option>Heading</option>

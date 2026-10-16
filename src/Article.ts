@@ -1214,12 +1214,47 @@ export class Article extends Module {
         def: this.CMDjotFootn.bind(this),
     }
 
+    CMDjotLinkMap: Record<string, () => void> = {
+        auto: this.CMDjotAutolink.bind(this)
+    }
+    CMDjotImageMap: Record<string, () => void> = {}
+
     guiSelectionMapSetup(select: JQuery<HTMLElement>, map: Record<string, () => void>) {
         select.change(() => {
             const op = select.val()
             const handler = map[op]
             if (handler)  handler()
             select.val("-")
+        })
+    }
+
+    guiMapDialogSetup(
+        dialog: JQuery<HTMLElement>,
+        handler: (key: string, target: string) => void,
+        name: string, register: Record<string, () => void>)
+    {
+        const l = dialog.find(".Key")
+        const t = dialog.find(".Target")
+        const c = dialog.find(".Cancel")
+        const i = dialog.find(".Insert")
+        console.debug(l, t, c, i)
+        register[name] = () =>
+        {
+            const text = this.CMSelected()
+            l.val(text)
+            t.val(text)
+            dialog.prop("open", true)
+        }
+        c.click(() => {
+            dialog.prop("open", false)
+        })
+        i.click(() => {
+            const label = l.val()
+            const target = t.val()
+            if (label && target) {
+                handler(label, target)
+                dialog.prop("open", false)
+            }
         })
     }
 
@@ -1245,147 +1280,26 @@ export class Article extends Module {
         this.guiSelectionMapSetup($("#CodeMirrorDjotInsertNew"), this.CMDjotInsertMap)
         this.guiSelectionMapSetup($("#CodeMirrorDjotMath"), this.CMDjotMathMap)
         this.guiSelectionMapSetup($("#CodeMirrorDjotFootnote"), this.CMDjotFootnMap)
+        this.guiSelectionMapSetup($("#CodeMirrorDjotLink"), this.CMDjotLinkMap)
+        this.guiMapDialogSetup($("#CodeMirrorDjotLinkDialog"),
+            this.CMDjotLink.bind(this), "direct", this.CMDjotLinkMap
+        )
+        this.guiMapDialogSetup($("#CodeMirrorDjotRefLinkDialog"),
+            this.CMDjotRefLink.bind(this), "ref", this.CMDjotLinkMap
+        )
+        this.guiMapDialogSetup($("#CodeMirrorDjotLinkRefDialog"),
+            this.CMDjotLinkRef.bind(this), "def", this.CMDjotLinkMap
+        )
         
-        {
-            const s = $("#CodeMirrorDjotLinkSelector")
-            s.change(() => {
-                s.val("-")
-            })
-        }
-        {
-            const b = $("#CodeMirrorDjotLink")
-            const d = $("#CodeMirrorDjotLinkDialog")
-            const l = $("#CodeMirrorDjotLinkDialogLabel")
-            const t = $("#CodeMirrorDjotLinkDialogTarget")
-            const c = $("#CodeMirrorDjotLinkDialogCancel")
-            const i = $("#CodeMirrorDjotLinkDialogInsert")
-            b.click(() => {
-                const text = this.CMSelected()
-                l.val(text)
-                t.val(text)
-                d.prop("open", true)
-            })
-            c.click(() => {
-                d.prop("open", false)
-            })
-            i.click(() => {
-                const label = l.val()
-                const target = t.val()
-                if (label && target) {
-                    this.CMDjotLink(label, target)
-                    d.prop("open", false)
-                }
-            })
-        }
-        {
-            const b = $("#CodeMirrorDjotRefLink")
-            const d = $("#CodeMirrorDjotRefLinkDialog")
-            const l = $("#CodeMirrorDjotRefLinkDialogLabel")
-            const t = $("#CodeMirrorDjotRefLinkDialogRef")
-            const c = $("#CodeMirrorDjotRefLinkDialogCancel")
-            const i = $("#CodeMirrorDjotRefLinkDialogInsert")
-            b.click(() => {
-                const text = this.CMSelected()
-                l.val(text)
-                t.val(text)
-                d.prop("open", true)
-            })
-            c.click(() => {
-                d.prop("open", false)
-            })
-            i.click(() => {
-                const label = l.val()
-                const ref = t.val()
-                if (label && ref) {
-                    this.CMDjotRefLink(label, ref)
-                    d.prop("open", false)
-                }
-            })
-        }
-        {
-            const b = $("#CodeMirrorDjotLinkRef")
-            const d = $("#CodeMirrorDjotLinkRefDialog")
-            const l = $("#CodeMirrorDjotLinkRefDialogRef")
-            const t = $("#CodeMirrorDjotLinkRefDialogTarget")
-            const c = $("#CodeMirrorDjotLinkRefDialogCancel")
-            const i = $("#CodeMirrorDjotLinkRefDialogInsert")
-            b.click(() => {
-                const text = this.CMSelected()
-                l.val(text)
-                t.val(text)
-                d.prop("open", true)
-            })
-            c.click(() => {
-                d.prop("open", false)
-            })
-            i.click(() => {
-                const ref = l.val()
-                const target = t.val()
-                if (ref && target) {
-                    this.CMDjotLinkRef(ref, target)
-                    d.prop("open", false)
-                }
-            })
-        }
-        $("#CodeMirrorDjotAutolink").click(() => {
-            this.CMDjotAutolink()
-        })
-        {
-            const s = $("#CodeMirrorDjotImageSelector")
-            s.change(() => {
-                s.val("-")
-            })
-        }
-        {
-            const b = $("#CodeMirrorDjotImage")
-            const d = $("#CodeMirrorDjotImageDialog")
-            const l = $("#CodeMirrorDjotImageDialogLabel")
-            const t = $("#CodeMirrorDjotImageDialogTarget")
-            const c = $("#CodeMirrorDjotImageDialogCancel")
-            const i = $("#CodeMirrorDjotImageDialogInsert")
-            b.click(() => {
-                const text = this.CMSelected()
-                l.val(text)
-                t.val(text)
-                d.prop("open", true)
-            })
-            c.click(() => {
-                d.prop("open", false)
-            })
-            i.click(() => {
-                const label = l.val()
-                const target = t.val()
-                if (target) {
-                    this.CMDjotImage(label, target)
-                    d.prop("open", false)
-                }
-            })
-        }
-        {
-            const b = $("#CodeMirrorDjotRefImage")
-            const d = $("#CodeMirrorDjotRefImageDialog")
-            const l = $("#CodeMirrorDjotRefImageDialogLabel")
-            const t = $("#CodeMirrorDjotRefImageDialogRef")
-            const c = $("#CodeMirrorDjotRefImageDialogCancel")
-            const i = $("#CodeMirrorDjotRefImageDialogInsert")
-            b.click(() => {
-                const text = this.CMSelected()
-                l.val(text)
-                t.val(text)
-                d.prop("open", true)
-            })
-            c.click(() => {
-                d.prop("open", false)
-            })
-            i.click(() => {
-                const label = l.val()
-                const ref = t.val()
-                if (ref) {
-                    this.CMDjotRefImage(label, ref)
-                    d.prop("open", false)
-                }
-            })
-        }
+        this.guiSelectionMapSetup($("#CodeMirrorDjotImage"), this.CMDjotImageMap)
+        this.guiMapDialogSetup($("#CodeMirrorDjotImageDialog"),
+            this.CMDjotImage.bind(this), "direct", this.CMDjotImageMap
+        )
+        this.guiMapDialogSetup($("#CodeMirrorDjotRefImageDialog"),
+            this.CMDjotRefImage.bind(this), "ref", this.CMDjotImageMap
+        )
+        const def = this.CMDjotLinkMap["def"]
+        if (def)  this.CMDjotImageMap.def = def
         {
             const s = $("#CodeMirrorDjotHeading")
             s.change(() => {
