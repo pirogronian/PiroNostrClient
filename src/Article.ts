@@ -991,7 +991,7 @@ export class Article extends Module {
 
             const modified: string[] = []
 
-            let begin: number, end: number
+            let begin: number = 0, end: number = 0
             for (let i = first.number; i <= last.number; i++) {
                 begin = 0
                 end = 0
@@ -1010,7 +1010,7 @@ export class Article extends Module {
 
             const repl = modified.join("\n")
             const from = (strict? range.from : first.from) + prefix.length
-            const to = from + repl.length - suffix.length - (strict? end : 0)
+            const to = from + repl.length - prefix.length - suffix.length - (strict? end : 0)
 
             return {
                 changes: {
