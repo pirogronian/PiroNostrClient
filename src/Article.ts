@@ -1214,6 +1214,15 @@ export class Article extends Module {
         def: this.CMDjotFootn.bind(this),
     }
 
+    guiSelectionMapSetup(select: JQuery<HTMLElement>, map: Record<string, () => void>) {
+        select.change(() => {
+            const op = select.val()
+            const handler = map[op]
+            if (handler)  handler()
+            select.val("-")
+        })
+    }
+
     codeMirrorSetup() {
         const c = $("#CodeMirrorContainer")
         const view = new CodeMirror.view({
@@ -1231,54 +1240,11 @@ export class Article extends Module {
             CodeMirror.redo(view)
             view.focus()
         })
-        {
-            const s = $("#CodeMirrorDjotText")
-            s.change(() => {
-                const op = s.val()
-                const handler = this.CMDjotTextMap[op]
-                if (handler)  handler()
-                s.val("-")
-            })
-        }
-        
-        {
-            const s = $("#CodeMirrorDjotQuote")
-            s.change(() => {
-                const op = s.val()
-                const h = this.CMDjotQuoteMap[op]
-                if (h)  h()
-                s.val("-")
-            })
-        }
-        {
-            const s = $("#CodeMirrorDjotInsertNew")
-            s.change(() => {
-                const op = s.val()
-                const h = this.CMDjotInsertMap[op]
-                if (h)  h()
-                s.val("-")
-            })
-        }
-        
-        {
-            const s = $("#CodeMirrorDjotMath")
-            s.change(() => {
-                const op = s.val()
-                const h = this.CMDjotMathMap[op]
-                if (h)  h()
-                s.val("-")
-            })
-        }
-
-        {
-            const s = $("#CodeMirrorDjotFootnote")
-            s.change(() => {
-                const op = s.val()
-                const h = this.CMDjotFootnMap[op]
-                if (h)  h()
-                s.val("-")
-            })
-        }
+        this.guiSelectionMapSetup($("#CodeMirrorDjotText"), this.CMDjotTextMap)
+        this.guiSelectionMapSetup($("#CodeMirrorDjotQuote"), this.CMDjotQuoteMap)
+        this.guiSelectionMapSetup($("#CodeMirrorDjotInsertNew"), this.CMDjotInsertMap)
+        this.guiSelectionMapSetup($("#CodeMirrorDjotMath"), this.CMDjotMathMap)
+        this.guiSelectionMapSetup($("#CodeMirrorDjotFootnote"), this.CMDjotFootnMap)
         
         {
             const s = $("#CodeMirrorDjotLinkSelector")
