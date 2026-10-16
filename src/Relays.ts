@@ -26,26 +26,29 @@ const DEFAULT_RELAYS = [
 interface RelaySettingsIface {
     use: boolean
     trusted: boolean
-    auth: string
+    auth: string,
+    tags: string[]
 }
 
 class RelaySettings {
     constructor(
         public use: boolean = false,
         public trusted: boolean = false,
-        public auth: string = "none"
+        public auth: string = "none",
+        public tags: string[] = []
     ) {}
 
     toJSON(): RelaySettingsIface {
         return {
             use: this.use,
             trusted: this.trusted,
-            auth: this.auth
+            auth: this.auth,
+            tags: this.tags
         }
     }
 
     static fromJSON(json: RelaySettingsIface): RelaySettings {
-        return new RelaySettings(json.use, json.trusted, json.auth)
+        return new RelaySettings(json.use, json.trusted, json.auth, json.tags)
     }
 }
 
@@ -310,6 +313,31 @@ export class Relays extends Module {
         }
     }
 
+    addTag(relay: NDKRelay|string, tag: string): boolean {
+        const s = this.relaySettings(relay)
+        if (s.tags.includes(tag)) {
+            console.warn("Tag already exists:", tag)
+            return false
+        }
+        s.tags.push(tag)
+        return true
+    }
+
+    delTag(relay: NDKRelay|string, tag: string) {
+        const s = this.relaySettings(relay)
+        const key = s.tags.indexOf(tag, 0)
+        if (key < 0) {
+            console.warn("No such tag:", tag)
+            return
+        }
+        s.tags.splice(key, 1)
+    }
+
+    getTags(relay: NDKRelay|string): string[] {
+        const s = this.relaySettings(relay)
+        return s.tags
+    }
+
     onConnectedUpdate() {
         if (this.connectedNum <= 0)
             Module.offline = true
@@ -489,6 +517,20 @@ export class Relays extends Module {
         return rin
     }
 
+    guiCreateTag(url: string, tag: string): JQuery<HTMLElement> {
+        const div = $("<div>")
+        div.addClass("RemovableItem")
+        div.text(tag)
+        div.prop("title", "Click to delete")
+        div.click(() => {
+            this.delTag(url, tag)
+            div.remove()
+            this.saveKnown()
+        })
+
+        return div
+    }
+
     guiCreateItem(relay: NDKRelay|string, url: string|undefined = undefined) {
         url = url? url : typeof relay == "string" ? relay : relay.url
 
@@ -562,6 +604,28 @@ export class Relays extends Module {
             }
             this.saveKnown()
         })
+
+        {
+            const tagsC = rn.find(".RelayTags")
+            const nt = rn.find(".RelayNewTag")
+            const i = nt.find("input")
+            const b = nt.find("button")
+            b.click(() => {
+                const tag = i.val()
+                if (!tag)  return
+                if (!this.addTag(url, tag))  return
+                this.saveKnown()
+                const div = this.guiCreateTag(url, tag)
+                tagsC.append(div)
+            })
+            const tags = this.getTags(url)
+            for (const tag of tags) {
+                const div = this.guiCreateTag(url, tag)
+                tagsC.append(div)
+            }
+        }
+
+
         const sn = rn.find(".RelayHeadMore")
         const rsb = rn.find(".RelaySettingsButton")
         rsb.click(() => { sn.toggle() })

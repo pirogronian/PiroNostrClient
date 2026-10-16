@@ -92,6 +92,10 @@
     border: lightcoral solid 1mm
 }
 
+.RelaysList .RelayItem .RelayTags {
+    padding: 0
+}
+
 #ActiveRelays, #OtherRelays {
     @extend .RelaysList
 }
