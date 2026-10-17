@@ -1,7 +1,7 @@
 
 import $ from "jquery"
 import NDK, { NDKEvent, NDKWiki, NDKRelay } from "@nostr-dev-kit/ndk";
-import type { NDKFilter, NDKSubscription } from "@nostr-dev-kit/ndk"
+import type { NDKFilter, NDKSubscription, NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
 import { NDKSync } from "@nostr-dev-kit/sync"
 //import NDKCacheAdapterDexie, { db } from '@nostr-dev-kit/ndk-cache-dexie';
 
@@ -81,6 +81,7 @@ export class Articles extends Module {
         //console.debug("Search tags test:", event.getMatchingTags("l", "bcp47", { markerIndex: 2, useCase: false }))
 
         //console.log("Article event:", event)
+        //console.debug(event.relay, event.onRelays)
         if (!this.isCurrent()) return
         //console.log("Articles enabled")
         const Head = $(ArtHeadHTML)
@@ -230,6 +231,19 @@ export class Articles extends Module {
             })
             fft.append(o)
         })
+
+        const relTags = App.get().relays.knownTags
+        const tagsSel = form.find("#FinderRelaysTag")
+        console.debug("Known tags:", relTags, tagsSel)
+        for (const [tag, n] of relTags) {
+            //const n = relTags.get(tag)
+            if (n) {
+                const op = App.get().relays.guiCreateKnownTag(tag, n)
+                console.debug("Append tag:", tag, n)
+                tagsSel.append(op)
+            }
+        }
+
         form.submit((e) => {
             e.preventDefault()
             const formData = new FormData(form.get(0));
@@ -290,6 +304,13 @@ export class Articles extends Module {
             kinds: [30818]
             //'#d': [pageSlug]
         };
+
+        const op: NDKSubscriptionOptions =
+        {
+            closeOnEose : true,
+            onEvent: onEvent
+        }
+
         if (params) {
             if (params.author) {
                 console.log("Subscribing with author:", params.author)
@@ -331,16 +352,18 @@ export class Articles extends Module {
                 console.log("Filter.limit:", limit)
                 filter.limit = limit
             }
+            if (params.relaysTag) {
+                op.relayUrls = App.get().relays.getRelaysByTag(params.relaysTag)
+                //console.debug("Subscribe with relays:", op.relayUrls)
+            }
         }
 
         console.log("Subscribing for articles with filter", filter)
         
         try {
             this.sub = await NDKSync.syncAndSubscribe(
-                this.ndk,
-                filter,
-                { closeOnEose : true,
-                onEvent: onEvent })
+                this.ndk, filter, op)
+            //console.debug(this.sub.relaySet)
         } catch (e) {
             return e
         }
