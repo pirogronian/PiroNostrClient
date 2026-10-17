@@ -48,6 +48,7 @@ export class Article extends Module {
     editMode: boolean = false
     editorNode: JQuery<HTMLElement>|undefined
     draftId: string|undefined
+    currentDraft: NDKDraft|undefined
     codeMirror?: CodeMirrorEditorView
     guiShowContentOnly: boolean = false
     guiHideToolbar: boolean = false
@@ -1465,6 +1466,11 @@ export class Article extends Module {
 
         this.guiUpdateEditor()
         this.guiUpdateRawEventEdit()
+
+        if (this.currentDraft) {
+            const status = this.editorNode.find("#ArticleDraftStatus")
+            status.text(`Saved at ${FormattedTime(this.currentDraft.created_at)}`)
+        }
     }
 
     async load(addr : string) : Promise<NDKEvent|Error|string|null> {
@@ -1509,6 +1515,7 @@ export class Article extends Module {
                         if (e.kind == NDKWiki.kind) {
                             this.draftId = draft.identifier
                             this.setEvent(e)
+                            this.currentDraft = draft
                         }
                         else this.error(`Wrong event kind: ${e.kind}!`)
                     }
@@ -1571,11 +1578,13 @@ export class Article extends Module {
     setup() {
         this.onRoute("/edit/:id", (match) => {
             this.setCurrent()
+            this.currentDraft = undefined
             this.restoreSettings()
             this.edit(match.data.id)
         })
         this.onRoute("/edit/", (match) => {
             this.setCurrent()
+            this.currentDraft = undefined
             this.restoreSettings()
             this.edit(match.params)
         })
