@@ -360,12 +360,13 @@ export class Article extends Module {
     }
 
     guiUpdateRelays() {
-        const relaysDOM = this.mainView().find("#ArticleRelays")
-        relaysDOM.append($("<div>").text(this.event?.relay?.url))
-        this.event.onRelays.forEach((relay) => {
-            if (relay.url != this.event?.relay?.url)
-                relaysDOM.append($("<div>").text(relay.url))
-        })
+        if (this.event) {
+            const relaysDOM = this.mainView().find("#ArticleRelays")
+            const urls = this.event?.relaysUrls
+            for (const url of urls) {
+                relaysDOM.append($("<div>").text(url))
+            }
+        }
     }
 
     async guiUpdateEditButtons() {
