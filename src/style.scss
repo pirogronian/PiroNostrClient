@@ -192,6 +192,13 @@ code {
     margin: 0
 }
 
+#FinderSummary {
+    @extend .MultirowFlexContainer;
+    @extend .Frame;
+    background: lightgreen;
+    margin: 0;
+}
+
 div.ArticleHead {
     @extend .OnerowFlexContainer;
     @extend .Frame
