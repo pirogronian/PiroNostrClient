@@ -87,6 +87,17 @@ export namespace Event {
         })
     }
 
+    export function relaysUrls(e: NDKEvent): string[] {
+        const ret: string[] = []
+        for (const relay of e.onRelays) {
+            ret.push(relay.url)
+        }
+        if (e.relay && !ret.includes(e.relay.url))
+            ret.push(e.relay.url)
+        
+        return ret
+    }
+
     export function setup() {
         NDKEvent.prototype.getMatchingTags = getMatchingTags
         NDKEvent.prototype.hasTag = hasTag
@@ -109,5 +120,13 @@ export namespace Event {
             enumerable: false,
             configurable: true,
         });
+
+        Object.defineProperty(NDKEvent.prototype, 'relaysUrls', {
+            get: function (this: NDKEvent) {
+                return relaysUrls(this)
+            },
+            enumerable: false,
+            configurable: true
+        })
     }
 }

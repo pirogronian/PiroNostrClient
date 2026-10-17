@@ -16,5 +16,6 @@ declare module '@nostr-dev-kit/ndk' {
 
     get naddr(): string
     get nevent(): string
+    get relaysUrls(): string[]
   }
 }
