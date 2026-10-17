@@ -693,7 +693,9 @@ export class Article extends Module {
         const en = this.editorNode
         en.find("input[name='ArticleTitle']").val(this.wiki.title)
         en.find("input[name='ArticleId']").val(this.wiki.dTag)
-        en.find("input[name='ArticleFormat']").val(this.wiki.tagValue("f"))
+        const f = this.wiki.tagValue("f")
+        en.find("input[name='ArticleFormat']").val(f)
+        en.find("input[name='ArticleFormatSelect']").val(f)
         if (this.wiki.published_at)
             en.find("input[name='ArticlePublishedAt']").val(TimeToISO(this.wiki.published_at))
         en.find("textarea#ArticleSummary").val(this.wiki.summary)
