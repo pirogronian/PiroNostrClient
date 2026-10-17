@@ -362,6 +362,7 @@ export class Article extends Module {
     guiUpdateRelays() {
         if (this.event) {
             const relaysDOM = this.mainView().find("#ArticleRelays")
+            relaysDOM.empty()
             const urls = this.event?.relaysUrls
             for (const url of urls) {
                 relaysDOM.append($("<div>").text(url))
@@ -1538,10 +1539,13 @@ export class Article extends Module {
         this.wiki = null
         this.editMode = false
         
-        this.subscribeForEvents(addr, { closeOnEose: true },
-            { onEvent: (event) => {
+        this.subscribeForEvents(addr, { closeOnEose: true,
+            onEvent: (event) => {
                 //console.debug("Article: got event:", event)
                 this.onEvent(event)
+            },
+            onEventDup: () => {
+                this.guiUpdateRelays()
             }
         })
     }
