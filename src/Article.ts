@@ -846,6 +846,7 @@ export class Article extends Module {
             if (!this.sameContext(context))  return
             console.debug("After published:", draft.identifier)
             status.text(`Saved on ${FormattedTime(time)}`)
+            if (newId)  this.navigate(`/edit/${draft.naddr}`)
         }).catch((error) => {
             if (!this.sameContext(context))  return
             status.text(`Not saved!`)
