@@ -54,8 +54,6 @@ label.Active input {
 
 .hidden { display: none }
 
-/*div:not(#ArticleView div) { display: flow-root; }*/
-
 .block {
     display: block;
     float: left;
@@ -90,10 +88,6 @@ label.Active input {
 
 .Info dd:nth-of-type(odd) {
     background: lightgray;
-}
-
-table.Info td {
-    padding: 1mm
 }
 
 #MainNav {
