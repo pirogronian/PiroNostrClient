@@ -186,10 +186,13 @@ code {
     margin: 0
 }
 
+#FinderSubmit {
+    background: orange;
+}
+
 #FinderSummary {
     @extend .MultirowFlexContainer;
-    @extend .Frame;
-    background: lightgreen;
+    border: solid 0.5mm lightgreen;
     margin: 0;
 }
 
