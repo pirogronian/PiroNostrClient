@@ -394,13 +394,17 @@ export class Articles extends Module {
                 console.log("Filter.limit:", limit)
                 filter.limit = limit
             }
-            if (this.relaysTag) {
-                op.relayUrls = App.get().relays.getRelaysByTag(this.relaysTag)
-                op.exclusiveRelay = true
-                console.debug("Subscribe with relays:", op.relayUrls, "with tag:", this.relaysTag)
-            }
+        }
+        if (this.relaysTag) {
+            op.relayUrls = App.get().relays.getRelaysByTag(this.relaysTag)
+            op.exclusiveRelay = true
+            console.debug("Subscribe with relays:", op.relayUrls, "with tag:", this.relaysTag)
         }
         op.cacheUsage = this.cacheUsage
+
+        op.onRelayError = (relay: NDKRelay, error: Error) => {
+            if (this.sub) relay.subscribe(this.sub, [filter])
+        }
 
         console.log("Subscribing for articles with filter", filter)
         
