@@ -269,6 +269,18 @@ export class Articles extends Module {
             if (addr)  App.get().article.navigate(`/${addr}`)
         })
 
+        const rs = $("#ArticleAddressRelaysTagSelect")
+        const tags = App.get().relays.knownTags
+        const ckn = App.get().relays.guiCreateKnownTag
+        for (const [tag, n] of tags)
+            rs.append(ckn(tag, n))
+        const a = App.get().article
+        rs.val(a.relaysTag)
+        rs.change(() => {
+            a.relaysTag = rs.val()
+            a.saveSettings()
+        })
+
         const cnB = $("#CreateNewButton")
         const idI = form.find("input[name='id']")
         cnB.click(() => {
