@@ -35,7 +35,6 @@ import "@/Article.scss"
 
 const LAST_ARTICLE_FORMAT_KEY = "last_format"
 const USE_LAST_ARTICLE_FORMAT_KEY = "use_last_format"
-const RELAYS_TAG_SETTING = "relays_tag"
 
 const SHOW_CONTENT_ONLY_SETTING = "show_content_only"
 const HIDE_TOOLBAR_SETTING = "hide_toolbar"
@@ -46,7 +45,6 @@ export class Article extends Module {
     wiki: NDKWiki|null = null
     lastFormat: string = ""
     useLastFormat: boolean = true
-    relaysTag: string = ""
     editMode: boolean = false
     editorNode: JQuery<HTMLElement>|undefined
     draftId: string|undefined
@@ -63,7 +61,7 @@ export class Article extends Module {
     saveSettings() {
         this.settings(LAST_ARTICLE_FORMAT_KEY, this.lastFormat)
         this.settings(USE_LAST_ARTICLE_FORMAT_KEY, this.useLastFormat? "1": null)
-        this.settings(RELAYS_TAG_SETTING, this.relaysTag)
+
         this.settings(SHOW_CONTENT_ONLY_SETTING, this.guiShowContentOnly? "1": null)
         this.settings(HIDE_TOOLBAR_SETTING, this.guiHideToolbar? "1": null)
         this.settings(SAFE_MODE_SETTING, this.guiSafeMode? "1": null)
@@ -74,7 +72,7 @@ export class Article extends Module {
         this.lastFormat = tmp ? tmp : ""
         tmp = this.settings(USE_LAST_ARTICLE_FORMAT_KEY)
         this.useLastFormat = tmp ? true : false
-        this.relaysTag = this.settings(RELAYS_TAG_SETTING) || ""
+
         this.guiShowContentOnly = this.settings(SHOW_CONTENT_ONLY_SETTING)? true : false
         this.guiHideToolbar = this.settings(HIDE_TOOLBAR_SETTING)? true : false
         this.guiSafeMode = this.settings(SAFE_MODE_SETTING)? true : false
@@ -1553,8 +1551,9 @@ export class Article extends Module {
             }
         }
 
-        if (this.relaysTag) {
-            const urls = App.get().relays.getRelaysByTag(this.relaysTag)
+        const tag = App.get().articles.relaysTag
+        if (tag) {
+            const urls = App.get().relays.getRelaysByTag(tag)
             if (urls) {
                 op.relayUrls = urls
                 op.exclusiveRelay = true

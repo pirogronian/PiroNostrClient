@@ -16,6 +16,7 @@ import ArtHeadHTML from "@/ArticleHeader.html?raw"
 
 import "@/Articles.scss"
 
+const RELAYS_TAG_SETTING = "relays_tag"
 const FOLLOW_AUTHOR_SETTING_KEY = "FollowAuthor"
 
 function sortItems(item1:HTMLElement, item2:HTMLElement): number {
@@ -64,6 +65,7 @@ function sortItems(item1:HTMLElement, item2:HTMLElement): number {
 export class Articles extends Module {
     sub: NDKSubscription | null = null
     enabled: boolean = false
+    relaysTag: string = ""
     resultSize: number = 0
     resultRelays: Set<string> = new Set<string>()
     followAuthor: boolean = false
@@ -71,10 +73,13 @@ export class Articles extends Module {
     results: HTMLElement[] = []
 
     loadSettings() {
+        this.relaysTag = this.settings(RELAYS_TAG_SETTING) || ""
         this.followAuthor = this.settings(FOLLOW_AUTHOR_SETTING_KEY) == "1"? true : false
     }
 
     saveSettings() {
+        //console.debug("Saving relays_tag:", this.relaysTag)
+        this.settings(RELAYS_TAG_SETTING, this.relaysTag || null)
         this.settings(FOLLOW_AUTHOR_SETTING_KEY, this.followAuthor? "1" : null)
     }
 
@@ -234,17 +239,17 @@ export class Articles extends Module {
             fft.append(o)
         })
 
-        const relTags = App.get().relays.knownTags
-        const tagsSel = form.find("#FinderRelaysTag")
-        console.debug("Known tags:", relTags, tagsSel)
-        for (const [tag, n] of relTags) {
-            //const n = relTags.get(tag)
-            if (n) {
-                const op = App.get().relays.guiCreateKnownTag(tag, n)
-                console.debug("Append tag:", tag, n)
-                tagsSel.append(op)
-            }
-        }
+        const rs = $("#FinderRelaysTag")
+        const tags = App.get().relays.knownTags
+        const ckn = App.get().relays.guiCreateKnownTag
+        for (const [tag, n] of tags)
+            rs.append(ckn(tag, n))
+        rs.val(this.relaysTag)
+        rs.change(() => {
+            this.relaysTag = rs.val()
+            console.debug("New relays tag:", this.relaysTag)
+            this.saveSettings()
+        })
 
         form.submit((e) => {
             e.preventDefault()
@@ -269,18 +274,6 @@ export class Articles extends Module {
         aag.click(() => {
             const addr = aa.val()
             if (addr)  App.get().article.navigate(`/${addr}`)
-        })
-
-        const rs = $("#ArticleAddressRelaysTagSelect")
-        const tags = App.get().relays.knownTags
-        const ckn = App.get().relays.guiCreateKnownTag
-        for (const [tag, n] of tags)
-            rs.append(ckn(tag, n))
-        const a = App.get().article
-        rs.val(a.relaysTag)
-        rs.change(() => {
-            a.relaysTag = rs.val()
-            a.saveSettings()
         })
 
         const cnB = $("#CreateNewButton")
@@ -380,10 +373,10 @@ export class Articles extends Module {
                 console.log("Filter.limit:", limit)
                 filter.limit = limit
             }
-            if (params.relaysTag) {
-                op.relayUrls = App.get().relays.getRelaysByTag(params.relaysTag)
+            if (this.relaysTag) {
+                op.relayUrls = App.get().relays.getRelaysByTag(this.relaysTag)
                 op.exclusiveRelay = true
-                //console.debug("Subscribe with relays:", op.relayUrls)
+                console.debug("Subscribe with relays:", op.relayUrls, "with tag:", this.relaysTag)
             }
         }
 
