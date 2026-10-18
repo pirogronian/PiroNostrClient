@@ -1555,7 +1555,10 @@ export class Article extends Module {
 
         if (this.relaysTag) {
             const urls = App.get().relays.getRelaysByTag(this.relaysTag)
-            if (urls) op.relayUrls = urls
+            if (urls) {
+                op.relayUrls = urls
+                op.exclusiveRelay = true
+            }
             console.debug("Relays:", op.relayUrls)
         }
 

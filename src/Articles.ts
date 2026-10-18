@@ -1,7 +1,8 @@
 
 import $ from "jquery"
 import NDK, { NDKEvent, NDKWiki, NDKRelay } from "@nostr-dev-kit/ndk";
-import type { NDKFilter, NDKSubscription, NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
+import type { NDKFilter, NDKSubscription, NDKSubscriptionOptions, NostrEvent } from "@nostr-dev-kit/ndk"
+import { type SyncAndSubscribeOptions } from "@nostr-dev-kit/sync";
 import { NDKSync } from "@nostr-dev-kit/sync"
 //import NDKCacheAdapterDexie, { db } from '@nostr-dev-kit/ndk-cache-dexie';
 
@@ -64,6 +65,7 @@ export class Articles extends Module {
     sub: NDKSubscription | null = null
     enabled: boolean = false
     resultSize: number = 0
+    resultRelays: Set<string> = new Set<string>()
     followAuthor: boolean = false
     author: string|undefined
     results: HTMLElement[] = []
@@ -317,10 +319,24 @@ export class Articles extends Module {
             //'#d': [pageSlug]
         };
 
-        const op: NDKSubscriptionOptions =
+        const op: SyncAndSubscribeOptions =
         {
             closeOnEose : true,
-            onEvent: onEvent
+            onEvent: (event: NDKEvent, relay?: NDKRelay, sub?: NDKSubscription, fromCache?: boolean) => {
+                if (relay)  {
+                    if (!this.resultRelays.has(relay.url))
+                        console.debug("New relay in results:", relay.url, fromCache? "(from cache)": "")
+                    this.resultRelays.add(relay.url)
+                }
+                onEvent(event, relay)
+            },
+            onEventDup: (event: NDKEvent|NostrEvent, relay?: NDKRelay, u?: number, sub?: NDKSubscription, fromCache?: boolean) => {
+                if (relay) {
+                    if (!this.resultRelays.has(relay.url))
+                        console.debug("New relay in results (dup):", relay.url, fromCache? "(from cache)": "")
+                    this.resultRelays.add(relay.url)
+                }
+            }
         }
 
         if (params) {
@@ -366,6 +382,7 @@ export class Articles extends Module {
             }
             if (params.relaysTag) {
                 op.relayUrls = App.get().relays.getRelaysByTag(params.relaysTag)
+                op.exclusiveRelay = true
                 //console.debug("Subscribe with relays:", op.relayUrls)
             }
         }
@@ -375,6 +392,10 @@ export class Articles extends Module {
         try {
             this.sub = await NDKSync.syncAndSubscribe(
                 this.ndk, filter, op)
+            this.sub.pool.on("relay:connect", (relay: NDKRelay) => {
+                //console.debug("New relay connected:", relay.url)
+                //console.debug(this.sub?.relayFilters)
+            })
             //console.debug(this.sub.relaySet)
         } catch (e) {
             return e
@@ -392,6 +413,7 @@ export class Articles extends Module {
         this.newContext()
         const context = this.context
         this.loadSettings()
+        this.resultRelays.clear()
         //this.loadFinder(params.author, params.id)
         //console.debug($("input[name='id']"))
         $("input[name='id']").val(params.id)
