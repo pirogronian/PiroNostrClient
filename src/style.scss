@@ -190,10 +190,19 @@ code {
     background: orange;
 }
 
-#FinderSummary {
-    @extend .MultirowFlexContainer;
+#FinderResultsSummary {
+    @extend .OnerowFlexContainer;
     border: solid 0.5mm lightgreen;
     margin: 0;
+}
+
+#FinderResultsRelays {
+    padding: 0;
+    margin: 0
+}
+
+#FinderResultsRelays > * {
+    margin: 0
 }
 
 div.ArticleHead {

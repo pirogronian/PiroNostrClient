@@ -69,7 +69,7 @@ export class Articles extends Module {
     relaysTag: string = ""
     cacheUsage: NDKSubscriptionCacheUsage = NDKSubscriptionCacheUsage.PARALLEL
     resultSize: number = 0
-    resultRelays: Set<string> = new Set<string>()
+    resultRelays: Map<string, number> = new Map<string, number>()
     followAuthor: boolean = false
     author: string|undefined
     results: HTMLElement[] = []
@@ -322,6 +322,33 @@ export class Articles extends Module {
         $("#FinderResult").empty()
     }
 
+    onRelayResult(url: string|NDKRelay) {
+        if (typeof url != "string")  url = url.url
+        let n = this.resultRelays.get(url)
+        if (n == undefined) n = 1
+        else n++
+        this.resultRelays.set(url, n)
+    }
+
+    guiUpdateRelaysResult() {
+        const num = $("#FinderResultsRelaysNumber")
+        const urls = $("#FinderResultsRelays")
+        num.text(`Relays: ${this.resultRelays.size}`)
+        urls.empty()
+        for (const [url, n] of this.resultRelays) {
+            const div = $("<div>")
+            div.text(`'${url}' (${n})`)
+            div.addClass("Copyable")
+            urls.append(div)
+        }
+    }
+
+    guiClearSummary() {
+        $("#FinderResultsNumber").empty()
+        $("#FinderResultsRelaysNumber").empty()
+        $("#FinderResultsRelays").empty()
+    }
+
     async load(params: object,
         onEvent: (event: NDKEvent, relay?: NDKRelay) => any)
     {
@@ -340,7 +367,8 @@ export class Articles extends Module {
                 if (relay)  {
                     if (!this.resultRelays.has(relay.url))
                         console.debug("New relay in results:", relay.url, fromCache? "(from cache)": "")
-                    this.resultRelays.add(relay.url)
+                    this.onRelayResult(relay.url)
+                    this.guiUpdateRelaysResult()
                 }
                 onEvent(event, relay)
             },
@@ -348,7 +376,8 @@ export class Articles extends Module {
                 if (relay) {
                     if (!this.resultRelays.has(relay.url))
                         console.debug("New relay in results (dup):", relay.url, fromCache? "(from cache)": "")
-                    this.resultRelays.add(relay.url)
+                    this.onRelayResult(relay.url)
+                    this.guiUpdateRelaysResult()
                 }
             }
         }
@@ -463,6 +492,7 @@ export class Articles extends Module {
             this.results = []
             if (this.isFinder()) {
                 console.log("Is finder, clearing results.")
+                this.guiClearSummary()
                 this.clearFinderResult()
             }
             else {
