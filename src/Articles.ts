@@ -1,7 +1,7 @@
 
 import $ from "jquery"
 import NDK, { NDKEvent, NDKWiki, NDKRelay } from "@nostr-dev-kit/ndk";
-import type { NDKFilter, NDKSubscription, NDKSubscriptionOptions, NostrEvent } from "@nostr-dev-kit/ndk"
+import { NDKSubscriptionCacheUsage, type NDKFilter, type NDKSubscription, type NDKSubscriptionOptions, type NostrEvent } from "@nostr-dev-kit/ndk"
 import { type SyncAndSubscribeOptions } from "@nostr-dev-kit/sync";
 import { NDKSync } from "@nostr-dev-kit/sync"
 //import NDKCacheAdapterDexie, { db } from '@nostr-dev-kit/ndk-cache-dexie';
@@ -17,6 +17,7 @@ import ArtHeadHTML from "@/ArticleHeader.html?raw"
 import "@/Articles.scss"
 
 const RELAYS_TAG_SETTING = "relays_tag"
+const CACHE_USAGE_SETTING = "cache_usage"
 const FOLLOW_AUTHOR_SETTING_KEY = "FollowAuthor"
 
 function sortItems(item1:HTMLElement, item2:HTMLElement): number {
@@ -66,6 +67,7 @@ export class Articles extends Module {
     sub: NDKSubscription | null = null
     enabled: boolean = false
     relaysTag: string = ""
+    cacheUsage: NDKSubscriptionCacheUsage = NDKSubscriptionCacheUsage.PARALLEL
     resultSize: number = 0
     resultRelays: Set<string> = new Set<string>()
     followAuthor: boolean = false
@@ -74,12 +76,14 @@ export class Articles extends Module {
 
     loadSettings() {
         this.relaysTag = this.settings(RELAYS_TAG_SETTING) || ""
+        this.cacheUsage = this.settings(CACHE_USAGE_SETTING) as NDKSubscriptionCacheUsage || NDKSubscriptionCacheUsage.PARALLEL
         this.followAuthor = this.settings(FOLLOW_AUTHOR_SETTING_KEY) == "1"? true : false
     }
 
     saveSettings() {
         //console.debug("Saving relays_tag:", this.relaysTag)
         this.settings(RELAYS_TAG_SETTING, this.relaysTag || null)
+        this.settings(CACHE_USAGE_SETTING, this.cacheUsage)
         this.settings(FOLLOW_AUTHOR_SETTING_KEY, this.followAuthor? "1" : null)
     }
 
@@ -285,6 +289,23 @@ export class Articles extends Module {
             App.get().article.navigate(`/edit/${param}`)
         })
 
+        const cus = $("#ArticleBrowseCacheUsage")
+        const addCacheOp = function(val: string, text: string) {
+            const op = $("<option>")
+            op.val(val)
+            op.text(text)
+            cus.append(op)
+        }
+        addCacheOp(NDKSubscriptionCacheUsage.ONLY_CACHE, "Only cache")
+        addCacheOp(NDKSubscriptionCacheUsage.CACHE_FIRST, "Cache first")
+        addCacheOp(NDKSubscriptionCacheUsage.PARALLEL, "Parallel")
+        addCacheOp(NDKSubscriptionCacheUsage.ONLY_RELAY, "Only relay")
+        cus.val(this.cacheUsage)
+        cus.change(() => {
+            this.cacheUsage = cus.val()
+            this.saveSettings()
+        })
+
         /*const sfi = $("select[name='ArticlesOrderField']")
         sfi.change(() => {
             this.sort()
@@ -379,6 +400,7 @@ export class Articles extends Module {
                 console.debug("Subscribe with relays:", op.relayUrls, "with tag:", this.relaysTag)
             }
         }
+        op.cacheUsage = this.cacheUsage
 
         console.log("Subscribing for articles with filter", filter)
         
