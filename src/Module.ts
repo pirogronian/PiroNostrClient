@@ -215,7 +215,7 @@ export class Module extends EventEmitter {
 
         if (relaySet)  opts.relaySet = relaySet
 
-        console.debug("Module.subscribe:", filters, opts, autoStartOrRelaySet, _autoStart)
+        //console.debug("Module.subscribe:", filters, opts, autoStartOrRelaySet, _autoStart)
 
         return this.ndk.subscribe(filters, opts, autoStartOrRelaySet, _autoStart)
     }
