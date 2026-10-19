@@ -606,7 +606,7 @@ export class Relays extends Module {
         return s
     }
 
-    guiCreateTagLabeledSelect(onChange?: (val: string) => void, init?: string, text: string = "Using relays:") {
+    guiCreateTagLabeledSelect(onChange?: (val: string) => void, init?: string, text: string = "Relays usage:") {
         const l = $("<label>")
         l.append(text)
         l.append(this.guiCreateTagSelect(onChange, init))
