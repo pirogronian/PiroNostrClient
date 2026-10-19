@@ -1,9 +1,9 @@
 
 import $ from "jquery"
 
-import NDK, { NDKWiki, NDKDraft, NDKEvent, type NDKFilter, nip19 } from "@nostr-dev-kit/ndk";
+import NDK, { NDKWiki, NDKDraft, NDKEvent, type NDKFilter, nip19, NDKSubscriptionCacheUsage, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk";
 
-import { FormattedTime, FormattedBytes, MakeLabelActive } from "./various.js";
+import { FormattedTime, FormattedBytes, MakeLabelActive, GuiCreateLabeledCacheUsageSelect } from "./various.js";
 
 import { Module } from "@/Module.js"
 import { App } from "@/App.js"
@@ -14,6 +14,24 @@ import DraftItemHTMK from "@/DraftItem.html?raw"
 import "@/Drafts.scss"
 
 export class Drafts extends Module {
+    readonly RELAYS_TAG_SETTING = "relays_tag"
+    readonly CACHE_USAGE_SETTING = "cache_usage"
+
+    relaysTag: string = ""
+    cacheUsage: NDKSubscriptionCacheUsage = NDKSubscriptionCacheUsage.PARALLEL
+
+    saveSettings() {
+        this.settings(this.RELAYS_TAG_SETTING, this.relaysTag)
+        this.settings(this.CACHE_USAGE_SETTING, this.cacheUsage)
+    }
+
+    loadSettings() {
+        const rt = this.settings(this.RELAYS_TAG_SETTING)
+        if (rt)  this.relaysTag = rt
+        const cu = this.settings(this.CACHE_USAGE_SETTING)
+        if (cu)  this.cacheUsage = cu
+    }
+
     onEvent(event: NDKEvent) {
         if (!this.isCurrent())  return
         if (event.kind != NDKDraft.kind) {
@@ -69,6 +87,14 @@ export class Drafts extends Module {
         })
 
         this.mainView(gui)
+        $("#DraftsRelaysTagSelectPlaceholder").replaceWith(
+            App.get().relays.guiCreateTagLabeledSelect(
+                (val: string) => { this.relaysTag = val; this.saveSettings() }, this.relaysTag
+            ))
+        $("#DraftsCacheUsageSelectPlaceholder").replaceWith(
+            GuiCreateLabeledCacheUsageSelect(
+                (val: string) => { this.cacheUsage = val; this.saveSettings() }, this.cacheUsage
+            ))
     }
 
     remove(draft: NDKDraft) {
@@ -92,9 +118,16 @@ export class Drafts extends Module {
             kinds: [ NDKDraft.kind],
             authors: [ pubkey ]
         }
-        this.ndk.subscribe(filter,
-            { closeOnEose : true },
-            { onEvent: (event) => { this.onEvent(event) } })
+        const op: NDKSubscriptionOptions = {
+            closeOnEose : true,
+            onEvent: (event) => { this.onEvent(event) } }
+        if (this.relaysTag) {
+            const urls = App.get().relays.getRelaysByTag(this.relaysTag)
+            op.relayUrls = urls
+            op.exclusiveRelay = true
+        }
+        op.cacheUsage = this.cacheUsage
+        this.ndk.subscribe(filter, op)
     }
 
     onLogin() {
@@ -119,5 +152,6 @@ export class Drafts extends Module {
         u.on("login", () => { this.onLogin() })
         u.on("logout", () => { this.onLogout() })
         if (u.loggedUser)  this.onLogin()
+        this.loadSettings()
     }
 }
