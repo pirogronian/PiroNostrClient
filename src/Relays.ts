@@ -590,6 +590,29 @@ export class Relays extends Module {
         return div
     }
 
+    guiCreateTagSelect(onChange?: (val: string) => void, init?: string) {
+        const s = $("<select>")
+        let op = $("<option>")
+        op.text("(All)")
+        op.prop("value", "")
+        s.append(op)
+        for (const [tag, n] of this.knownTags) {
+            s.append(this.guiCreateKnownTag(tag, n))
+        }
+        if (onChange)  s.change(() => {
+            onChange(s.val())
+        })
+        if (init)  s.val(init)
+        return s
+    }
+
+    guiCreateTagLabeledSelect(onChange?: (val: string) => void, init?: string, text: string = "Using relays:") {
+        const l = $("<label>")
+        l.append(text)
+        l.append(this.guiCreateTagSelect(onChange, init))
+        return l
+    }
+
     guiCreateItem(relay: NDKRelay|string, url: string|undefined = undefined) {
         url = url? url : typeof relay == "string" ? relay : relay.url
 

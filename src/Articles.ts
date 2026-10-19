@@ -243,17 +243,14 @@ export class Articles extends Module {
             fft.append(o)
         })
 
-        const rs = $("#FinderRelaysTag")
-        const tags = App.get().relays.knownTags
-        const ckn = App.get().relays.guiCreateKnownTag
-        for (const [tag, n] of tags)
-            rs.append(ckn(tag, n))
-        rs.val(this.relaysTag)
-        rs.change(() => {
-            this.relaysTag = rs.val()
-            console.debug("New relays tag:", this.relaysTag)
-            this.saveSettings()
-        })
+        $("#ArticlesRelaysTagPlaceholder").replaceWith(
+            App.get().relays.guiCreateTagLabeledSelect(
+                (val: string) => {
+                    this.relaysTag = val
+                    this.saveSettings()
+                },
+                this.relaysTag
+            ))
 
         form.submit((e) => {
             e.preventDefault()
