@@ -439,12 +439,12 @@ export class Articles extends Module {
         }
 
         console.log("Subscribing for articles with filter", filter)
-        
-        console.log("Subscribing with options:", op)
 
         try {
-            this.sub = await NDKSync.syncAndSubscribe(
-                this.ndk, filter, op)
+            if (op.cacheUsage == NDKSubscriptionCacheUsage.ONLY_CACHE ||
+                op.cacheUsage == NDKSubscriptionCacheUsage.ONLY_RELAY
+            )  this.sub = this.subscribeForEvents(filter, op)
+            else  this.sub = await NDKSync.syncAndSubscribe(this.ndk, filter, op)
         } catch (e) {
             return e
         }
