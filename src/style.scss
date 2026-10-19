@@ -205,6 +205,11 @@ code {
     margin: 0
 }
 
+#FinderResultsRelays .Url {
+    padding: 0;
+    margin: 0
+}
+
 div.ArticleHead {
     @extend .OnerowFlexContainer;
     @extend .Frame

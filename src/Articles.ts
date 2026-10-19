@@ -337,8 +337,8 @@ export class Articles extends Module {
         urls.empty()
         for (const [url, n] of this.resultRelays) {
             const div = $("<div>")
-            div.text(`'${url}' (${n})`)
-            div.addClass("Copyable")
+            div.html(`'<span class="Copyable Url">${url}</span>' (${n})`)
+            //div.addClass("Copyable")
             urls.append(div)
         }
     }
