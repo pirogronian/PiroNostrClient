@@ -1,12 +1,11 @@
 
 import $ from "jquery"
-import NDK, { NDKEvent, NDKWiki, NDKRelay } from "@nostr-dev-kit/ndk";
-import { NDKSubscriptionCacheUsage, type NDKFilter, type NDKSubscription, type NDKSubscriptionOptions, type NostrEvent } from "@nostr-dev-kit/ndk"
+import { NDKEvent, NDKWiki, NDKRelay } from "@nostr-dev-kit/ndk";
+import { NDKSubscriptionCacheUsage, type NDKFilter, type NDKSubscription, type NostrEvent } from "@nostr-dev-kit/ndk"
 import { type SyncAndSubscribeOptions } from "@nostr-dev-kit/sync";
 import { NDKSync } from "@nostr-dev-kit/sync"
-//import NDKCacheAdapterDexie, { db } from '@nostr-dev-kit/ndk-cache-dexie';
 
-import { safeAsync, EventTagValues, FormattedTime, FormattedBytes, formatNip54TagD, GuiCreateLabeledCacheUsageSelect } from "@/various.js";
+import { EventTagValues, FormattedTime, FormattedBytes, formatNip54TagD, GuiCreateLabeledCacheUsageSelect } from "@/various.js";
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
@@ -59,7 +58,7 @@ function sortItems(item1:HTMLElement, item2:HTMLElement): number {
         if (field1 > field2) ret = 1
         if (!asc) ret = -ret
     }
-    //console.debug("sort:", field1, field2, ret)
+
     return ret
 }
 
@@ -89,7 +88,6 @@ export class Articles extends Module {
 
     async articleHead(event: NDKWiki, relay?: NDKRelay) : Promise<void> {
         if (!event) { console.warn("Articles: no event!"); return}
-        //console.debug("Search tags test:", event.getMatchingTags("l", "bcp47", { markerIndex: 2, useCase: false }))
 
         //console.log("Article event:", event)
         //console.debug(event.relay, event.onRelays)
@@ -139,7 +137,6 @@ export class Articles extends Module {
     sort() {
         this.results.sort(sortItems)
         const resn = $("#FinderResult")
-        //console.debug("Finder results container:", resn)
         resn.empty()
         this.results.forEach((item) => {
             resn.append($(item))
@@ -270,12 +267,6 @@ export class Articles extends Module {
             console.debug("Sub stopped.")
         })
 
-        /*form.find("input").on("keydown", function(e){
-            console.log("Pressed key in input:", e.key)
-            if (e.key === "Enter")
-                console.log("Enter pressed in input field.")
-        })*/
-
         const aa = $("#ArticleAddress")
         const aag = $("#ArticleAddressGo")
         aag.click(() => {
@@ -297,10 +288,6 @@ export class Articles extends Module {
                 (val: string) => { this.cacheUsage = val; this.saveSettings() }, this.cacheUsage
             ))
 
-        /*const sfi = $("select[name='ArticlesOrderField']")
-        sfi.change(() => {
-            this.sort()
-        })*/
         $("#ArticlesSortButton").click(() => { this.sort() })
         $("#ArticlesFilterButton").click(() => { this.filter() })
     }
