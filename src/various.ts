@@ -1,7 +1,7 @@
 import $ from "jquery"
 import type { JQuery } from "jquery"
 
-import { NDKEvent, NDKRelay } from "@nostr-dev-kit/ndk";
+import { NDKEvent, NDKRelay, NDKSubscriptionCacheUsage } from "@nostr-dev-kit/ndk";
 
 export async function safeAsync<T>(promise: Promise<T>): Promise<[Error | null, T | null]> {
     try {
@@ -165,4 +165,31 @@ export function InstallRelayDebugHandlers(relay: NDKRelay, all: boolean = false)
     relay.on("auth:failed", (error) => {
         console.error(relay.url, ": failed to auth with error:", error)
     })
+}
+
+export function GuiCreateCacheUsageSelect(onChange?: (val: string) => any, init?: string) {
+    const s = $("<select>")
+    const addCacheOp = function(val: string, text: string) {
+        const op = $("<option>")
+        op.val(val)
+        op.text(text)
+        s.append(op)
+    }
+    addCacheOp(NDKSubscriptionCacheUsage.ONLY_CACHE, "Only cache")
+    addCacheOp(NDKSubscriptionCacheUsage.CACHE_FIRST, "Cache first")
+    addCacheOp(NDKSubscriptionCacheUsage.PARALLEL, "Parallel")
+    addCacheOp(NDKSubscriptionCacheUsage.ONLY_RELAY, "Only relay")
+    if (onChange)  s.change(() => {
+        onChange(s.val())
+    })
+    if (init)  s.val(init)
+    return s
+}
+
+export function GuiCreateLabeledCacheUsageSelect(onChange?: (val: string) => any, init?: string, label: string = "Cache usage") {
+    const l = $("<label>")
+    const s = GuiCreateCacheUsageSelect(onChange, init)
+    l.append(label)
+    l.append(s)
+    return l
 }

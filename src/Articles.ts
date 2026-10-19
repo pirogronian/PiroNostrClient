@@ -6,7 +6,7 @@ import { type SyncAndSubscribeOptions } from "@nostr-dev-kit/sync";
 import { NDKSync } from "@nostr-dev-kit/sync"
 //import NDKCacheAdapterDexie, { db } from '@nostr-dev-kit/ndk-cache-dexie';
 
-import { safeAsync, EventTagValues, FormattedTime, FormattedBytes, formatNip54TagD } from "@/various.js";
+import { safeAsync, EventTagValues, FormattedTime, FormattedBytes, formatNip54TagD, GuiCreateLabeledCacheUsageSelect } from "@/various.js";
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
 
@@ -292,22 +292,10 @@ export class Articles extends Module {
             App.get().article.navigate(`/edit/${param}`)
         })
 
-        const cus = $("#ArticleBrowseCacheUsage")
-        const addCacheOp = function(val: string, text: string) {
-            const op = $("<option>")
-            op.val(val)
-            op.text(text)
-            cus.append(op)
-        }
-        addCacheOp(NDKSubscriptionCacheUsage.ONLY_CACHE, "Only cache")
-        addCacheOp(NDKSubscriptionCacheUsage.CACHE_FIRST, "Cache first")
-        addCacheOp(NDKSubscriptionCacheUsage.PARALLEL, "Parallel")
-        addCacheOp(NDKSubscriptionCacheUsage.ONLY_RELAY, "Only relay")
-        cus.val(this.cacheUsage)
-        cus.change(() => {
-            this.cacheUsage = cus.val()
-            this.saveSettings()
-        })
+        $("#ArticleBrowseCacheUsagePlaceholder").replaceWith(
+            GuiCreateLabeledCacheUsageSelect(
+                (val: string) => { this.cacheUsage = val; this.saveSettings() }, this.cacheUsage
+            ))
 
         /*const sfi = $("select[name='ArticlesOrderField']")
         sfi.change(() => {
