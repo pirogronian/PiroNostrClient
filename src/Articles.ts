@@ -440,14 +440,11 @@ export class Articles extends Module {
 
         console.log("Subscribing for articles with filter", filter)
         
+        console.log("Subscribing with options:", op)
+
         try {
             this.sub = await NDKSync.syncAndSubscribe(
                 this.ndk, filter, op)
-            this.sub.pool.on("relay:connect", (relay: NDKRelay) => {
-                //console.debug("New relay connected:", relay.url)
-                //console.debug(this.sub?.relayFilters)
-            })
-            //console.debug(this.sub.relaySet)
         } catch (e) {
             return e
         }
