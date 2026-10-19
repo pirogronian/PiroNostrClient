@@ -264,6 +264,12 @@ export class Articles extends Module {
             const url = searchParams.toString()
             App.get().router.navigate(`/articles?${url}`)
         })
+
+        form.find("#FinderStop").click(() => {
+            this.sub?.stop()
+            console.debug("Sub stopped.")
+        })
+
         /*form.find("input").on("keydown", function(e){
             console.log("Pressed key in input:", e.key)
             if (e.key === "Enter")

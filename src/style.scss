@@ -190,6 +190,10 @@ code {
     background: orange;
 }
 
+#FinderStop {
+    background: lightcoral;
+}
+
 #FinderResultsSummary {
     @extend .OnerowFlexContainer;
     border: solid 0.5mm lightgreen;
