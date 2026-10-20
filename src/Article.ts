@@ -55,6 +55,9 @@ export class Article extends Module {
     guiHideToolbar: boolean = false
     guiSafeMode: boolean = true
     draftRelaysDialog: EventRelaysDialog = new EventRelaysDialog()
+    relaysTag: string = ""
+
+    readonly RELAYS_TAG_SETTING = "relays_tag_setting"
 
     constructor() {
         super()
@@ -67,6 +70,8 @@ export class Article extends Module {
         this.settings(SHOW_CONTENT_ONLY_SETTING, this.guiShowContentOnly? "1": null)
         this.settings(HIDE_TOOLBAR_SETTING, this.guiHideToolbar? "1": null)
         this.settings(SAFE_MODE_SETTING, this.guiSafeMode? "1": null)
+
+        this.settings(this.RELAYS_TAG_SETTING, this.relaysTag)
     }
 
     restoreSettings() {
@@ -78,6 +83,8 @@ export class Article extends Module {
         this.guiShowContentOnly = this.settings(SHOW_CONTENT_ONLY_SETTING)? true : false
         this.guiHideToolbar = this.settings(HIDE_TOOLBAR_SETTING)? true : false
         this.guiSafeMode = this.settings(SAFE_MODE_SETTING)? true : false
+
+        this.relaysTag = this.settings(this.RELAYS_TAG_SETTING) || ""
     }
 
     setEvent(event: NDKEvent) {
@@ -887,7 +894,12 @@ export class Article extends Module {
             console.debug("Trying to publish a Wiki event...")
             this.hideMessages()
             this.applyCurrent()
-            const relays = this.wiki?.publishReplaceable()
+            let toRelays = undefined
+            if (this.relaysTag) {
+                const urls = App.get().relays.getRelaysByTag(this.relaysTag)
+                toRelays = NDKRelaySet.fromRelayUrls(urls, this.ndk)
+            }
+            const relays = this.wiki?.publishReplaceable(toRelays)
             relays?.then((set) => {
                 const addr = nip19.naddrEncode(this.wiki)
                 this.navigate(`/${addr}`)
@@ -1497,6 +1509,16 @@ export class Article extends Module {
             status.text(`Saved at ${FormattedTime(this.currentDraft.created_at)}`)
             this.guiDraftRelaysDialogSetup()
         }
+
+        $("#ArticlePublishRelaysTagSelectPlaceholder").replaceWith(
+            App.get().relays.guiCreateTagLabeledSelect(
+                (val: string) => {
+                    this.relaysTag = val
+                    this.saveSettings()
+                },
+                this.relaysTag, "on relays:"
+            )
+        )
     }
 
     async load(addr : string) : Promise<NDKEvent|Error|string|null> {
