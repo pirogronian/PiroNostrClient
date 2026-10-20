@@ -22,7 +22,8 @@ import { Module } from "@/Module.js"
 import { App } from "@/App.js"
 import { safeAsync, formatNip54TagD, EventTagValues,
     FormattedTime, FormattedBytes, MakeLabelActive,
-    CurrentTime, TimeToISO, TimeToUnix } from "@/various.js";
+    CurrentTime, TimeToISO, TimeToUnix, 
+    EventRelaysDialog} from "@/various.js";
 
 import { LangTools } from "./LangTools.js";
 import { CreateLangEvent } from "./LangEvent.js";
@@ -53,6 +54,7 @@ export class Article extends Module {
     guiShowContentOnly: boolean = false
     guiHideToolbar: boolean = false
     guiSafeMode: boolean = true
+    draftRelaysDialog: EventRelaysDialog = new EventRelaysDialog()
 
     constructor() {
         super()
@@ -891,6 +893,16 @@ export class Article extends Module {
         }
     }
 
+    guiDraftRelaysDialogSetup() {
+        const ds = $("#ArticleDraftStatus")
+        //console.debug("Draft status node:", ds)
+        ds.prop("title", "Click to show relays")
+        ds.addClass("Copyable")
+        ds.click(() => {
+            this.draftRelaysDialog.open(this.currentDraft)
+        })
+    }
+
     onFormatUpdate() {
         const fmt = $("#ArticleFormat").val()
         const cmt = $("#CodeMirrorToolbar")
@@ -1472,9 +1484,12 @@ export class Article extends Module {
         this.guiUpdateEditor()
         this.guiUpdateRawEventEdit()
 
+        $("#ArticleDraftRelaysDialogPlaceholder").replaceWith(this.draftRelaysDialog.node)
+
         if (this.currentDraft) {
             const status = this.editorNode.find("#ArticleDraftStatus")
             status.text(`Saved at ${FormattedTime(this.currentDraft.created_at)}`)
+            this.guiDraftRelaysDialogSetup()
         }
     }
 
