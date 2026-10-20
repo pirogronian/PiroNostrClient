@@ -193,3 +193,41 @@ export function GuiCreateLabeledCacheUsageSelect(onChange?: (val: string) => any
     l.append(s)
     return l
 }
+
+export class EventRelaysDialog {
+    node: JQuery<HTMLElement>
+    list: JQuery<HTMLElement>
+    event: NDKEvent|undefined
+
+    constructor() {
+        this.node = $("<dialog>")
+        this.node.addClass("EventRelaysDialog")
+        this.list = $("<div>")
+        this.list.addClass("EventRelaysList")
+        this.node.append(this.list)
+        const b = $("<button>")
+        b.text("Close")
+        b.click(() => {
+            this.node.prop("open", false)
+        })
+        this.node.append(b)
+    }
+
+    open(event?: NDKEvent) {
+        if (event) this.event = event
+        if (!this.event) {
+            console.warn("No event to get relays for.")
+            return
+        }
+        const urls = this.event.relaysUrls
+        this.list.empty()
+        for (const url of urls) {
+            const item = $("<div>")
+            item.addClass("Copyable")
+            item.prop("title", "Click to copy")
+            item.text(url)
+            this.list.append(item)
+        }
+        this.node.prop("open", true)
+    }
+}
