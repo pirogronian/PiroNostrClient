@@ -1,7 +1,7 @@
 
 import $, { type JQuery } from "jquery"
 
-import NDK, { NDKWiki, NDKDraft, NDKEvent, NDKUser, nip19, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk";
+import NDK, { NDKWiki, NDKDraft, NDKEvent, NDKUser, nip19, type NDKSubscriptionOptions, NDKRelaySet } from "@nostr-dev-kit/ndk";
 
 import { convert as ADConvert, Document as ADDocument } from '@asciidoctor/core';
 import { parse as DjotParse, renderHTML as DJotRenderHTML, type AstNode, type Doc } from '@djot/djot';
@@ -845,7 +845,13 @@ export class Article extends Module {
         if (!this.draftId || newId)  this.draftId = `wiki-${id}-${time}`
         draft.dTag = this.draftId
         console.debug("After id set:", draft.identifier)
-        const p = draft.publishReplaceable()
+        let relays = undefined
+        const tag = App.get().drafts.relaysTag
+        if (tag) {
+            const urls = App.get().relays.getRelaysByTag(tag)
+            relays = NDKRelaySet.fromRelayUrls(urls, this.ndk)
+        }
+        const p = draft.publishReplaceable(relays)
         console.debug("After publishing:", draft.identifier)
         status.text("Saving...")
         p.then(() => {
