@@ -207,9 +207,6 @@ export class EventRelaysDialog {
         this.node.append(this.list)
         const b = $("<button>")
         b.text("Close")
-        b.click(() => {
-            this.node.prop("open", false)
-        })
         this.node.append(b)
     }
 
@@ -228,6 +225,12 @@ export class EventRelaysDialog {
             item.text(url)
             this.list.append(item)
         }
+        const b = this.node.find("button")
+        b.off("click")
+        b.click(() => {
+            this.node.prop("open", false)
+            console.debug("Dialog closed:", !this.node.prop("open"))
+        })
         this.node.prop("open", true)
     }
 }
