@@ -3,7 +3,7 @@ import $, { type JQuery } from "jquery"
 
 import { NDKEvent, NDKUser, type NDKUserProfile, type NostrEvent, profileFromEvent, serializeProfile } from "@nostr-dev-kit/ndk";
 
-import { MakeCopyable, FormattedTime, CreateLink, JTagName } from "@/various.js";
+import { MakeCopyable, FormattedTime, CreateLink, JTagName, EventRelaysDialog } from "@/various.js";
 
 import { Module } from "@/Module.js";
 import { App } from "@/App.js"
@@ -27,6 +27,7 @@ export class Profile extends Module {
     editProfile: NDKUserProfile|undefined
     editEvent: NDKEvent|undefined
     event: NDKEvent|undefined
+    relaysDialog: EventRelaysDialog = new EventRelaysDialog()
 
     readonly StandardMembers = new Set<string>([
         "pubkey",
@@ -449,21 +450,10 @@ export class Profile extends Module {
             this.save()
         })
 
-        const d = $("#UserProfileRelaysDialog")
-        const c = d.find("button")
-        c.click(() => { d.prop("open", false) })
+        $("#UserProfileRelaysDialogPlaceholder").replaceWith(this.relaysDialog.node)
         $("#UserProfileRelaysButton").click(() => {
-            if (this.event) {
-                const relays = this.event.onRelays
-                const ul = d.find("ul")
-                ul.empty()
-                relays.forEach((relay) => {
-                    const li = $("<li>")
-                    li.text(relay.url)
-                    ul.append(li)
-                })
-                d.prop("open", true)
-            }
+            console.debug("Opening relays dialog...")
+            this.relaysDialog.open(this.event)
         })
     }
 }
