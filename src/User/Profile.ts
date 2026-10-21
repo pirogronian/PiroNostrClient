@@ -1,7 +1,7 @@
 
 import $, { type JQuery } from "jquery"
 
-import { NDKEvent, NDKUser, type NDKUserProfile, type NostrEvent, profileFromEvent, serializeProfile } from "@nostr-dev-kit/ndk";
+import { NDKEvent, NDKRelaySet, NDKUser, type NDKUserProfile, type NostrEvent, profileFromEvent, serializeProfile } from "@nostr-dev-kit/ndk";
 
 import { MakeCopyable, FormattedTime, CreateLink, JTagName, EventRelaysDialog } from "@/various.js";
 
@@ -22,12 +22,28 @@ function E(field: string) {
 }
 
 export class Profile extends Module {
+    readonly RELAYS_TAG_SETTING = "relays_tag"
+
     user: NDKUser|undefined
     editMode: boolean = false
     editProfile: NDKUserProfile|undefined
     editEvent: NDKEvent|undefined
     event: NDKEvent|undefined
+    relaysTag: string = ""
     relaysDialog: EventRelaysDialog = new EventRelaysDialog()
+
+    /*constructor() {
+        super()
+        console.debug("Initiate Profile object.")
+    }*/
+
+    saveSettings() {
+        this.settings(this.RELAYS_TAG_SETTING, this.relaysTag)
+    }
+
+    loadSettings() {
+        this.relaysTag = this.settings(this.RELAYS_TAG_SETTING) || ""
+    }
 
     readonly StandardMembers = new Set<string>([
         "pubkey",
@@ -352,8 +368,14 @@ export class Profile extends Module {
         if (!this.apply())  return
         if (!this.editEvent)  return
 
+        let relays = undefined
+        if (this.relaysTag) {
+            const urls = App.get().relays.getRelaysByTag(this.relaysTag)
+            relays = NDKRelaySet.fromRelayUrls(urls, this.ndk)
+        }
+
         try {
-            const relays = await this.publishEvent(this.editEvent)
+            await this.publishEvent(this.editEvent, relays)
             this.editMode = false
             if (!this.isCurrent())  return
             App.get().user.navigate()
@@ -455,5 +477,19 @@ export class Profile extends Module {
             console.debug("Opening relays dialog...")
             this.relaysDialog.open(this.event)
         })
+
+        $("#UserProfileRelaysTagSelectPlaceholder").replaceWith(
+            App.get().relays.guiCreateTagLabeledSelect(
+                (val: string) => {
+                    this.relaysTag = val
+                    this.saveSettings()
+                },
+                this.relaysTag
+            )
+        )
+    }
+
+    setup() {
+        this.loadSettings()
     }
 }

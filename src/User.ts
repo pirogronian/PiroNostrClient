@@ -3,7 +3,8 @@ import QRCode from "qrcode";
 import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer,
     NDKPrivateKeySigner, NDKRelay, NDKRelayList, nip19,
     nip49, type NDKUserProfile,
-    profileFromEvent} from "@nostr-dev-kit/ndk";
+    profileFromEvent,
+    type NDKSubscriptionOptions} from "@nostr-dev-kit/ndk";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils"
 import $ from "jquery"
 import type JQuery from "jquery"
@@ -725,10 +726,9 @@ export class User extends Module {
         if (this.user) {
             this.profile.user = this.user
             console.debug("Subscribing for porfile...")
-            this.subscribeForEvents(
-                { kinds: [0], authors: [this.user.pubkey] },
-                {closeOnEose: true, groupable: true},
-                { onEvent: (event) => {
+            const op: NDKSubscriptionOptions = {
+                closeOnEose: true, groupable: true,
+                onEvent: (event) => {
                     if (this.user && this.user.profile &&
                         this.user.profile.created_at && event.created_at &&
                         this.user.profile.created_at > event.created_at)  return
@@ -743,7 +743,13 @@ export class User extends Module {
                         this.ndk.cacheAdapter.saveProfile(event.pubkey, profile);
                     }
                     this.profile.guiShow()
-                }})
+                }}
+            /*if (this.profile.relaysTag) {
+                const urls = App.get().relays.getRelaysByTag(this.profile.relaysTag)
+                op.relayUrls = urls
+                op.exclusiveRelay = true
+            }*/
+            this.subscribeForEvents({ kinds: [0], authors: [this.user.pubkey] }, op)
         }
 
         this.show()
