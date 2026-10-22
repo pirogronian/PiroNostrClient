@@ -624,6 +624,33 @@ export class User extends Module {
         })
     }
 
+    guiSetPasswSetup() {
+        const setp = $("#UserNsecSetPassw")
+        const dialog = $("#UserNsecSetPasswDialog")
+        const label = dialog.find("input[name='label']")
+        const passw = dialog.find("input[name='password']")
+        const enter = dialog.find("button#UserNsecSetPasswEnter")
+        const cancel = dialog.find("button#UserNsecSetPasswCancel")
+        const last = this.localSettings(NSEC_LAST_KEY)
+        const copyNsec = $("#UserNsecCopy")
+        enter.click(() => {
+            const l = label.val()
+            const p = passw.val()
+            //console.debug("Secure nsec under:", l, p)
+            this.nsecSetPassw(l, p)
+            dialog.prop("open", false)
+        })
+        cancel.click(() => { dialog.prop("open", false) })
+        setp.click(() => {
+            label.val(last)
+            dialog.prop("open", true)
+        })
+        copyNsec.click(() => {
+            const pk = this.nsecSigner?.privateKey
+            if (pk)  navigator.clipboard.writeText(pk)
+        })
+    }
+
     guiSetup() {
         this.mainView().html(UserHTML)
         if (this.newlyCreated)  $("#NewIdentityAdvice").show()
@@ -636,6 +663,8 @@ export class User extends Module {
             this.login(selector.val())
         })
         $("#UserLoginCreateNew").click(() => { this.nsecCreateNew() })
+
+        this.guiSetPasswSetup()
 
         const rprt = App.get().relays.guiCreateTagLabeledSelect(
             (val: string) => {
@@ -701,33 +730,11 @@ export class User extends Module {
                 syncSet.show()
                 pubSet.show()
                 if (this.nsecSigner) {
-                    const last = this.localSettings(NSEC_LAST_KEY)
                     const setp = $("#UserNsecSetPassw")
                     if (this.newlyCreated) setp.addClass("Important2")
-                    setp.click(() => {
-                        const dialog = $("#UserNsecSetPasswDialog")
-                        const label = dialog.find("input[name='label']")
-                        const passw = dialog.find("input[name='password']")
-                        const enter = dialog.find("button#UserNsecSetPasswEnter")
-                        const cancel = dialog.find("button#UserNsecSetPasswCancel")
-                        label.val(last)
-                        enter.click(() => {
-                            const l = label.val()
-                            const p = passw.val()
-                            //console.debug("Secure nsec under:", l, p)
-                            this.nsecSetPassw(l, p)
-                            dialog.prop("open", false)
-                        })
-                        cancel.click(() => { dialog.prop("open", false) })
-                        dialog.prop("open", true)
-                    })
                     setp.show()
                     const copyNsec = $("#UserNsecCopy")
                     if (this.newlyCreated)  copyNsec.addClass("Important1")
-                    copyNsec.click(() => {
-                        const pk = this.nsecSigner?.privateKey
-                        if (pk)  navigator.clipboard.writeText(pk)
-                    })
                     copyNsec.show()
                 }
             }
