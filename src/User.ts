@@ -678,10 +678,18 @@ export class User extends Module {
             this.cancelNip46Login()
         })
         syncSet.click(() => {
-            Module.settingsManager?.sync()
+            let relays = undefined
+            if (this.userSettingsRelaysTag)
+                relays = App.get().relays.getRelaysByTag(this.userSettingsRelaysTag)
+            Module.settingsManager?.sync(relays)
         })
         pubSet.click(() => {
-            Module.settingsManager?.publish()
+            let relays = undefined
+            if (this.userSettingsRelaysTag) {
+                const urls = App.get().relays.getRelaysByTag(this.userSettingsRelaysTag)
+                relays = NDKRelaySet.fromRelayUrls(urls, this.ndk)
+            }
+            Module.settingsManager?.publish(relays)
         })
 
         const rprt = App.get().relays.guiCreateTagLabeledSelect(

@@ -1,7 +1,7 @@
 
 import { EventEmitter } from "tseep"
 
-import NDK, { NDKEvent, NDKRelay, NDKRelaySet, type NDKFilter } from "@nostr-dev-kit/ndk"
+import NDK, { NDKEvent, NDKRelay, NDKRelaySet, type NDKFilter, type NDKSubscriptionOptions } from "@nostr-dev-kit/ndk"
 import { CurrentTime, TimeToISO, TimeToUnix } from "./various.js"
 
 const EVENT_KIND = 30078
@@ -71,7 +71,7 @@ export class SettingsManager extends EventEmitter {
         return ret
     }
 
-    sync() {
+    sync(relays?: NDKRelaySet|string[]) {
         const pubkey = this.ndk.activeUser?.pubkey
         const cname = this.ndk.clientName
         if (!pubkey || !cname)  return
@@ -81,12 +81,19 @@ export class SettingsManager extends EventEmitter {
             "#d": [ cname ]
         }
 
-        this.ndk.subscribe(
-            filter,
-            { closeOnEose : true },
-            { onEvent: (event) => {
+        const op: NDKSubscriptionOptions = {
+            closeOnEose : true,
+            onEvent: (event) => {
                 this.onSyncEvent(event)
-            } })
+            }
+        }
+        if (typeof relays == "object") {
+            if (Array.isArray(relays))  op.relayUrls = relays
+            else op.relaySet = relays
+            op.exclusiveRelay = true
+        }
+
+        this.ndk.subscribe(filter, op)
     }
 
     onSyncEvent(event: NDKEvent) {
