@@ -4,7 +4,9 @@ import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer,
     NDKPrivateKeySigner, NDKRelay, NDKRelayList, nip19,
     nip49, type NDKUserProfile,
     profileFromEvent,
-    type NDKSubscriptionOptions} from "@nostr-dev-kit/ndk";
+    type NDKSubscriptionOptions,
+    NDKEvent,
+    type NDKFilter} from "@nostr-dev-kit/ndk";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils"
 import $ from "jquery"
 import type JQuery from "jquery"
@@ -87,13 +89,7 @@ export class User extends Module {
 
     async onLogin() {
         this.loggedUser = await this.get()
-        this.loggedRelays = await this.relays(this.loggedUser)
-        if (this.loggedRelays) {
-            //console.debug("User's relays loaded.")
-            App.get().relays.guiRefreshItems()
-        }
-        else console.warn("User's relays not loaded!")
-        this.loggedRelaysChanged = false
+        this.syncRelays()
         this.emit("login")
     }
 
@@ -423,17 +419,40 @@ export class User extends Module {
         this.forgetNip46Login()
     }
 
-    async relays(user: NDKUser|string|null|undefined = undefined) {
+    syncRelays(user: NDKUser|string|null|undefined = undefined) {
         let pubkey:string|undefined = ""
         if (!user)  pubkey = this.user?.pubkey
         if (user && typeof user == "object")  pubkey = user.pubkey
         if (!pubkey)  return
-        const event = await this.ndk.fetchEvent({
+        const filter: NDKFilter = {
             kinds: [10002],
             authors: [pubkey]
-        })
-        if (event)
-            return NDKRelayList.from(event)
+        }
+        const op: NDKSubscriptionOptions = {
+            closeOnEose: true,
+            onEvent: (event: NDKEvent) => {
+                this.onSyncRelays(event)
+            }
+        }
+        console.debug("Synchronizing relays.")
+        this.subscribeForEvents(filter, op)
+    }
+
+    onSyncRelays(event: NDKEvent) {
+        const time = event.created_at
+        const time2 = this.loggedRelays?.created_at
+        if (!time) return
+        if (time2 && time <= time2) return
+        try {
+            console.debug("Got newer relays list, replacing...")
+            const relays = NDKRelayList.from(event)
+            this.loggedRelays = relays
+            this.loggedRelaysChanged = false
+            this.show()
+            //App.get().relays.guiRefreshItems()
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     isReadRelay(relay: NDKRelay|string): boolean {
@@ -664,7 +683,7 @@ export class User extends Module {
                 }
             }
 
-            const rl = await this.relays()
+            const rl = this.loggedRelays
             //console.debug("User relays:", rl?.readRelayUrls, rl?.writeRelayUrls)
             const rrn = $("#UserReadRelays")
             const rrnn = $("#UserReadRelaysNumber")
