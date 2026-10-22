@@ -706,6 +706,7 @@ export class User extends Module {
 
         const usrt = App.get().relays.guiCreateTagLabeledSelect(
             (val: string) => {
+                console.debug("Change settings relays tag to:", val)
                 this.userSettingsRelaysTag = val
                 this.saveSettings()
             },
