@@ -580,6 +580,10 @@ export class User extends Module {
         return false
     }
 
+    guiSettingsRelaysTagSelect() {
+        return $("#UserSettingsRelaysTagSelect")
+    }
+
     guiPublishRelaysButton() {
         return $("#PublishRelaysButton")
     }
@@ -678,15 +682,16 @@ export class User extends Module {
         rprt.hide()
         $("#UserRelaysPublishRelaysTagSelectPlaceholder").replaceWith(rprt)
 
-        $("#UserSettingsRelaysTagSelectPlaceholder").replaceWith(
-            App.get().relays.guiCreateTagLabeledSelect(
-                (val: string) => {
-                    this.userSettingsRelaysTag = val
-                    this.saveSettings()
-                },
-                this.userSettingsRelaysTag
-            )
+        const usrt = App.get().relays.guiCreateTagLabeledSelect(
+            (val: string) => {
+                this.userSettingsRelaysTag = val
+                this.saveSettings()
+            },
+            this.userSettingsRelaysTag
         )
+        usrt.prop("id", "UserSettingsRelaysTagSelect")
+        usrt.hide()
+        $("#UserSettingsRelaysTagSelectPlaceholder").replaceWith(usrt)
 
         this.profile.guiSetup()
     }
@@ -699,6 +704,7 @@ export class User extends Module {
         const logout = $("#Logout")
         const syncSet = $("#SyncSettings")
         const pubSet = $("#PublishSettings")
+        const setTagSel = this.guiSettingsRelaysTagSelect()
         const LoginForm = $("#Login")
         $("#UserLoginNIP46Cancel").click(() => {
             this.cancelNip46Login()
@@ -729,6 +735,7 @@ export class User extends Module {
             } else {
                 syncSet.show()
                 pubSet.show()
+                setTagSel.show()
                 if (this.nsecSigner) {
                     const setp = $("#UserNsecSetPassw")
                     if (this.newlyCreated) setp.addClass("Important2")
