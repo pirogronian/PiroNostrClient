@@ -600,10 +600,11 @@ export class Relays extends Module {
         return div
     }
 
-    guiCreateTagSelect(onChange?: (val: string) => void, init?: string) {
+    guiCreateTagSelect(onChange?: (val: string) => void, init?: string, first?: string) {
+        if (!first) first = "(All)"
         const s = $("<select>")
         let op = $("<option>")
-        op.text("(All)")
+        op.text(first)
         op.prop("value", "")
         s.append(op)
         for (const [tag, n] of this.knownTags) {
@@ -616,10 +617,11 @@ export class Relays extends Module {
         return s
     }
 
-    guiCreateTagLabeledSelect(onChange?: (val: string) => void, init?: string, text: string = "Relays usage:") {
+    guiCreateTagLabeledSelect(onChange?: (val: string) => void, init?: string, text?: string, first?: string) {
+        if (!text)  text = "Relays usage:"
         const l = $("<label>")
         l.append(text)
-        l.append(this.guiCreateTagSelect(onChange, init))
+        l.append(this.guiCreateTagSelect(onChange, init, first))
         return l
     }
 
@@ -907,7 +909,8 @@ export class Relays extends Module {
                     this.guiRefreshItems()
                 },
                 this.markedRelaysTag,
-                "Marked relays tag:"
+                "Marked relays tag:",
+                "(None)"
             )
         )
 
