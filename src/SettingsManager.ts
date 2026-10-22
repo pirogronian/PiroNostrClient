@@ -42,7 +42,7 @@ export class SettingsManager extends EventEmitter {
     settings(key: string, value: string|undefined|null = undefined): string|null|void {
         let ret: string|null = null
 
-        if (value) {
+        if (value != undefined) {
             if (value == this._settings[key])  return
             this._settings[key] = value
             localStorage.setItem(key, value)
