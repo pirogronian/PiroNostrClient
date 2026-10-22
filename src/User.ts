@@ -744,6 +744,7 @@ export class User extends Module {
             const rrn = $("#UserReadRelays")
             const rrnn = $("#UserReadRelaysNumber")
             rrnn.text(rl?.readRelayUrls ? rl?.readRelayUrls.length : 0)
+            rrn.empty()
             if (typeof rl?.readRelayUrls == "object") {
                 for (const url of rl?.readRelayUrls) {
                     if (url) {
@@ -755,6 +756,7 @@ export class User extends Module {
                 
             const wrn = $("#UserWriteRelays")
             const wrnn = $("#UserWriteRelaysNumber")
+            wrn.empty()
             wrnn.text(rl?.writeRelayUrls ? rl?.writeRelayUrls.length : 0)
             if (typeof rl?.writeRelayUrls == "object")
                 for (const url of rl?.writeRelayUrls) {
