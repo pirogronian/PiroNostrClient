@@ -42,6 +42,7 @@ const NSECS_KEY = "nsec.stored"
 const NSEC_LAST_KEY = "nsec.last"
 
 const RELAYS_PUBLISH_RELAYS_TAG_SETTING = "relays_publish_relays_tag"
+const SETTINGS_RELAYS_TAG_SETTING = "settings_relays_tag"
 
 export class User extends Module {
     user?: NDKUser|null|undefined
@@ -58,6 +59,7 @@ export class User extends Module {
     newlyCreated: boolean = false
     profile: Profile
     userRelaysPublishRelaysTag: string = ""
+    userSettingsRelaysTag: string = ""
 
     constructor() {
         super()
@@ -66,10 +68,12 @@ export class User extends Module {
 
     saveSettings() {
         this.settings(RELAYS_PUBLISH_RELAYS_TAG_SETTING, this.userRelaysPublishRelaysTag)
+        this.settings(SETTINGS_RELAYS_TAG_SETTING, this.userSettingsRelaysTag)
     }
 
     loadSettings() {
         this.userRelaysPublishRelaysTag = this.settings(RELAYS_PUBLISH_RELAYS_TAG_SETTING) || ""
+        this.userSettingsRelaysTag = this.settings(SETTINGS_RELAYS_TAG_SETTING) || ""
     }
 
     async get(npub: string|null|undefined = null, profile: boolean = true) : Promise<NDKUser|null|undefined> {
@@ -645,6 +649,16 @@ export class User extends Module {
         rprt.hide()
         $("#UserRelaysPublishRelaysTagSelectPlaceholder").replaceWith(rprt)
 
+        $("#UserSettingsRelaysTagSelectPlaceholder").replaceWith(
+            App.get().relays.guiCreateTagLabeledSelect(
+                (val: string) => {
+                    this.userSettingsRelaysTag = val
+                    this.saveSettings()
+                },
+                this.userSettingsRelaysTag
+            )
+        )
+
         this.profile.guiSetup()
     }
 
@@ -858,7 +872,7 @@ export class User extends Module {
                 $("#SettingsStatus").text(`Published at ${FormattedTime(CurrentTime())}`)
             })
         }
-
+        this.loadSettings()
         this.profile.setup()
     }
 }
