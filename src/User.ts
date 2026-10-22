@@ -6,7 +6,8 @@ import NDK, { NDKUser, NDKNip07Signer, NDKNip46Signer,
     profileFromEvent,
     type NDKSubscriptionOptions,
     NDKEvent,
-    type NDKFilter} from "@nostr-dev-kit/ndk";
+    type NDKFilter,
+    NDKRelaySet} from "@nostr-dev-kit/ndk";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils"
 import $ from "jquery"
 import type JQuery from "jquery"
@@ -40,6 +41,8 @@ const CONFIGKEY_NIP46_RELAYS = "nip46.relays"
 const NSECS_KEY = "nsec.stored"
 const NSEC_LAST_KEY = "nsec.last"
 
+const RELAYS_PUBLISH_RELAYS_TAG_SETTING = "relays_publish_relays_tag"
+
 export class User extends Module {
     user?: NDKUser|null|undefined
     nip07Signer: NDKNip07Signer|undefined
@@ -54,10 +57,19 @@ export class User extends Module {
     nip46autologin: boolean = false
     newlyCreated: boolean = false
     profile: Profile
+    userRelaysPublishRelaysTag: string = ""
 
     constructor() {
         super()
         this.profile = new Profile()
+    }
+
+    saveSettings() {
+        this.settings(RELAYS_PUBLISH_RELAYS_TAG_SETTING, this.userRelaysPublishRelaysTag)
+    }
+
+    loadSettings() {
+        this.userRelaysPublishRelaysTag = this.settings(RELAYS_PUBLISH_RELAYS_TAG_SETTING) || ""
     }
 
     async get(npub: string|null|undefined = null, profile: boolean = true) : Promise<NDKUser|null|undefined> {
@@ -568,6 +580,10 @@ export class User extends Module {
         return $("#PublishRelaysButton")
     }
 
+    guiPublishRelaysTagSelect() {
+        return $("#UserRelaysPublishRelaysTagSelect")
+    }
+
     guiPublishRelaysButtonSetup() {
         this.guiPublishRelaysButton().click(() => { this.publishRelays() })
     }
@@ -575,6 +591,7 @@ export class User extends Module {
     onUserRelaysChange() {
         console.debug("User's relays changed.")
         this.guiPublishRelaysButton().show()
+        this.guiPublishRelaysTagSelect().show()
     }
 
     publishRelays() {
@@ -584,11 +601,17 @@ export class User extends Module {
         }
         const id = this.loggedRelays.getEventHash()
         console.debug("Publishing user's relays with hash", id)
-        const p = this.loggedRelays.publishReplaceable()
+        let relays = undefined
+        if (this.userRelaysPublishRelaysTag) {
+            const urls = App.get().relays.getRelaysByTag(this.userRelaysPublishRelaysTag)
+            relays = NDKRelaySet.fromRelayUrls(urls, this.ndk)
+        }
+        const p = this.loggedRelays.publishReplaceable(relays)
         p.then(() => {
             console.debug("User's relays published.")
             this.loggedRelaysChanged = false
             this.guiPublishRelaysButton().text("Publish user's relays").hide()
+            this.guiPublishRelaysTagSelect().hide()
             this.hideMessages()
         }).catch((error) => {
             this.guiPublishRelaysButton().text("Unable to publish relays! (push to retry)")
@@ -609,6 +632,18 @@ export class User extends Module {
             this.login(selector.val())
         })
         $("#UserLoginCreateNew").click(() => { this.nsecCreateNew() })
+
+        const rprt = App.get().relays.guiCreateTagLabeledSelect(
+            (val: string) => {
+                this.userRelaysPublishRelaysTag = val
+                this.saveSettings()
+            },
+            this.userRelaysPublishRelaysTag,
+            "on relays:"
+        )
+        rprt.prop("id", "UserRelaysPublishRelaysTagSelect")
+        rprt.hide()
+        $("#UserRelaysPublishRelaysTagSelectPlaceholder").replaceWith(rprt)
 
         this.profile.guiSetup()
     }
