@@ -78,6 +78,8 @@ export class Relays extends Module {
 
     knownTags: Map<string, number> = new Map<string, number>()
 
+    markedRelaysTag: string = ""
+
     saveSettings() {
         this.settings("autoUse", this.autoUse ? "1" : null)
         this.settings("autoConnect", this.autoConnect ? "1" : null)
@@ -378,6 +380,13 @@ export class Relays extends Module {
         return ret
     }
 
+    hasTag(relay: NDKRelay|string, tag: string): boolean {
+        const sett = this.relaySettings(relay)
+        if (sett.tags.includes(tag))
+            return true
+        return false
+    }
+
     onConnectedUpdate() {
         if (this.connectedNum <= 0)
             Module.offline = true
@@ -585,6 +594,7 @@ export class Relays extends Module {
             div.remove()
             this.saveKnown()
             this.guiUpdateTagList()
+            this.guiRefreshItem(url)
         })
 
         return div
@@ -751,6 +761,10 @@ export class Relays extends Module {
         if (!relay)  relay = url
         const ri = $(`div[relay='${url}']`)
 
+        if (this.markedRelaysTag && this.hasTag(relay, this.markedRelaysTag))
+            ri.addClass("Marked")
+        else ri.removeClass("Marked")
+
         const cn = ri.find(".Challenge")
         cn.hide()
         const nn = ri.find(".Notice")
@@ -885,6 +899,18 @@ export class Relays extends Module {
         Head.find("#RefreshRelaysItems").click(() => {
             this.guiRefreshItems()
         })
+
+        Head.find("#MarkedRelaysTagSelectPlaceholder").replaceWith(
+            this.guiCreateTagLabeledSelect(
+                (val: string) => {
+                    this.markedRelaysTag = val
+                    this.guiRefreshItems()
+                },
+                this.markedRelaysTag,
+                "Marked relays tag:"
+            )
+        )
+
         Head.find("#ReloadRelaysItems").click(() => {
             this.guiReloadItems()
         })

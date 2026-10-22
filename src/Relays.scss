@@ -88,8 +88,22 @@
     border: lightgrey solid 1mm
 }
 
+.RelaysList .RelayItem.Marked:nth-child(odd) {
+    background: cyan;
+    border: white solid 1mm
+}
+
+.RelaysList .RelayItem.Marked:nth-child(even) {
+    background: lightblue;
+    border: white solid 1mm
+}
+
 .RelaysList .RelayItem:hover {
     border: lightcoral solid 1mm
+}
+
+.RelaysList .RelayItem.Marked:hover {
+    border: purple solid 1mm
 }
 
 .RelaysList .RelayItem .RelayTags {
