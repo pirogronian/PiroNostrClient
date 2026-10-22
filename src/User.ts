@@ -657,6 +657,10 @@ export class User extends Module {
 
     guiSetup() {
         this.mainView().html(UserHTML)
+
+        const syncSet = $("#SyncSettings")
+        const pubSet = $("#PublishSettings")
+
         if (this.newlyCreated)  $("#NewIdentityAdvice").show()
         $("#Logout").click(() => {
             this.logout()
@@ -669,6 +673,16 @@ export class User extends Module {
         $("#UserLoginCreateNew").click(() => { this.nsecCreateNew() })
 
         this.guiSetPasswSetup()
+
+        $("#UserLoginNIP46Cancel").click(() => {
+            this.cancelNip46Login()
+        })
+        syncSet.click(() => {
+            Module.settingsManager?.sync()
+        })
+        pubSet.click(() => {
+            Module.settingsManager?.publish()
+        })
 
         const rprt = App.get().relays.guiCreateTagLabeledSelect(
             (val: string) => {
@@ -693,28 +707,20 @@ export class User extends Module {
         usrt.hide()
         $("#UserSettingsRelaysTagSelectPlaceholder").replaceWith(usrt)
 
+        this.guiPublishRelaysButtonSetup()
+
         this.profile.guiSetup()
     }
 
     async show(user: NDKUser|null|undefined = undefined) {
         const context = this.context
-
+        const syncSet = $("#SyncSettings")
+        const pubSet = $("#PublishSettings")
         const loading = $("#UserLoading")
         loading.hide()
         const logout = $("#Logout")
-        const syncSet = $("#SyncSettings")
-        const pubSet = $("#PublishSettings")
         const setTagSel = this.guiSettingsRelaysTagSelect()
         const LoginForm = $("#Login")
-        $("#UserLoginNIP46Cancel").click(() => {
-            this.cancelNip46Login()
-        })
-        syncSet.click(() => {
-            Module.settingsManager?.sync()
-        })
-        pubSet.click(() => {
-            Module.settingsManager?.publish()
-        })
 
         if (!user)  user = this.user
 
@@ -781,7 +787,6 @@ export class User extends Module {
                 this.guiNip46Autologin()
             else this.login(false)
         }
-        this.guiPublishRelaysButtonSetup()
     }
 
     async handle(id: string|undefined = undefined) {
